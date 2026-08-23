@@ -27,7 +27,7 @@ export const AccessibilityToolbar: React.FC = () => {
     stopSpeech,
   } = useAccessibility();
 
-  const { activeView, activePatient, activeScan, dashboardStats, backendStatus } = useMedicalData();
+  const { activeView, setActiveView, activePatient, activeScan, dashboardStats, backendStatus } = useMedicalData();
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   const handleReadScreen = () => {
@@ -67,13 +67,17 @@ export const AccessibilityToolbar: React.FC = () => {
       >
         <div className="w-full px-4 sm:px-8 py-2.5 flex flex-wrap items-center justify-between gap-4">
           {/* Brand & Suite Subtitle */}
-          <div className="flex items-center gap-4">
-            <div className="w-10 h-10 bg-[#38BDF8] rounded-full flex items-center justify-center shadow-md shrink-0">
-              <Eye className="w-6 h-6 text-[#0B0F19] stroke-[2.5]" />
+          <div
+            onClick={() => setActiveView(activeView === 'landing' ? 'dashboard' : 'landing')}
+            className="flex items-center gap-4 cursor-pointer group"
+            title="Click to view Product Landing Page"
+          >
+            <div className="w-10 h-10 bg-[#38BDF8] group-hover:bg-[#0284C7] rounded-full flex items-center justify-center shadow-md shrink-0 transition-all">
+              <Eye className="w-6 h-6 text-[#0B0F19] group-hover:text-white stroke-[2.5] transition-colors" />
             </div>
             <div className="flex flex-col">
               <div className="flex items-center gap-2">
-                <span className="text-2xl font-bold tracking-tight text-[#F8FAFC]">
+                <span className="text-2xl font-bold tracking-tight text-[#F8FAFC] group-hover:text-[#38BDF8] transition-colors">
                   OptiGemma
                 </span>
                 <span className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md bg-sky-500/20 text-[#38BDF8] border border-sky-500/30">

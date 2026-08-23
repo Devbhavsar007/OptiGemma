@@ -200,4 +200,4 @@ export interface DashboardStats {
 
 export type ReportLanguage = 'english' | 'hindi' | 'gujarati';
 
-export type ActiveView = 'dashboard' | 'new-scan' | 'batch-screening' | 'patients' | 'patient-detail';
+export type ActiveView = 'landing' | 'dashboard' | 'new-scan' | 'batch-screening' | 'patients' | 'patient-detail';

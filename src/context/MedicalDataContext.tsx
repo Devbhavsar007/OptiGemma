@@ -108,7 +108,7 @@ export const MedicalDataProvider: React.FC<{ children: React.ReactNode }> = ({ c
     },
   ]);
 
-  const [activeView, setActiveView] = useState<ActiveView>('dashboard');
+  const [activeView, setActiveView] = useState<ActiveView>('landing');
   const [reportLanguage, setReportLanguage] = useState<ReportLanguage>('english');
   const [backendUrl, setBackendUrl] = useState<string>('http://127.0.0.1:5000');
   const [backendStatus, setBackendStatus] = useState<'connected' | 'disconnected' | 'testing' | 'offline-ai-mode'>('offline-ai-mode');

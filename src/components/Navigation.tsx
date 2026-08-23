@@ -88,16 +88,26 @@ export const Navigation: React.FC = () => {
         </div>
 
         {/* Clinical Accreditation / Clinic Mode Footer Box in Sidebar */}
-        <div className="mt-auto p-4 bg-[#0F172A] border-2 border-[#334155] rounded-xl space-y-1.5">
-          <p className="text-[10px] font-bold text-[#94A3B8] uppercase tracking-wider">
-            Clinic Mode
-          </p>
-          <p className="text-sm font-bold text-[#F8FAFC]">
-            General Hospital - Mumbai
-          </p>
-          <div className="flex items-center justify-between pt-2 border-t border-[#1E293B] text-[10px] font-mono text-[#64748B]">
-            <span>OptiGemma v2.4</span>
-            <span className="text-[#38BDF8] font-bold">WCAG AAA</span>
+        <div className="mt-auto space-y-2">
+          <button
+            onClick={() => setActiveView('landing')}
+            className="w-full flex items-center justify-between p-3 rounded-xl bg-[#0F172A] hover:bg-[#1E293B] border-2 border-[#334155] text-xs font-bold text-[#CBD5E1] hover:text-white transition-all cursor-pointer"
+          >
+            <span>Landing Page</span>
+            <span className="text-[#38BDF8]">Overview ↗</span>
+          </button>
+
+          <div className="p-4 bg-[#0F172A] border-2 border-[#334155] rounded-xl space-y-1.5">
+            <p className="text-[10px] font-bold text-[#94A3B8] uppercase tracking-wider">
+              Clinic Mode
+            </p>
+            <p className="text-sm font-bold text-[#F8FAFC]">
+              General Hospital - Mumbai
+            </p>
+            <div className="flex items-center justify-between pt-2 border-t border-[#1E293B] text-[10px] font-mono text-[#64748B]">
+              <span>OptiGemma v2.4</span>
+              <span className="text-[#38BDF8] font-bold">WCAG AAA</span>
+            </div>
           </div>
         </div>
       </aside>
