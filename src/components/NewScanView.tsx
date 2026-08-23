@@ -230,45 +230,48 @@ export const NewScanView: React.FC = () => {
           SECTION: WORKFLOW FORM (Shown when no scan result is active or during new analysis)
       ────────────────────────────────────────────────────────────── */}
       {!activeScan && !isAnalyzing && (
-        <div className="space-y-8">
+        <div className="space-y-6 sm:space-y-8 animate-fadeIn text-white">
           {/* Header */}
-          <div className="p-6 bg-[#131B2E] border-2 border-[#334155] rounded-2xl shadow-xl space-y-1">
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-[#F8FAFC] flex items-center gap-3">
-              <Microscope className="w-8 h-8 text-[#38BDF8]" />
+          <div className="p-7 bg-white text-black rounded-[36px] shadow-2xl border-4 border-white space-y-1">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sky-100 text-[#1E54B7] text-xs font-black mb-1">
+              <Microscope className="w-4 h-4" />
+              <span>Multi-Modal AI Pipeline</span>
+            </div>
+            <h1 className="text-2xl sm:text-4xl font-extrabold text-black flex items-center gap-3 font-sans">
               New Retinal Scan & AI Analysis
             </h1>
-            <p className="text-base text-[#CBD5E1]">
+            <p className="text-sm sm:text-base text-gray-600 font-medium">
               Instant Diabetic Retinopathy screening with EfficientNet-B3, Grad-CAM explainability, and Gemma-4
             </p>
           </div>
 
           {/* STEP 1: Patient Assignment */}
-          <div className="p-6 bg-[#131B2E] border-2 border-[#334155] rounded-2xl shadow-xl space-y-6">
+          <div className="p-7 sm:p-8 bg-white text-black rounded-[36px] shadow-2xl border-4 border-white space-y-6">
             <div className="flex items-center justify-between">
-              <h2 className="text-xl font-bold text-[#F8FAFC] flex items-center gap-2">
-                <span className="flex items-center justify-center w-7 h-7 rounded-full bg-[#38BDF8] text-[#0B0F19] text-sm font-black">
+              <h2 className="text-xl sm:text-2xl font-bold text-black flex items-center gap-3 font-sans">
+                <span className="flex items-center justify-center w-8 h-8 rounded-full bg-[#1E54B7] text-white text-sm font-black">
                   1
                 </span>
                 Step 1: Patient Assignment
               </h2>
 
               {activePatient && (
-                <div className="hidden sm:inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-emerald-500/10 text-emerald-300 border border-emerald-500/30 text-xs font-bold">
-                  <CheckCircle2 className="w-4 h-4" />
+                <div className="hidden sm:inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-100 text-emerald-900 border border-emerald-200 text-xs font-black">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-700" />
                   <span>Assigned: {activePatient.name} ({activePatient.id})</span>
                 </div>
               )}
             </div>
 
             {/* Accessible Mode Tabs */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 p-1.5 bg-[#0F172A] border border-[#334155] rounded-xl">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 p-1.5 bg-gray-100 rounded-full border border-gray-200">
               <button
                 type="button"
                 onClick={() => setPatientMode('existing')}
-                className={`flex items-center justify-center gap-2 py-3 px-4 rounded-lg font-bold text-sm transition-all min-h-[48px] ${
+                className={`flex items-center justify-center gap-2 py-3 px-4 rounded-full font-black text-xs uppercase tracking-wider transition-all min-h-[44px] cursor-pointer ${
                   patientMode === 'existing'
-                    ? 'bg-[#38BDF8] text-[#0B0F19] shadow-md'
-                    : 'text-[#CBD5E1] hover:bg-[#1E293B]'
+                    ? 'bg-black text-white shadow-md'
+                    : 'text-gray-600 hover:text-black hover:bg-gray-200/60'
                 }`}
               >
                 <UserCheck className="w-4 h-4" />
@@ -278,10 +281,10 @@ export const NewScanView: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setPatientMode('new')}
-                className={`flex items-center justify-center gap-2 py-3 px-4 rounded-lg font-bold text-sm transition-all min-h-[48px] ${
+                className={`flex items-center justify-center gap-2 py-3 px-4 rounded-full font-black text-xs uppercase tracking-wider transition-all min-h-[44px] cursor-pointer ${
                   patientMode === 'new'
-                    ? 'bg-[#38BDF8] text-[#0B0F19] shadow-md'
-                    : 'text-[#CBD5E1] hover:bg-[#1E293B]'
+                    ? 'bg-black text-white shadow-md'
+                    : 'text-gray-600 hover:text-black hover:bg-gray-200/60'
                 }`}
               >
                 <UserPlus className="w-4 h-4" />
@@ -291,10 +294,10 @@ export const NewScanView: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setPatientMode('quick')}
-                className={`flex items-center justify-center gap-2 py-3 px-4 rounded-lg font-bold text-sm transition-all min-h-[48px] ${
+                className={`flex items-center justify-center gap-2 py-3 px-4 rounded-full font-black text-xs uppercase tracking-wider transition-all min-h-[44px] cursor-pointer ${
                   patientMode === 'quick'
-                    ? 'bg-[#38BDF8] text-[#0B0F19] shadow-md'
-                    : 'text-[#CBD5E1] hover:bg-[#1E293B]'
+                    ? 'bg-black text-white shadow-md'
+                    : 'text-gray-600 hover:text-black hover:bg-gray-200/60'
                 }`}
               >
                 <Zap className="w-4 h-4" />
@@ -306,37 +309,37 @@ export const NewScanView: React.FC = () => {
             {patientMode === 'existing' && (
               <div className="space-y-4">
                 <div className="relative">
-                  <Search className="absolute left-4 top-3.5 w-5 h-5 text-[#94A3B8]" />
+                  <Search className="absolute left-4 top-3.5 w-5 h-5 text-gray-400" />
                   <input
                     type="text"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="Search by patient name, ID (e.g. Rajesh, P-1001)..."
-                    className="w-full pl-12 pr-4 py-3 bg-[#0F172A] border-2 border-[#334155] rounded-xl text-white placeholder-[#94A3B8] font-medium focus:border-[#38BDF8] focus:outline-none transition-colors"
+                    className="w-full pl-12 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-2xl text-black placeholder-gray-400 font-medium focus:border-[#1E54B7] focus:ring-2 focus:ring-sky-100 focus:outline-none transition-all"
                   />
                 </div>
 
                 {/* Patient List */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-56 overflow-y-auto pr-1">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-60 overflow-y-auto pr-1">
                   {searchedPatients.map((p) => {
                     const isSelected = activePatient?.id === p.id;
                     return (
                       <div
                         key={p.id}
                         onClick={() => setActivePatient(p)}
-                        className={`p-4 rounded-xl border-2 cursor-pointer transition-all ${
+                        className={`p-4 rounded-2xl border cursor-pointer transition-all ${
                           isSelected
-                            ? 'bg-[#1E293B] border-[#38BDF8] shadow-md'
-                            : 'bg-[#0F172A] border-[#1E293B] hover:border-[#475569]'
+                            ? 'bg-sky-50/90 border-[#1E54B7] shadow-md ring-2 ring-[#1E54B7]/20'
+                            : 'bg-gray-50/70 border-gray-200 hover:bg-white hover:border-gray-300 hover:shadow-sm'
                         }`}
                       >
                         <div className="flex items-center justify-between">
-                          <span className="font-bold text-[#F8FAFC]">{p.name}</span>
-                          <span className="text-xs font-mono text-[#38BDF8] font-bold">
+                          <span className="font-bold text-black text-base">{p.name}</span>
+                          <span className="text-xs font-mono text-[#1E54B7] font-bold bg-sky-100 px-2.5 py-0.5 rounded-full">
                             {p.id}
                           </span>
                         </div>
-                        <div className="text-xs text-[#94A3B8] mt-1">
+                        <div className="text-xs text-gray-500 font-medium mt-1">
                           Age: {p.age} | HbA1c: {p.hba1c}% | Sugar: {p.sugar_level} mg/dL
                         </div>
                       </div>
@@ -350,7 +353,7 @@ export const NewScanView: React.FC = () => {
             {patientMode === 'new' && (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 <div className="space-y-1 sm:col-span-2">
-                  <label className="block text-xs font-bold uppercase tracking-wider text-[#94A3B8]">
+                  <label className="block text-xs font-bold uppercase tracking-wider text-gray-500">
                     Patient Full Name *
                   </label>
                   <input
@@ -358,13 +361,13 @@ export const NewScanView: React.FC = () => {
                     value={newPatientForm.name}
                     onChange={(e) => setNewPatientForm({ ...newPatientForm, name: e.target.value })}
                     placeholder="e.g. Meera Desai"
-                    className="w-full px-4 py-2.5 bg-[#0F172A] border-2 border-[#334155] rounded-xl text-white focus:border-[#38BDF8] focus:outline-none"
+                    className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-2xl text-black focus:border-[#1E54B7] focus:outline-none"
                     required
                   />
                 </div>
 
                 <div className="space-y-1">
-                  <label className="block text-xs font-bold uppercase tracking-wider text-[#94A3B8]">
+                  <label className="block text-xs font-bold uppercase tracking-wider text-gray-500">
                     Age & Gender
                   </label>
                   <div className="flex gap-2">
@@ -372,12 +375,12 @@ export const NewScanView: React.FC = () => {
                       type="number"
                       value={newPatientForm.age}
                       onChange={(e) => setNewPatientForm({ ...newPatientForm, age: Number(e.target.value) })}
-                      className="w-20 px-3 py-2.5 bg-[#0F172A] border-2 border-[#334155] rounded-xl text-white"
+                      className="w-20 px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-2xl text-black"
                     />
                     <select
                       value={newPatientForm.gender}
                       onChange={(e) => setNewPatientForm({ ...newPatientForm, gender: e.target.value as any })}
-                      className="flex-1 px-3 py-2.5 bg-[#0F172A] border-2 border-[#334155] rounded-xl text-white"
+                      className="flex-1 px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-2xl text-black"
                     >
                       <option value="Male">Male</option>
                       <option value="Female">Female</option>
@@ -387,31 +390,31 @@ export const NewScanView: React.FC = () => {
                 </div>
 
                 <div className="space-y-1">
-                  <label className="block text-xs font-bold uppercase tracking-wider text-[#94A3B8]">
+                  <label className="block text-xs font-bold uppercase tracking-wider text-gray-500">
                     Diabetes Duration (Years)
                   </label>
                   <input
                     type="number"
                     value={newPatientForm.diabetes_duration}
                     onChange={(e) => setNewPatientForm({ ...newPatientForm, diabetes_duration: Number(e.target.value) })}
-                    className="w-full px-4 py-2.5 bg-[#0F172A] border-2 border-[#334155] rounded-xl text-white"
+                    className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-2xl text-black"
                   />
                 </div>
 
                 <div className="space-y-1">
-                  <label className="block text-xs font-bold uppercase tracking-wider text-[#94A3B8]">
+                  <label className="block text-xs font-bold uppercase tracking-wider text-gray-500">
                     Fasting Blood Sugar (mg/dL)
                   </label>
                   <input
                     type="number"
                     value={newPatientForm.sugar_level}
                     onChange={(e) => setNewPatientForm({ ...newPatientForm, sugar_level: Number(e.target.value) })}
-                    className="w-full px-4 py-2.5 bg-[#0F172A] border-2 border-[#334155] rounded-xl text-white"
+                    className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-2xl text-black"
                   />
                 </div>
 
                 <div className="space-y-1">
-                  <label className="block text-xs font-bold uppercase tracking-wider text-[#94A3B8]">
+                  <label className="block text-xs font-bold uppercase tracking-wider text-gray-500">
                     Latest HbA1c (%)
                   </label>
                   <input
@@ -419,7 +422,7 @@ export const NewScanView: React.FC = () => {
                     step="0.1"
                     value={newPatientForm.hba1c}
                     onChange={(e) => setNewPatientForm({ ...newPatientForm, hba1c: Number(e.target.value) })}
-                    className="w-full px-4 py-2.5 bg-[#0F172A] border-2 border-[#334155] rounded-xl text-white"
+                    className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-2xl text-black"
                   />
                 </div>
               </div>
@@ -427,24 +430,24 @@ export const NewScanView: React.FC = () => {
 
             {/* Mode 3: Quick Camp Screening Banner */}
             {patientMode === 'quick' && (
-              <div className="p-4 rounded-xl bg-sky-500/10 border border-sky-500/30 text-[#CBD5E1] text-sm">
-                <span className="font-bold text-white block mb-1">⚡ Quick Camp Outreach Mode</span>
+              <div className="p-4 rounded-2xl bg-sky-50 border border-sky-200 text-gray-800 text-sm">
+                <span className="font-bold text-black block mb-1">⚡ Quick Camp Outreach Mode</span>
                 Quickly process community scans with automated temporary identification. Patient records can be detailed and linked post-diagnosis.
               </div>
             )}
 
             {/* Active Patient High-Visibility Banner */}
             {activePatient && (
-              <div className="p-4 rounded-xl bg-[#0F172A] border border-[#334155] flex flex-wrap items-center justify-between gap-3">
+              <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 flex flex-wrap items-center justify-between gap-3">
                 <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-lg bg-emerald-500/10 text-emerald-400">
+                  <div className="p-2 rounded-full bg-emerald-100 text-emerald-800">
                     <UserCheck className="w-5 h-5" />
                   </div>
                   <div>
-                    <span className="text-sm font-bold text-white">
+                    <span className="text-sm font-bold text-black">
                       Selected: {activePatient.name}
                     </span>
-                    <span className="text-xs text-[#94A3B8] ml-2">
+                    <span className="text-xs text-gray-600 ml-2 font-medium">
                       ({activePatient.id} • Age {activePatient.age} • HbA1c {activePatient.hba1c}%)
                     </span>
                   </div>
@@ -453,7 +456,7 @@ export const NewScanView: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setActivePatient(null)}
-                  className="text-xs text-[#38BDF8] hover:underline font-semibold"
+                  className="text-xs text-[#1E54B7] hover:underline font-bold cursor-pointer"
                 >
                   Change Patient
                 </button>
@@ -462,9 +465,9 @@ export const NewScanView: React.FC = () => {
           </div>
 
           {/* STEP 2: Fundus Image Upload & Presets */}
-          <div className="p-6 bg-[#131B2E] border-2 border-[#334155] rounded-2xl shadow-xl space-y-6">
-            <h2 className="text-xl font-bold text-[#F8FAFC] flex items-center gap-2">
-              <span className="flex items-center justify-center w-7 h-7 rounded-full bg-[#38BDF8] text-[#0B0F19] text-sm font-black">
+          <div className="p-7 sm:p-8 bg-white text-black rounded-[36px] shadow-2xl border-4 border-white space-y-6">
+            <h2 className="text-xl sm:text-2xl font-bold text-black flex items-center gap-3 font-sans">
+              <span className="flex items-center justify-center w-8 h-8 rounded-full bg-[#1E54B7] text-white text-sm font-black">
                 2
               </span>
               Step 2: Retinal Fundus Image
@@ -473,15 +476,15 @@ export const NewScanView: React.FC = () => {
             {/* Presets Grid for Instant Testing */}
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-bold uppercase tracking-wider text-[#94A3B8]">
+                <span className="text-xs font-black uppercase tracking-wider text-gray-500">
                   Select Clinical Case Preset or Upload Custom Scan:
                 </span>
-                <span className="text-xs text-[#38BDF8] font-semibold">
+                <span className="text-xs text-[#1E54B7] font-bold">
                   (5 Benchmark Stages Ready)
                 </span>
               </div>
 
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3.5">
                 {PRESET_FUNDUS_CASES.map((preset) => {
                   const isSelected = selectedPreset?.id === preset.id;
                   const meta = DR_STAGES[preset.stage];
@@ -490,30 +493,30 @@ export const NewScanView: React.FC = () => {
                       key={preset.id}
                       type="button"
                       onClick={() => handleSelectPreset(preset)}
-                      className={`p-3 rounded-xl border-2 text-left transition-all relative overflow-hidden ${
+                      className={`p-3.5 rounded-2xl border-2 text-left transition-all relative overflow-hidden cursor-pointer ${
                         isSelected
-                          ? 'bg-[#1E293B] border-[#38BDF8] shadow-lg scale-[1.02]'
-                          : 'bg-[#0F172A] border-[#1E293B] hover:border-[#475569]'
+                          ? 'bg-sky-50/80 border-[#1E54B7] shadow-lg ring-2 ring-[#1E54B7]/20 scale-[1.02]'
+                          : 'bg-gray-50 border-gray-200 hover:border-gray-300 hover:bg-white'
                       }`}
                     >
-                      <div className="aspect-square w-full rounded-lg overflow-hidden bg-black mb-2 border border-[#334155]">
+                      <div className="aspect-square w-full rounded-xl overflow-hidden bg-black mb-2.5 border-2 border-white shadow-sm">
                         <img
                           src={preset.originalImage}
                           alt={preset.clinicalNote}
                           className="w-full h-full object-cover"
                         />
                       </div>
-                      <div className="text-xs font-bold text-[#F8FAFC] truncate">
+                      <div className="text-xs font-bold text-black truncate">
                         {preset.patientName}
                       </div>
-                      <div className="flex items-center gap-1 mt-1">
+                      <div className="flex items-center gap-1.5 mt-1">
                         <span
-                          className="w-3.5 h-3.5 rounded text-[9px] font-bold text-white flex items-center justify-center shrink-0"
+                          className="w-3.5 h-3.5 rounded-full text-[9px] font-black text-white flex items-center justify-center shrink-0"
                           style={{ backgroundColor: meta.color }}
                         >
                           {meta.icon}
                         </span>
-                        <span className="text-[11px] font-bold text-[#CBD5E1] truncate">
+                        <span className="text-[11px] font-bold text-gray-700 truncate">
                           {meta.shortName}
                         </span>
                       </div>
@@ -528,7 +531,7 @@ export const NewScanView: React.FC = () => {
               onDragOver={(e) => e.preventDefault()}
               onDrop={handleDrop}
               onClick={() => fileInputRef.current?.click()}
-              className="relative p-8 border-2 border-dashed border-[#475569] hover:border-[#38BDF8] rounded-2xl bg-[#0F172A] text-center cursor-pointer transition-all hover:bg-[#1E293B]/40 group min-h-[200px] flex flex-col items-center justify-center space-y-3"
+              className="relative p-8 border-2 border-dashed border-gray-300 hover:border-[#1E54B7] rounded-3xl bg-gray-50 text-center cursor-pointer transition-all hover:bg-sky-50/50 group min-h-[190px] flex flex-col items-center justify-center space-y-3"
               role="button"
               tabIndex={0}
               aria-label="Upload retinal fundus image"
@@ -541,21 +544,21 @@ export const NewScanView: React.FC = () => {
                 className="hidden"
               />
 
-              <div className="p-4 rounded-2xl bg-[#131B2E] border border-[#334155] text-[#38BDF8] group-hover:scale-110 transition-transform">
-                <Upload className="w-8 h-8" />
+              <div className="p-4 rounded-2xl bg-white border border-gray-200 text-[#1E54B7] shadow-sm group-hover:scale-110 transition-transform">
+                <Upload className="w-7 h-7" />
               </div>
 
               <div>
-                <p className="text-lg font-bold text-white">
+                <p className="text-base sm:text-lg font-bold text-black">
                   Drop retinal fundus image here, or click to browse
                 </p>
-                <p className="text-xs text-[#94A3B8] mt-1">
+                <p className="text-xs text-gray-500 mt-1 font-medium">
                   Supports PNG, JPG, JPEG, TIFF (DICOM compliant up to 20MB)
                 </p>
               </div>
 
               {selectedFile && (
-                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-sky-500/20 text-[#38BDF8] text-xs font-mono font-bold border border-sky-500/40">
+                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-sky-100 text-[#1E54B7] text-xs font-mono font-bold">
                   <span>Selected file: {selectedFile.name} ({(selectedFile.size / 1024).toFixed(1)} KB)</span>
                 </div>
               )}
@@ -566,10 +569,10 @@ export const NewScanView: React.FC = () => {
               <button
                 type="button"
                 onClick={handleStartAnalysis}
-                className="w-full flex items-center justify-center gap-3 px-8 py-5 rounded-2xl bg-gradient-to-r from-[#0284C7] to-[#0D9488] hover:from-[#0369A1] hover:to-[#0F766E] text-white font-black text-lg sm:text-xl shadow-2xl shadow-sky-500/30 transition-all hover:scale-[1.01] min-h-[58px]"
+                className="w-full flex items-center justify-center gap-3 px-8 py-5 rounded-full bg-[#E1FA4A] hover:bg-[#d6f236] text-black font-black text-base sm:text-lg uppercase tracking-wider shadow-2xl hover:scale-[1.01] transition-all min-h-[58px] cursor-pointer"
               >
-                <Microscope className="w-7 h-7" />
-                <span>Run Full AI Diagnostic Analysis</span>
+                <Microscope className="w-6 h-6" />
+                <span>Run Full AI Diagnostic Analysis ↗</span>
               </button>
             </div>
           </div>
@@ -580,79 +583,79 @@ export const NewScanView: React.FC = () => {
           SECTION: STEP 3 - ACCESSIBLE LOADING STATE
       ────────────────────────────────────────────────────────────── */}
       {isAnalyzing && (
-        <div className="p-8 sm:p-12 bg-[#131B2E] border-2 border-[#334155] rounded-3xl shadow-2xl text-center max-w-2xl mx-auto space-y-8 animate-fadeIn">
+        <div className="p-8 sm:p-12 bg-white text-black border-4 border-white rounded-[36px] shadow-2xl text-center max-w-2xl mx-auto space-y-8 animate-fadeIn">
           <div className="relative flex items-center justify-center">
-            <div className="w-20 h-20 rounded-full border-4 border-[#1E293B] border-t-[#38BDF8] animate-spin" />
-            <Microscope className="absolute w-8 h-8 text-[#38BDF8]" />
+            <div className="w-20 h-20 rounded-full border-4 border-gray-100 border-t-[#1E54B7] animate-spin" />
+            <Microscope className="absolute w-8 h-8 text-[#1E54B7]" />
           </div>
 
           <div className="space-y-2">
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-white">
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-black font-sans">
               Analyzing Retinal Microvasculature...
             </h2>
-            <p className="text-sm text-[#CBD5E1]">
+            <p className="text-sm text-gray-600 font-medium">
               Running multi-modal ophthalmology pipeline with Grad-CAM explainability
             </p>
           </div>
 
           {/* Sequential Step Checklist */}
-          <div className="space-y-3 text-left max-w-md mx-auto p-4 bg-[#0B0F19] rounded-2xl border border-[#334155] font-medium text-sm">
+          <div className="space-y-3 text-left max-w-md mx-auto p-5 bg-gray-50 rounded-2xl border border-gray-200 font-medium text-xs sm:text-sm">
             <div className="flex items-center gap-3">
               {loadingStep >= 1 ? (
-                <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
+                <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
               ) : (
-                <div className="w-5 h-5 rounded-full border-2 border-dashed border-[#64748B] shrink-0" />
+                <div className="w-5 h-5 rounded-full border-2 border-dashed border-gray-300 shrink-0" />
               )}
-              <span className={loadingStep >= 1 ? 'text-white' : 'text-[#64748B]'}>
+              <span className={loadingStep >= 1 ? 'text-black font-bold' : 'text-gray-400'}>
                 Image normalization & CLAHE contrast enhancement
               </span>
             </div>
 
             <div className="flex items-center gap-3">
               {loadingStep >= 2 ? (
-                <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
+                <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
               ) : (
-                <div className="w-5 h-5 rounded-full border-2 border-dashed border-[#64748B] shrink-0" />
+                <div className="w-5 h-5 rounded-full border-2 border-dashed border-gray-300 shrink-0" />
               )}
-              <span className={loadingStep >= 2 ? 'text-white' : 'text-[#64748B]'}>
+              <span className={loadingStep >= 2 ? 'text-black font-bold' : 'text-gray-400'}>
                 EfficientNet-B3 Diabetic Retinopathy stage classification
               </span>
             </div>
 
             <div className="flex items-center gap-3">
               {loadingStep >= 3 ? (
-                <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
+                <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
               ) : (
-                <div className="w-5 h-5 rounded-full border-2 border-dashed border-[#64748B] shrink-0" />
+                <div className="w-5 h-5 rounded-full border-2 border-dashed border-gray-300 shrink-0" />
               )}
-              <span className={loadingStep >= 3 ? 'text-white' : 'text-[#64748B]'}>
+              <span className={loadingStep >= 3 ? 'text-black font-bold' : 'text-gray-400'}>
                 Retinal blood vessel segmentation & density calculation
               </span>
             </div>
 
             <div className="flex items-center gap-3">
               {loadingStep >= 4 ? (
-                <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
+                <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
               ) : (
-                <div className="w-5 h-5 rounded-full border-2 border-dashed border-[#64748B] shrink-0" />
+                <div className="w-5 h-5 rounded-full border-2 border-dashed border-gray-300 shrink-0" />
               )}
-              <span className={loadingStep >= 4 ? 'text-white' : 'text-[#64748B]'}>
+              <span className={loadingStep >= 4 ? 'text-black font-bold' : 'text-gray-400'}>
                 Grad-CAM attention heatmap generation & lesion localization
               </span>
             </div>
 
             <div className="flex items-center gap-3">
-              <RefreshCw className="w-5 h-5 text-sky-400 animate-spin shrink-0" />
-              <span className="text-[#38BDF8] font-bold">
+              <RefreshCw className="w-5 h-5 text-[#1E54B7] animate-spin shrink-0" />
+              <span className="text-[#1E54B7] font-black">
                 Gemma-4 formulating empathetic clinical report...
               </span>
             </div>
           </div>
 
           {/* High-Contrast Progress Bar */}
-          <div className="w-full h-3 bg-[#0B0F19] rounded-full overflow-hidden border border-[#334155]">
+          <div className="w-full h-3 bg-gray-200 rounded-full overflow-hidden">
             <div
-              className="h-full bg-[#38BDF8] transition-all duration-300 rounded-full"
+              className="h-full bg-[#1E54B7] transition-all duration-300 rounded-full"
               style={{ width: `${(loadingStep / 5) * 100}%` }}
             />
           </div>
@@ -663,20 +666,16 @@ export const NewScanView: React.FC = () => {
           SECTION: STEP 4 - DIAGNOSTIC RESULTS (THE COMPREHENSIVE CLINICAL SUITE)
       ────────────────────────────────────────────────────────────── */}
       {activeScan && !isAnalyzing && (
-        <div className="space-y-8 animate-fadeIn">
+        <div className="space-y-6 sm:space-y-8 animate-fadeIn text-white">
           {/* 1. TOP HERO DIAGNOSTIC SUMMARY BANNER */}
           <div
-            className="p-6 sm:p-8 rounded-3xl border-2 shadow-2xl relative overflow-hidden space-y-6"
-            style={{
-              backgroundColor: '#131B2E',
-              borderColor: DR_STAGES[activeScan.detection.stage].borderColor,
-            }}
+            className="p-7 sm:p-8 rounded-[36px] border-4 border-white shadow-2xl relative overflow-hidden space-y-6 bg-white text-black"
           >
             <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
               {/* Left: Large Circular Severity Badge */}
               <div className="flex items-center gap-5">
                 <div
-                  className="flex flex-col items-center justify-center w-20 h-20 sm:w-24 sm:h-24 rounded-2xl shadow-xl text-white font-black shrink-0 border-2 border-white/20"
+                  className="flex flex-col items-center justify-center w-20 h-20 sm:w-24 sm:h-24 rounded-3xl shadow-xl text-white font-black shrink-0 border-4 border-white"
                   style={{ backgroundColor: DR_STAGES[activeScan.detection.stage].color }}
                 >
                   <span className="text-2xl sm:text-3xl">
@@ -689,27 +688,27 @@ export const NewScanView: React.FC = () => {
 
                 <div className="space-y-1">
                   <div className="flex flex-wrap items-center gap-2">
-                    <h1 className="text-2xl sm:text-3xl font-black text-white">
+                    <h1 className="text-2xl sm:text-4xl font-black text-black font-sans">
                       {DR_STAGES[activeScan.detection.stage].name}
                     </h1>
                     <span
-                      className={`px-3 py-1 rounded-full text-xs font-bold border ${
+                      className={`px-3 py-1 rounded-full text-xs font-black border ${
                         activeScan.report.urgency === 'IMMEDIATE' || activeScan.report.urgency === 'URGENT'
-                          ? 'bg-rose-500/20 text-rose-300 border-rose-500/40'
-                          : 'bg-amber-500/20 text-amber-300 border-amber-500/40'
+                          ? 'bg-rose-100 text-rose-800 border-rose-200'
+                          : 'bg-amber-100 text-amber-900 border-amber-200'
                       }`}
                     >
                       {activeScan.report.urgency === 'IMMEDIATE' ? '🚨 EMERGENCY' : `⚠️ ${activeScan.report.urgency}`}
                     </span>
                   </div>
 
-                  <p className="text-sm sm:text-base text-[#CBD5E1]">
-                    Patient: <strong className="text-white">{activePatient?.name || activeScan.patient_name}</strong> (
+                  <p className="text-sm sm:text-base text-gray-600 font-medium">
+                    Patient: <strong className="text-black font-bold">{activePatient?.name || activeScan.patient_name}</strong> (
                     {activePatient?.id || activeScan.patient_id}) • Screened on {activeScan.scan_date}
                   </p>
 
-                  <div className="flex flex-wrap items-center gap-3 pt-1 text-xs text-[#94A3B8] font-mono">
-                    <span>Confidence: <strong className="text-[#38BDF8]">{activeScan.detection.confidence.toFixed(1)}%</strong></span>
+                  <div className="flex flex-wrap items-center gap-3 pt-1 text-xs text-gray-500 font-mono font-medium">
+                    <span>Confidence: <strong className="text-[#1E54B7]">{activeScan.detection.confidence.toFixed(1)}%</strong></span>
                     <span>•</span>
                     <span>Processing: {activeScan.processing_time}s</span>
                     <span>•</span>
@@ -723,23 +722,23 @@ export const NewScanView: React.FC = () => {
                 <button
                   type="button"
                   onClick={handleListenDiagnosis}
-                  className={`flex items-center gap-2 px-5 py-3.5 rounded-xl font-black text-sm transition-all shadow-md min-h-[48px] ${
+                  className={`flex items-center gap-2 px-6 py-3.5 rounded-full font-black text-xs uppercase tracking-wider transition-all shadow-md min-h-[46px] cursor-pointer ${
                     isSpeaking
-                      ? 'bg-red-500/20 text-red-300 border-2 border-red-400 animate-pulse'
-                      : 'bg-emerald-500 text-[#0B0F19] hover:bg-emerald-400'
+                      ? 'bg-rose-100 text-rose-800 border-2 border-rose-400 animate-pulse'
+                      : 'bg-[#E1FA4A] hover:bg-[#d6f236] text-black shadow-lg hover:scale-105'
                   }`}
                   aria-label="Listen to diagnosis report read aloud"
                 >
-                  {isSpeaking ? <VolumeX className="w-5 h-5 text-red-400" /> : <Volume2 className="w-5 h-5 text-[#0B0F19]" />}
-                  <span>{isSpeaking ? 'Stop Reading' : 'Listen to Diagnosis'}</span>
+                  {isSpeaking ? <VolumeX className="w-4 h-4 text-rose-600" /> : <Volume2 className="w-4 h-4 text-black" />}
+                  <span>{isSpeaking ? 'Stop Audio' : 'Listen to Report'}</span>
                 </button>
 
                 <button
                   type="button"
                   onClick={handleDownloadPDF}
-                  className="flex items-center gap-2 px-5 py-3.5 rounded-xl bg-[#1E293B] hover:bg-[#334155] text-white font-bold text-sm border border-[#475569] transition-all min-h-[48px]"
+                  className="flex items-center gap-2 px-6 py-3.5 rounded-full bg-gray-100 hover:bg-gray-200 text-black font-black text-xs uppercase tracking-wider transition-all min-h-[46px] cursor-pointer"
                 >
-                  <FileDown className="w-5 h-5 text-[#38BDF8]" />
+                  <FileDown className="w-4 h-4 text-[#1E54B7]" />
                   <span>Large-Print PDF</span>
                 </button>
               </div>
@@ -749,35 +748,35 @@ export const NewScanView: React.FC = () => {
           {/* 2. IMAGE TRIPTYCH (INTERACTIVE RETINAL VIEWER) */}
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <h2 className="text-xl sm:text-2xl font-bold text-[#F8FAFC] flex items-center gap-2">
-                <Eye className="w-6 h-6 text-[#38BDF8]" />
+              <h2 className="text-xl sm:text-2xl font-bold text-white flex items-center gap-2 font-sans">
+                <Eye className="w-6 h-6 text-white" />
                 Retinal Multimodal Explainability Triptych
               </h2>
               <button
                 type="button"
                 onClick={() => setLightboxOpen(true)}
-                className="flex items-center gap-1.5 text-xs sm:text-sm font-bold text-[#38BDF8] hover:underline"
+                className="flex items-center gap-1.5 text-xs sm:text-sm font-bold text-white hover:underline bg-white/20 px-3.5 py-1.5 rounded-full cursor-pointer"
               >
-                <Maximize2 className="w-4 h-4" />
+                <Maximize2 className="w-3.5 h-3.5" />
                 <span>Open Fullscreen Lightbox</span>
               </button>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {/* Card 1: Original Retinal Fundus Scan */}
-              <div className="p-4 bg-[#131B2E] border-2 border-[#334155] rounded-2xl space-y-3">
+              <div className="p-5 bg-white text-black border-4 border-white rounded-[32px] shadow-2xl space-y-3">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-bold text-white flex items-center gap-2">
-                    <Eye className="w-4 h-4 text-[#38BDF8]" />
+                  <span className="text-sm font-bold text-black flex items-center gap-2 font-sans">
+                    <Eye className="w-4 h-4 text-[#1E54B7]" />
                     1. Original Retinal Scan
                   </span>
                   <button
                     type="button"
                     onClick={() => setInvertOriginal((v) => !v)}
-                    className={`text-xs px-2 py-1 rounded-md border font-semibold ${
+                    className={`text-xs px-2.5 py-1 rounded-full border font-bold cursor-pointer ${
                       invertOriginal
-                        ? 'bg-amber-500/20 text-amber-300 border-amber-400'
-                        : 'bg-[#0F172A] text-[#94A3B8] border-[#334155]'
+                        ? 'bg-amber-100 text-amber-900 border-amber-300'
+                        : 'bg-gray-100 text-gray-600 border-gray-200'
                     }`}
                   >
                     {invertOriginal ? 'Inverted' : 'Invert'}
@@ -785,7 +784,7 @@ export const NewScanView: React.FC = () => {
                 </div>
 
                 <div
-                  className="aspect-square w-full rounded-xl overflow-hidden bg-black border border-[#334155] cursor-pointer relative group"
+                  className="aspect-square w-full rounded-2xl overflow-hidden bg-black border-2 border-white shadow-md cursor-pointer relative group"
                   onClick={() => setLightboxOpen(true)}
                 >
                   <img
@@ -799,25 +798,25 @@ export const NewScanView: React.FC = () => {
                   </div>
                 </div>
 
-                <p className="text-xs text-[#CBD5E1] leading-relaxed">
+                <p className="text-xs text-gray-600 font-medium leading-relaxed">
                   High-definition fundus view depicting optic nerve head and macular vascular topography.
                 </p>
               </div>
 
               {/* Card 2: Vessel Segmentation Map */}
-              <div className="p-4 bg-[#131B2E] border-2 border-[#334155] rounded-2xl space-y-3">
+              <div className="p-5 bg-white text-black border-4 border-white rounded-[32px] shadow-2xl space-y-3">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-bold text-white flex items-center gap-2">
-                    <Layers className="w-4 h-4 text-sky-400" />
+                  <span className="text-sm font-bold text-black flex items-center gap-2 font-sans">
+                    <Layers className="w-4 h-4 text-sky-600" />
                     2. Vessel Segmentation Map
                   </span>
-                  <span className="text-xs font-mono font-bold text-[#38BDF8] bg-sky-500/10 px-2 py-0.5 rounded border border-sky-500/20">
+                  <span className="text-xs font-mono font-bold text-[#1E54B7] bg-sky-100 px-2.5 py-0.5 rounded-full">
                     {activeScan.vessel_stats.vessel_density_percent}% Density
                   </span>
                 </div>
 
                 <div
-                  className="aspect-square w-full rounded-xl overflow-hidden bg-black border border-[#334155] cursor-pointer relative group"
+                  className="aspect-square w-full rounded-2xl overflow-hidden bg-black border-2 border-white shadow-md cursor-pointer relative group"
                   onClick={() => setLightboxOpen(true)}
                 >
                   <img
@@ -831,25 +830,25 @@ export const NewScanView: React.FC = () => {
                   </div>
                 </div>
 
-                <p className="text-xs text-[#CBD5E1] leading-relaxed">
+                <p className="text-xs text-gray-600 font-medium leading-relaxed">
                   {activeScan.vessel_stats.vessel_health_text}
                 </p>
               </div>
 
               {/* Card 3: AI Grad-CAM Heatmap */}
-              <div className="p-4 bg-[#131B2E] border-2 border-[#334155] rounded-2xl space-y-3">
+              <div className="p-5 bg-white text-black border-4 border-white rounded-[32px] shadow-2xl space-y-3">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-bold text-white flex items-center gap-2">
-                    <Flame className="w-4 h-4 text-rose-400" />
+                  <span className="text-sm font-bold text-black flex items-center gap-2 font-sans">
+                    <Flame className="w-4 h-4 text-rose-600" />
                     3. AI Grad-CAM Heatmap
                   </span>
-                  <span className="text-xs font-mono font-bold text-rose-400 bg-rose-500/10 px-2 py-0.5 rounded border border-rose-500/20">
+                  <span className="text-xs font-mono font-bold text-rose-700 bg-rose-100 px-2.5 py-0.5 rounded-full">
                     {activeScan.heatmap_analysis.activity_intensity}
                   </span>
                 </div>
 
                 <div
-                  className="aspect-square w-full rounded-xl overflow-hidden bg-black border border-[#334155] cursor-pointer relative group"
+                  className="aspect-square w-full rounded-2xl overflow-hidden bg-black border-2 border-white shadow-md cursor-pointer relative group"
                   onClick={() => setLightboxOpen(true)}
                 >
                   <img
@@ -863,7 +862,7 @@ export const NewScanView: React.FC = () => {
                   </div>
                 </div>
 
-                <p className="text-xs text-[#CBD5E1] leading-relaxed">
+                <p className="text-xs text-gray-600 font-medium leading-relaxed">
                   Deep activation highlights microvascular damage focused on {activeScan.heatmap_analysis.most_affected_region}.
                 </p>
               </div>
@@ -871,8 +870,8 @@ export const NewScanView: React.FC = () => {
           </div>
 
           {/* 3. PROBABILITY DISTRIBUTION BARS */}
-          <div className="p-6 bg-[#131B2E] border-2 border-[#334155] rounded-2xl space-y-4">
-            <h3 className="text-base font-bold text-[#F8FAFC] uppercase tracking-wider text-xs">
+          <div className="p-7 sm:p-8 bg-white text-black border-4 border-white rounded-[36px] shadow-2xl space-y-4">
+            <h3 className="text-xs font-black uppercase tracking-wider text-gray-500">
               Five-Class Severity Probability Breakdown
             </h3>
 
@@ -885,33 +884,33 @@ export const NewScanView: React.FC = () => {
                 return (
                   <div
                     key={stageNum}
-                    className={`p-3 rounded-xl border ${
+                    className={`p-3.5 rounded-2xl border transition-all ${
                       isPredicted
-                        ? 'bg-[#1E293B] border-[#38BDF8] shadow-md'
-                        : 'bg-[#0F172A] border-[#1E293B]'
+                        ? 'bg-sky-50 border-[#1E54B7] shadow-sm ring-1 ring-[#1E54B7]/20'
+                        : 'bg-gray-50 border-gray-200'
                     }`}
                   >
                     <div className="flex items-center justify-between text-xs sm:text-sm font-semibold mb-1.5">
                       <div className="flex items-center gap-2">
                         <span
-                          className="w-4 h-4 rounded text-[10px] font-bold text-white flex items-center justify-center shrink-0"
+                          className="w-4 h-4 rounded-full text-[10px] font-black text-white flex items-center justify-center shrink-0"
                           style={{ backgroundColor: meta.color }}
                         >
                           {meta.icon}
                         </span>
-                        <span className={isPredicted ? 'text-white font-bold' : 'text-[#CBD5E1]'}>
+                        <span className={isPredicted ? 'text-black font-bold' : 'text-gray-700'}>
                           {meta.name}
                         </span>
                         {isPredicted && (
-                          <span className="text-[10px] uppercase font-bold text-[#38BDF8] bg-sky-500/20 px-2 py-0.5 rounded">
+                          <span className="text-[10px] uppercase font-black text-[#1E54B7] bg-sky-100 px-2 py-0.5 rounded-full">
                             Predicted
                           </span>
                         )}
                       </div>
-                      <span className="font-mono font-bold text-white">{prob.toFixed(1)}%</span>
+                      <span className="font-mono font-bold text-black">{prob.toFixed(1)}%</span>
                     </div>
 
-                    <div className="w-full h-2.5 bg-[#0B0F19] rounded-full overflow-hidden border border-[#334155]">
+                    <div className="w-full h-2.5 bg-gray-200 rounded-full overflow-hidden">
                       <div
                         className="h-full rounded-full transition-all duration-500"
                         style={{
@@ -928,54 +927,54 @@ export const NewScanView: React.FC = () => {
 
           {/* 4. GEMMA-4 CLINICAL DIAGNOSTIC REPORT CARD */}
           {translatedReport && (
-            <div className="p-6 sm:p-8 bg-[#131B2E] border-2 border-[#334155] rounded-3xl shadow-2xl space-y-6">
+            <div className="p-7 sm:p-8 bg-white text-black border-4 border-white rounded-[36px] shadow-2xl space-y-6">
               {/* Report Header with Language Switcher & PDF */}
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[#334155]">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-gray-200">
                 <div className="flex items-center gap-3">
-                  <div className="p-2.5 rounded-xl bg-purple-500/10 text-purple-400 border border-purple-500/20">
+                  <div className="p-2.5 rounded-2xl bg-purple-100 text-purple-700">
                     <Sparkles className="w-6 h-6" />
                   </div>
                   <div>
-                    <h3 className="text-xl font-bold text-white">
+                    <h3 className="text-xl font-bold text-black font-sans">
                       Gemma-4 Clinical Diagnostic Intelligence Report
                     </h3>
-                    <p className="text-xs text-[#94A3B8]">
+                    <p className="text-xs text-gray-500">
                       Empathetic, structured evaluation generated by Google Gemma-4 (31B-IT)
                     </p>
                   </div>
                 </div>
 
                 {/* Multilingual Selector [ English ] [ हिंदी ] [ ગુજરાતી ] */}
-                <div className="flex items-center gap-1.5 p-1 bg-[#0F172A] border border-[#334155] rounded-xl self-start sm:self-auto">
-                  <span className="px-2 text-xs text-[#94A3B8] font-bold hidden md:inline flex items-center gap-1">
+                <div className="flex items-center gap-1 p-1 bg-gray-100 rounded-full border border-gray-200 self-start sm:self-auto">
+                  <span className="px-2 text-xs text-gray-500 font-bold hidden md:inline flex items-center gap-1">
                     <Languages className="w-3.5 h-3.5" /> Language:
                   </span>
                   <button
                     onClick={() => setReportLanguage('english')}
-                    className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all ${
+                    className={`px-3.5 py-1.5 text-xs font-black rounded-full transition-all cursor-pointer ${
                       reportLanguage === 'english'
-                        ? 'bg-[#38BDF8] text-[#0B0F19] shadow-sm'
-                        : 'text-[#CBD5E1] hover:bg-[#1E293B]'
+                        ? 'bg-black text-white shadow-sm'
+                        : 'text-gray-700 hover:text-black hover:bg-gray-200'
                     }`}
                   >
                     English
                   </button>
                   <button
                     onClick={() => setReportLanguage('hindi')}
-                    className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all ${
+                    className={`px-3.5 py-1.5 text-xs font-black rounded-full transition-all cursor-pointer ${
                       reportLanguage === 'hindi'
-                        ? 'bg-[#38BDF8] text-[#0B0F19] shadow-sm'
-                        : 'text-[#CBD5E1] hover:bg-[#1E293B]'
+                        ? 'bg-black text-white shadow-sm'
+                        : 'text-gray-700 hover:text-black hover:bg-gray-200'
                     }`}
                   >
                     हिंदी (Hindi)
                   </button>
                   <button
                     onClick={() => setReportLanguage('gujarati')}
-                    className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all ${
+                    className={`px-3.5 py-1.5 text-xs font-black rounded-full transition-all cursor-pointer ${
                       reportLanguage === 'gujarati'
-                        ? 'bg-[#38BDF8] text-[#0B0F19] shadow-sm'
-                        : 'text-[#CBD5E1] hover:bg-[#1E293B]'
+                        ? 'bg-black text-white shadow-sm'
+                        : 'text-gray-700 hover:text-black hover:bg-gray-200'
                     }`}
                   >
                     ગુજરાતી (Gujarati)
@@ -984,72 +983,72 @@ export const NewScanView: React.FC = () => {
               </div>
 
               {/* a) 🩺 Current Ocular Status */}
-              <div className="space-y-2 p-5 bg-[#0F172A] rounded-2xl border border-[#334155]">
-                <h4 className="text-base font-bold text-[#38BDF8] flex items-center gap-2">
+              <div className="space-y-2 p-5 bg-sky-50/70 rounded-3xl border border-sky-100">
+                <h4 className="text-base font-bold text-[#1E54B7] flex items-center gap-2">
                   <Activity className="w-5 h-5" />
                   1. Current Ocular Status (Plain Language Explanation)
                 </h4>
-                <p className="text-sm sm:text-base text-[#F8FAFC] leading-relaxed">
+                <p className="text-sm sm:text-base text-gray-800 leading-relaxed font-medium">
                   {translatedReport.plainLanguage}
                 </p>
               </div>
 
               {/* b) 👁️ Visual Biomarkers */}
-              <div className="space-y-3 p-5 bg-[#0F172A] rounded-2xl border border-[#334155]">
-                <h4 className="text-base font-bold text-white flex items-center gap-2">
-                  <Eye className="w-5 h-5 text-[#38BDF8]" />
+              <div className="space-y-3 p-5 bg-gray-50 rounded-3xl border border-gray-200">
+                <h4 className="text-base font-bold text-black flex items-center gap-2">
+                  <Eye className="w-5 h-5 text-[#1E54B7]" />
                   2. Retinal Biomarkers & Microvascular Density
                 </h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs sm:text-sm text-[#CBD5E1]">
-                  <div className="p-3.5 rounded-xl bg-[#131B2E] border border-[#1E293B] space-y-1">
-                    <span className="font-bold text-sky-400 block">Grad-CAM Lesion Localization:</span>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs sm:text-sm text-gray-700">
+                  <div className="p-4 rounded-2xl bg-white border border-gray-200 space-y-1 shadow-sm">
+                    <span className="font-bold text-[#1E54B7] block text-xs uppercase">Grad-CAM Lesion Localization:</span>
                     <p>{translatedReport.visualFindingsHeatmap}</p>
                   </div>
-                  <div className="p-3.5 rounded-xl bg-[#131B2E] border border-[#1E293B] space-y-1">
-                    <span className="font-bold text-sky-400 block">Capillary Network Perfusion:</span>
+                  <div className="p-4 rounded-2xl bg-white border border-gray-200 space-y-1 shadow-sm">
+                    <span className="font-bold text-[#1E54B7] block text-xs uppercase">Capillary Network Perfusion:</span>
                     <p>{translatedReport.visualFindingsVessels}</p>
                   </div>
                 </div>
               </div>
 
               {/* c) 📊 Time-Aware Risk Progression */}
-              <div className="space-y-3 p-5 bg-[#0F172A] rounded-2xl border border-[#334155]">
-                <h4 className="text-base font-bold text-white flex items-center gap-2">
-                  <Calendar className="w-5 h-5 text-amber-400" />
+              <div className="space-y-3 p-5 bg-amber-50/60 rounded-3xl border border-amber-200">
+                <h4 className="text-base font-bold text-amber-950 flex items-center gap-2">
+                  <Calendar className="w-5 h-5 text-amber-700" />
                   3. Time-Aware Progression Risk Forecast
                 </h4>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {/* 6 Month Card */}
-                  <div className="p-4 rounded-xl bg-[#131B2E] border border-amber-500/30 space-y-2">
+                  <div className="p-4 rounded-2xl bg-white border border-amber-200 space-y-2 shadow-sm">
                     <div className="flex items-center justify-between">
-                      <span className="font-bold text-sm text-amber-300">6-Month Forecast</span>
-                      <span className="text-xs font-mono font-bold px-2 py-0.5 rounded bg-amber-500/20 text-amber-300">
+                      <span className="font-bold text-sm text-amber-900">6-Month Forecast</span>
+                      <span className="text-xs font-mono font-black px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-900">
                         Risk: {activeScan.report.risk_prediction['6_month'].progression_risk_percent}
                       </span>
                     </div>
                     <div className="text-xs space-y-1.5">
-                      <p className="text-rose-300 font-medium">
+                      <p className="text-rose-700 font-medium">
                         <strong>If Untreated:</strong> {translatedReport.riskUntreated6Mo}
                       </p>
-                      <p className="text-emerald-300 font-medium">
+                      <p className="text-emerald-800 font-medium">
                         <strong>If Managed:</strong> {translatedReport.riskManaged6Mo}
                       </p>
                     </div>
                   </div>
 
                   {/* 12 Month Card */}
-                  <div className="p-4 rounded-xl bg-[#131B2E] border border-amber-500/30 space-y-2">
+                  <div className="p-4 rounded-2xl bg-white border border-amber-200 space-y-2 shadow-sm">
                     <div className="flex items-center justify-between">
-                      <span className="font-bold text-sm text-amber-300">12-Month Forecast</span>
-                      <span className="text-xs font-mono font-bold px-2 py-0.5 rounded bg-amber-500/20 text-amber-300">
+                      <span className="font-bold text-sm text-amber-900">12-Month Forecast</span>
+                      <span className="text-xs font-mono font-black px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-900">
                         Risk: {activeScan.report.risk_prediction['12_month'].progression_risk_percent}
                       </span>
                     </div>
                     <div className="text-xs space-y-1.5">
-                      <p className="text-rose-300 font-medium">
+                      <p className="text-rose-700 font-medium">
                         <strong>If Untreated:</strong> {translatedReport.riskUntreated12Mo}
                       </p>
-                      <p className="text-emerald-300 font-medium">
+                      <p className="text-emerald-800 font-medium">
                         <strong>If Managed:</strong> {translatedReport.riskManaged12Mo}
                       </p>
                     </div>
@@ -1058,18 +1057,18 @@ export const NewScanView: React.FC = () => {
               </div>
 
               {/* d) ✅ Clinical Action Plan */}
-              <div className="space-y-3 p-5 bg-[#0F172A] rounded-2xl border border-[#334155]">
-                <h4 className="text-base font-bold text-white flex items-center gap-2">
-                  <CheckSquare className="w-5 h-5 text-emerald-400" />
+              <div className="space-y-3 p-5 bg-gray-50 rounded-3xl border border-gray-200">
+                <h4 className="text-base font-bold text-black flex items-center gap-2">
+                  <CheckSquare className="w-5 h-5 text-emerald-600" />
                   4. Clinical Action Plan Checklist
                 </h4>
                 <div className="space-y-2">
                   {translatedReport.actionPlan.map((act, idx) => (
                     <div
                       key={idx}
-                      className="flex items-start gap-3 p-3 rounded-xl bg-[#131B2E] border border-[#1E293B] text-xs sm:text-sm text-[#F8FAFC]"
+                      className="flex items-start gap-3 p-3.5 rounded-2xl bg-white border border-gray-200 text-xs sm:text-sm text-gray-800 shadow-sm"
                     >
-                      <span className="flex items-center justify-center w-5 h-5 rounded bg-emerald-500/20 text-emerald-300 text-xs font-bold shrink-0 mt-0.5">
+                      <span className="flex items-center justify-center w-5 h-5 rounded-full bg-emerald-100 text-emerald-800 text-xs font-black shrink-0 mt-0.5">
                         {idx + 1}
                       </span>
                       <span>{act}</span>
@@ -1079,18 +1078,18 @@ export const NewScanView: React.FC = () => {
               </div>
 
               {/* e) 🥗 Diabetic Eye-Care Dietary Guidance */}
-              <div className="space-y-3 p-5 bg-[#0F172A] rounded-2xl border border-[#334155]">
-                <h4 className="text-base font-bold text-white flex items-center gap-2">
-                  <Utensils className="w-5 h-5 text-teal-400" />
+              <div className="space-y-3 p-5 bg-teal-50/50 rounded-3xl border border-teal-200">
+                <h4 className="text-base font-bold text-teal-950 flex items-center gap-2">
+                  <Utensils className="w-5 h-5 text-teal-700" />
                   5. Retinal Nutrition & Dietary Recommendations
                 </h4>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                   {translatedReport.dietRecommendations.map((diet, idx) => (
                     <div
                       key={idx}
-                      className="p-3.5 rounded-xl bg-[#131B2E] border border-[#1E293B] text-xs sm:text-sm text-[#CBD5E1] leading-relaxed flex items-start gap-2"
+                      className="p-3.5 rounded-2xl bg-white border border-teal-100 text-xs sm:text-sm text-gray-700 leading-relaxed flex items-start gap-2 shadow-sm"
                     >
-                      <span className="text-teal-400 font-bold">•</span>
+                      <span className="text-teal-600 font-bold">•</span>
                       <span>{diet}</span>
                     </div>
                   ))}
@@ -1098,29 +1097,29 @@ export const NewScanView: React.FC = () => {
               </div>
 
               {/* f) 📅 Recommended Follow-Up & g) Disclaimer */}
-              <div className="p-4 rounded-xl bg-sky-500/10 border border-sky-500/30 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs sm:text-sm">
-                <div className="flex items-center gap-2 font-bold text-white">
-                  <Calendar className="w-5 h-5 text-[#38BDF8]" />
+              <div className="p-4 rounded-2xl bg-sky-50 border border-sky-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs sm:text-sm">
+                <div className="flex items-center gap-2 font-bold text-[#1E54B7]">
+                  <Calendar className="w-5 h-5 text-[#1E54B7]" />
                   <span>Recommended Next Follow-Up Screening: {translatedReport.followUp}</span>
                 </div>
-                <div className="text-xs text-[#94A3B8]">
+                <div className="text-xs text-gray-500 font-medium">
                   Clinical Decision Support • Validated by Gemma-4
                 </div>
               </div>
 
-              <div className="p-4 rounded-xl bg-[#0B0F19] border border-[#334155] flex items-start gap-2 text-xs text-[#94A3B8]">
-                <ShieldAlert className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+              <div className="p-4 rounded-2xl bg-gray-50 border border-gray-200 flex items-start gap-2 text-xs text-gray-500">
+                <ShieldAlert className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
                 <span>{translatedReport.disclaimer}</span>
               </div>
             </div>
           )}
 
           {/* 5. ACTION FOOTER */}
-          <div className="flex flex-wrap items-center justify-between gap-4 p-6 bg-[#131B2E] border-2 border-[#334155] rounded-2xl shadow-xl">
+          <div className="flex flex-wrap items-center justify-between gap-4 p-7 bg-white text-black border-4 border-white rounded-[36px] shadow-2xl">
             <button
               type="button"
               onClick={handleResetScan}
-              className="flex items-center gap-2 px-6 py-3.5 rounded-xl bg-[#1E293B] hover:bg-[#334155] text-white font-bold text-sm border border-[#475569] transition-all min-h-[48px]"
+              className="flex items-center gap-2 px-6 py-3.5 rounded-full bg-gray-100 hover:bg-gray-200 text-black font-black text-xs uppercase tracking-wider transition-all min-h-[46px] cursor-pointer"
             >
               <RefreshCw className="w-4 h-4" />
               <span>Scan Another Patient</span>
@@ -1132,7 +1131,7 @@ export const NewScanView: React.FC = () => {
                 onClick={() => {
                   if (activePatient) setActiveView('patient-detail');
                 }}
-                className="flex items-center gap-2 px-6 py-3.5 rounded-xl bg-[#0F172A] hover:bg-[#1E293B] text-[#38BDF8] font-bold text-sm border border-[#38BDF8]/40 transition-all min-h-[48px]"
+                className="flex items-center gap-2 px-6 py-3.5 rounded-full bg-sky-50 hover:bg-sky-100 text-[#1E54B7] font-black text-xs uppercase tracking-wider border border-sky-200 transition-all min-h-[46px] cursor-pointer"
               >
                 <span>View Longitudinal Profile →</span>
               </button>
@@ -1140,10 +1139,10 @@ export const NewScanView: React.FC = () => {
               <button
                 type="button"
                 onClick={handleDownloadPDF}
-                className="flex items-center gap-2 px-7 py-3.5 rounded-xl bg-[#38BDF8] hover:bg-[#0284C7] text-[#0B0F19] font-black text-sm shadow-md transition-all min-h-[48px]"
+                className="flex items-center gap-2 px-7 py-3.5 rounded-full bg-[#E1FA4A] hover:bg-[#d6f236] text-black font-black text-xs uppercase tracking-wider shadow-lg hover:scale-105 transition-all min-h-[46px] cursor-pointer"
               >
                 <FileDown className="w-4 h-4" />
-                <span>Save & Print Clinical Report</span>
+                <span>Save &amp; Print Clinical Report</span>
               </button>
             </div>
           </div>

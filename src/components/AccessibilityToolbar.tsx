@@ -61,7 +61,7 @@ export const AccessibilityToolbar: React.FC = () => {
   return (
     <>
       <header
-        className="sticky top-0 z-40 w-full min-h-[72px] bg-[#131B2E] border-b-2 border-[#334155] text-[#F8FAFC] flex items-center shadow-md transition-colors"
+        className="sticky top-0 z-40 w-full min-h-[72px] bg-white/30 hover:bg-white/35 backdrop-blur-2xl border-b border-white/40 text-black flex items-center shadow-[0_8px_32px_rgba(0,0,0,0.08)] transition-all"
         role="region"
         aria-label="Accessibility and Primary Toolbar"
       >
@@ -69,42 +69,42 @@ export const AccessibilityToolbar: React.FC = () => {
           {/* Brand & Suite Subtitle */}
           <div
             onClick={() => setActiveView(activeView === 'landing' ? 'dashboard' : 'landing')}
-            className="flex items-center gap-4 cursor-pointer group"
+            className="flex items-center gap-3.5 cursor-pointer group select-none"
             title="Click to view Product Landing Page"
           >
-            <div className="w-10 h-10 bg-[#38BDF8] group-hover:bg-[#0284C7] rounded-full flex items-center justify-center shadow-md shrink-0 transition-all">
-              <Eye className="w-6 h-6 text-[#0B0F19] group-hover:text-white stroke-[2.5] transition-colors" />
+            <div className="w-10 h-10 bg-white/80 backdrop-blur-md border border-white/80 group-hover:scale-105 rounded-full flex items-center justify-center shadow-md shrink-0 transition-transform">
+              <Eye className="w-5 h-5 text-[#1E54B7] stroke-[2.5]" />
             </div>
             <div className="flex flex-col">
               <div className="flex items-center gap-2">
-                <span className="text-2xl font-bold tracking-tight text-[#F8FAFC] group-hover:text-[#38BDF8] transition-colors">
+                <span className="text-2xl font-black tracking-tight text-slate-950 font-sans drop-shadow-sm">
                   OptiGemma
                 </span>
-                <span className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md bg-sky-500/20 text-[#38BDF8] border border-sky-500/30">
-                  <Sparkles className="w-3 h-3" />
+                <span className="inline-flex items-center gap-1 text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-[#E1FA4A] text-black shadow-sm">
+                  <Sparkles className="w-3 h-3 fill-black" />
                   Gemma-4 AI
                 </span>
               </div>
-              <span className="text-[10px] uppercase tracking-widest text-[#94A3B8] font-semibold">
+              <span className="text-[10px] uppercase tracking-widest text-slate-800 font-black">
                 Diabetic Retinopathy Clinical Suite
               </span>
             </div>
           </div>
 
           {/* Right-Aligned Accessibility & Mode Controls */}
-          <div className="flex flex-wrap items-center gap-3">
-            {/* Font Scale Switcher: [A-] [STD] [A+] */}
+          <div className="flex flex-wrap items-center gap-2.5">
+            {/* Font Scale Switcher: [STD] [A+] [A++] */}
             <div
-              className="flex bg-[#0B0F19] rounded-lg border-2 border-[#334155] p-1"
+              className="flex bg-white/50 backdrop-blur-md rounded-full border border-white/70 p-1 shadow-sm"
               role="group"
               aria-label="Font size scaling"
             >
               <button
                 onClick={() => setFontSize('standard')}
-                className={`px-3 sm:px-4 py-1 text-sm font-bold border-r border-[#334155] transition-all ${
+                className={`px-3 py-1 text-xs font-black rounded-full transition-all cursor-pointer ${
                   fontSize === 'standard'
-                    ? 'bg-[#38BDF8] text-[#0B0F19] rounded-md'
-                    : 'text-[#CBD5E1] hover:bg-[#38BDF8] hover:text-[#0B0F19]'
+                    ? 'bg-[#E1FA4A] text-black shadow-sm'
+                    : 'text-slate-900 font-bold hover:text-black hover:bg-white/60'
                 }`}
                 aria-pressed={fontSize === 'standard'}
                 title="Standard Text Size"
@@ -113,10 +113,10 @@ export const AccessibilityToolbar: React.FC = () => {
               </button>
               <button
                 onClick={() => setFontSize('large')}
-                className={`px-3 sm:px-4 py-1 text-sm font-bold border-r border-[#334155] transition-all ${
+                className={`px-3 py-1 text-xs font-black rounded-full transition-all cursor-pointer ${
                   fontSize === 'large'
-                    ? 'bg-[#38BDF8] text-[#0B0F19] rounded-md'
-                    : 'text-[#CBD5E1] hover:bg-[#38BDF8] hover:text-[#0B0F19]'
+                    ? 'bg-[#E1FA4A] text-black shadow-sm'
+                    : 'text-slate-900 font-bold hover:text-black hover:bg-white/60'
                 }`}
                 aria-pressed={fontSize === 'large'}
                 title="Large Text Size (A+)"
@@ -125,10 +125,10 @@ export const AccessibilityToolbar: React.FC = () => {
               </button>
               <button
                 onClick={() => setFontSize('xlarge')}
-                className={`px-3 sm:px-4 py-1 text-sm font-bold transition-all ${
+                className={`px-3 py-1 text-xs font-black rounded-full transition-all cursor-pointer ${
                   fontSize === 'xlarge'
-                    ? 'bg-[#38BDF8] text-[#0B0F19] rounded-md'
-                    : 'text-[#CBD5E1] hover:bg-[#38BDF8] hover:text-[#0B0F19]'
+                    ? 'bg-[#E1FA4A] text-black shadow-sm'
+                    : 'text-slate-900 font-bold hover:text-black hover:bg-white/60'
                 }`}
                 aria-pressed={fontSize === 'xlarge'}
                 title="Extra Large Text Size (A++)"
@@ -140,58 +140,38 @@ export const AccessibilityToolbar: React.FC = () => {
             {/* High Contrast Mode Toggle */}
             <button
               onClick={toggleContrast}
-              className={`flex items-center gap-2 px-3 sm:px-4 h-11 sm:h-12 border-2 rounded-lg font-bold text-xs sm:text-sm uppercase tracking-wider transition-all ${
+              className={`flex items-center gap-1.5 px-3.5 h-10 rounded-full font-black text-xs uppercase tracking-wider transition-all cursor-pointer shadow-sm ${
                 highContrast
-                  ? 'bg-amber-400 text-black border-amber-300 shadow-md'
-                  : 'bg-[#0F172A] border-[#334155] text-[#CBD5E1] hover:border-[#38BDF8]'
+                  ? 'bg-amber-300 text-black border-2 border-black'
+                  : 'bg-white/50 hover:bg-white/70 backdrop-blur-md border border-white/70 text-slate-950'
               }`}
               aria-pressed={highContrast}
               title="Toggle High Contrast Mode"
             >
-              <Contrast className="w-4 h-4 text-amber-400" />
+              <Contrast className="w-3.5 h-3.5 text-slate-900" />
               <span className="hidden sm:inline">CONTRAST</span>
-            </button>
-
-            {/* Dark / Light Mode Button */}
-            <button
-              onClick={toggleTheme}
-              className="flex items-center gap-2 px-3 sm:px-4 h-11 sm:h-12 bg-[#0F172A] border-2 border-[#334155] rounded-lg font-bold text-xs sm:text-sm uppercase tracking-wider text-[#CBD5E1] hover:border-[#38BDF8] transition-all"
-              aria-label={`Switch to ${theme === 'dark' ? 'Light Mode' : 'Dark Mode'}`}
-              title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
-            >
-              {theme === 'dark' ? (
-                <>
-                  <Moon className="w-4 h-4 text-[#38BDF8]" />
-                  <span>DARK</span>
-                </>
-              ) : (
-                <>
-                  <Sun className="w-4 h-4 text-amber-400" />
-                  <span>LIGHT</span>
-                </>
-              )}
             </button>
 
             {/* Read Screen Speech Synthesizer Button */}
             <button
               onClick={handleReadScreen}
-              className={`flex items-center gap-2 px-4 sm:px-5 h-11 sm:h-12 rounded-lg font-extrabold text-xs sm:text-sm uppercase tracking-wider shadow-lg transition-all ${
+              className={`flex items-center gap-2 px-4 sm:px-5 h-10 rounded-full font-black text-xs uppercase tracking-wider shadow-md hover:scale-105 transition-all cursor-pointer ${
                 isSpeaking
-                  ? 'bg-red-500 text-white animate-pulse'
-                  : 'bg-[#38BDF8] text-[#0B0F19] hover:bg-[#0284C7] hover:text-white'
+                  ? 'bg-rose-600 text-white animate-pulse'
+                  : 'bg-[#E1FA4A] hover:bg-[#d6f236] text-black'
               }`}
               aria-label={isSpeaking ? 'Stop reading screen' : 'Read screen aloud'}
               title="Screen reader text-to-speech"
             >
               {isSpeaking ? (
                 <>
-                  <VolumeX className="w-4 h-4" />
-                  <span>STOP</span>
+                  <VolumeX className="w-4 h-4 text-white" />
+                  <span>STOP AUDIO</span>
                 </>
               ) : (
                 <>
-                  <Volume2 className="w-4 h-4" />
-                  <span>READ SCREEN</span>
+                  <Volume2 className="w-4 h-4 text-black" />
+                  <span>AUDIO READ</span>
                 </>
               )}
             </button>
@@ -199,11 +179,11 @@ export const AccessibilityToolbar: React.FC = () => {
             {/* Settings Opener */}
             <button
               onClick={() => setIsSettingsOpen(true)}
-              className="flex items-center justify-center w-11 h-11 sm:w-12 sm:h-12 rounded-lg bg-[#0F172A] hover:bg-[#1E293B] border-2 border-[#334155] hover:border-[#38BDF8] text-[#CBD5E1] transition-all"
+              className="flex items-center justify-center w-10 h-10 rounded-full bg-white/50 hover:bg-white/75 backdrop-blur-md border border-white/70 text-slate-900 hover:text-black transition-all cursor-pointer shadow-sm"
               title="Backend & AI Settings"
               aria-label="Backend Connection Settings"
             >
-              <Settings className="w-4 h-4 text-[#94A3B8]" />
+              <Settings className="w-4 h-4" />
             </button>
           </div>
         </div>

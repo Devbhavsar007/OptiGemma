@@ -53,18 +53,18 @@ const AppBody: React.FC = () => {
 
   if (activeView === 'landing') {
     return (
-      <div className="min-h-screen bg-[var(--color-bg)] text-[var(--color-text)] transition-colors duration-150 font-sans">
+      <div className="min-h-screen bg-[#619FE8] text-white transition-colors duration-150 font-sans selection:bg-[#E1FA4A] selection:text-black">
         <LandingPageView />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[var(--color-bg)] text-[var(--color-text)] transition-colors duration-150 flex flex-col font-sans">
+    <div className="min-h-screen bg-[#619FE8] text-white transition-colors duration-150 flex flex-col font-sans selection:bg-[#E1FA4A] selection:text-black relative">
       {/* Skip link for screen-readers and keyboard navigators */}
       <a
         href="#main-content"
-        className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:p-4 focus:bg-[#38BDF8] focus:text-[#0B0F19] focus:font-black focus:rounded-xl focus:shadow-2xl"
+        className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:p-4 focus:bg-[#E1FA4A] focus:text-black focus:font-black focus:rounded-xl focus:shadow-2xl"
       >
         Skip to primary clinical workspace
       </a>
@@ -73,7 +73,7 @@ const AppBody: React.FC = () => {
       <AccessibilityToolbar />
 
       {/* Body Container with Sidebar + Content */}
-      <div className="flex-1 flex flex-row">
+      <div className="flex-1 flex flex-row relative">
         <Navigation />
         <MainContent />
       </div>

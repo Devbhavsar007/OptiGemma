@@ -49,15 +49,18 @@ export const PatientDirectoryView: React.FC = () => {
   };
 
   return (
-    <div className="space-y-8 animate-fadeIn">
+    <div className="space-y-6 sm:space-y-8 animate-fadeIn text-white">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-6 bg-[#131B2E] border-2 border-[#334155] rounded-2xl shadow-xl">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-7 bg-white text-black rounded-[36px] shadow-2xl border-4 border-white">
         <div className="space-y-1">
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-[#F8FAFC] flex items-center gap-3">
-            <Users className="w-8 h-8 text-[#38BDF8]" />
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sky-100 text-[#1E54B7] text-xs font-black">
+            <Users className="w-4 h-4" />
+            <span>Comprehensive Clinical Directory</span>
+          </div>
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-black flex items-center gap-3 font-sans">
             Patient Records Directory
           </h1>
-          <p className="text-base text-[#CBD5E1]">
+          <p className="text-sm sm:text-base text-gray-600 font-medium">
             Longitudinal diabetic ophthalmology profiles, scan histories, and HbA1c tracking
           </p>
         </div>
@@ -68,24 +71,24 @@ export const PatientDirectoryView: React.FC = () => {
             setActiveScan(null);
             setActiveView('new-scan');
           }}
-          className="flex items-center gap-2 px-6 py-3.5 rounded-xl bg-[#38BDF8] hover:bg-[#0284C7] text-[#0B0F19] font-black text-sm shadow-md transition-all shrink-0 min-h-[48px]"
+          className="flex items-center gap-2 px-7 py-3.5 rounded-full bg-[#E1FA4A] hover:bg-[#d6f236] text-black font-black text-xs uppercase tracking-wider shadow-lg hover:scale-105 transition-all shrink-0 min-h-[48px] cursor-pointer"
         >
-          <UserPlus className="w-5 h-5" />
-          <span>Register & Scan Patient</span>
+          <UserPlus className="w-4 h-4" />
+          <span>Register &amp; Scan Patient</span>
         </button>
       </div>
 
       {/* Search & Filter Bar */}
-      <div className="p-6 bg-[#131B2E] border-2 border-[#334155] rounded-2xl space-y-4 shadow-xl">
+      <div className="p-7 bg-white text-black rounded-[36px] space-y-6 shadow-2xl border-4 border-white">
         <div className="flex flex-col md:flex-row gap-4">
           <div className="relative flex-1">
-            <Search className="absolute left-4 top-3.5 w-5 h-5 text-[#94A3B8]" />
+            <Search className="absolute left-4 top-3.5 w-5 h-5 text-gray-400" />
             <input
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search by patient name, ID, clinical notes..."
-              className="w-full pl-12 pr-4 py-3 bg-[#0F172A] border-2 border-[#334155] rounded-xl text-white placeholder-[#94A3B8] font-medium focus:border-[#38BDF8] focus:outline-none transition-colors"
+              className="w-full pl-12 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-2xl text-black placeholder-gray-400 font-medium focus:border-[#1E54B7] focus:ring-2 focus:ring-sky-100 focus:outline-none transition-all"
             />
           </div>
 
@@ -93,40 +96,40 @@ export const PatientDirectoryView: React.FC = () => {
           <div className="flex flex-wrap items-center gap-2">
             <button
               onClick={() => setFilter('all')}
-              className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all ${
+              className={`px-4 py-2.5 rounded-full text-xs font-black transition-all cursor-pointer ${
                 filter === 'all'
-                  ? 'bg-[#38BDF8] text-[#0B0F19] shadow-md'
-                  : 'bg-[#0F172A] text-[#CBD5E1] border border-[#334155] hover:bg-[#1E293B]'
+                  ? 'bg-black text-white shadow-md'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
               }`}
             >
               All Records ({patients.length})
             </button>
             <button
               onClick={() => setFilter('no-dr')}
-              className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all ${
+              className={`px-4 py-2.5 rounded-full text-xs font-black transition-all cursor-pointer ${
                 filter === 'no-dr'
                   ? 'bg-[#009E73] text-white shadow-md'
-                  : 'bg-[#0F172A] text-[#CBD5E1] border border-[#334155] hover:bg-[#1E293B]'
+                  : 'bg-emerald-50 text-emerald-800 hover:bg-emerald-100'
               }`}
             >
               [●] No DR / Healthy
             </button>
             <button
               onClick={() => setFilter('mild-mod')}
-              className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all ${
+              className={`px-4 py-2.5 rounded-full text-xs font-black transition-all cursor-pointer ${
                 filter === 'mild-mod'
                   ? 'bg-[#E69F00] text-black shadow-md'
-                  : 'bg-[#0F172A] text-[#CBD5E1] border border-[#334155] hover:bg-[#1E293B]'
+                  : 'bg-amber-50 text-amber-900 hover:bg-amber-100'
               }`}
             >
               [▲] Mild / Moderate
             </button>
             <button
               onClick={() => setFilter('high-risk')}
-              className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all ${
+              className={`px-4 py-2.5 rounded-full text-xs font-black transition-all cursor-pointer ${
                 filter === 'high-risk'
                   ? 'bg-[#D55E00] text-white shadow-md'
-                  : 'bg-[#0F172A] text-[#CBD5E1] border border-[#334155] hover:bg-[#1E293B]'
+                  : 'bg-rose-50 text-rose-900 hover:bg-rose-100'
               }`}
             >
               [◆] High Risk (Severe/PDR)
@@ -135,7 +138,7 @@ export const PatientDirectoryView: React.FC = () => {
         </div>
 
         {/* Results List */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pt-2">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 pt-2">
           {filteredPatients.map((patient) => {
             const latestScan = patient.scans && patient.scans.length > 0 ? patient.scans[0] : null;
 
@@ -143,52 +146,52 @@ export const PatientDirectoryView: React.FC = () => {
               <div
                 key={patient.id}
                 onClick={() => handleSelectPatient(patient)}
-                className="p-5 bg-[#0F172A] border-2 border-[#1E293B] hover:border-[#38BDF8] rounded-2xl cursor-pointer transition-all hover:bg-[#131B2E] space-y-4 group flex flex-col justify-between"
+                className="p-6 bg-gray-50/70 border border-gray-200/90 hover:border-[#1E54B7] hover:bg-white rounded-3xl cursor-pointer transition-all hover:shadow-xl space-y-4 group flex flex-col justify-between"
               >
                 <div>
                   <div className="flex items-center justify-between gap-2">
-                    <span className="font-bold text-lg text-[#F8FAFC] group-hover:text-[#38BDF8] transition-colors truncate">
+                    <span className="font-bold text-lg text-black group-hover:text-[#1E54B7] transition-colors truncate">
                       {patient.name}
                     </span>
-                    <span className="text-xs font-mono font-bold text-[#38BDF8] bg-sky-500/10 px-2 py-0.5 rounded border border-sky-500/20 shrink-0">
+                    <span className="text-xs font-mono font-bold text-[#1E54B7] bg-sky-100 px-2.5 py-0.5 rounded-full shrink-0">
                       {patient.id}
                     </span>
                   </div>
 
-                  <div className="text-xs text-[#94A3B8] mt-1 flex items-center gap-3">
+                  <div className="text-xs text-gray-500 mt-1 flex items-center gap-2 font-medium">
                     <span>Age: {patient.age} ({patient.gender})</span>
                     <span>•</span>
                     <span>Diabetes: {patient.diabetes_duration} yrs</span>
                   </div>
 
                   {/* Vitals Summary */}
-                  <div className="grid grid-cols-2 gap-2 mt-3 p-3 bg-[#131B2E] rounded-xl border border-[#1E293B] text-xs font-mono">
+                  <div className="grid grid-cols-2 gap-2 mt-3.5 p-3 bg-white rounded-2xl border border-gray-200/80 text-xs font-mono">
                     <div>
-                      <span className="text-[#94A3B8] block">HbA1c</span>
-                      <strong className="text-white text-sm">{patient.hba1c}%</strong>
+                      <span className="text-gray-400 block text-[10px] uppercase font-bold">HbA1c</span>
+                      <strong className="text-black text-sm">{patient.hba1c}%</strong>
                     </div>
                     <div>
-                      <span className="text-[#94A3B8] block">Fasting Sugar</span>
-                      <strong className="text-white text-sm">{patient.sugar_level} mg/dL</strong>
+                      <span className="text-gray-400 block text-[10px] uppercase font-bold">Fasting Sugar</span>
+                      <strong className="text-black text-sm">{patient.sugar_level} mg/dL</strong>
                     </div>
                   </div>
 
                   {/* Latest Diagnostic Status */}
-                  <div className="mt-3">
-                    <span className="text-[11px] font-bold text-[#94A3B8] uppercase block mb-1">
+                  <div className="mt-3.5">
+                    <span className="text-[11px] font-bold text-gray-500 uppercase block mb-1">
                       Latest Retinal Diagnosis:
                     </span>
                     {latestScan ? (
                       <DualCodedBadge stage={latestScan.detection.stage} size="sm" showDetails />
                     ) : (
-                      <span className="text-xs text-[#64748B] italic">No prior scans recorded</span>
+                      <span className="text-xs text-gray-400 italic">No prior scans recorded</span>
                     )}
                   </div>
                 </div>
 
                 {/* Card Actions */}
-                <div className="flex items-center justify-between pt-3 border-t border-[#1E293B] text-xs">
-                  <span className="text-[#94A3B8] font-mono">
+                <div className="flex items-center justify-between pt-3.5 border-t border-gray-200 text-xs">
+                  <span className="text-gray-500 font-mono font-medium">
                     {patient.scans?.length || 0} scans on file
                   </span>
 
@@ -198,13 +201,13 @@ export const PatientDirectoryView: React.FC = () => {
                         e.stopPropagation();
                         handleStartScanForPatient(patient);
                       }}
-                      className="p-2 rounded-lg bg-sky-500/10 hover:bg-[#38BDF8] text-[#38BDF8] hover:text-[#0B0F19] transition-all font-bold"
+                      className="p-2 rounded-full bg-sky-100 hover:bg-[#E1FA4A] text-[#1E54B7] hover:text-black transition-all font-bold cursor-pointer"
                       title="Run new scan for this patient"
                     >
                       <Microscope className="w-4 h-4" />
                     </button>
 
-                    <span className="inline-flex items-center gap-1 font-bold text-[#38BDF8] group-hover:translate-x-1 transition-transform">
+                    <span className="inline-flex items-center gap-1 font-black text-[#1E54B7] group-hover:translate-x-1 transition-transform">
                       Profile <ArrowRight className="w-3.5 h-3.5" />
                     </span>
                   </div>
