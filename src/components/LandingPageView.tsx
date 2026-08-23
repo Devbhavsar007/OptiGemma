@@ -1,74 +1,109 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Eye,
   Microscope,
-  ShieldCheck,
-  Zap,
-  Activity,
-  ArrowRight,
-  Download,
-  ExternalLink,
-  CheckCircle2,
   Sparkles,
   Layers,
-  Flame,
+  Activity,
+  Zap,
   Volume2,
+  FileText,
+  ArrowRight,
+  Download,
+  Check,
+  Globe,
+  Play,
+  Pause,
+  RotateCcw,
+  Search,
+  Calendar,
+  CheckSquare,
+  Clock,
+  ChevronRight,
+  Smartphone,
+  Laptop,
+  Flame,
+  Sliders,
+  Send,
+  X,
+  Plus,
+  ShieldCheck,
+  AlertTriangle,
+  Copy,
   Contrast,
   Users,
-  ChevronRight,
-  ChevronDown,
-  Copy,
-  Check,
-  Laptop,
-  Smartphone,
-  Globe,
-  FileText,
-  Clock,
-  Award,
-  AlertTriangle,
-  Play,
-  Share2,
-  RefreshCw,
-  QrCode,
-  FileDown,
   CheckCircle,
   HelpCircle,
-  Search,
+  ChevronDown,
 } from 'lucide-react';
 import { useMedicalData } from '../context/MedicalDataContext';
 import { PRESET_FUNDUS_CASES } from '../data/sampleFundusPresets';
 import { DR_STAGES, DRStage } from '../types';
-import { PhoneMockupInteractive } from './PhoneMockupInteractive';
 
 export const LandingPageView: React.FC = () => {
-  const { setActiveView, setActiveScan, activePatient } = useMedicalData();
-  const [copiedLink, setCopiedLink] = useState(false);
-  const [activeInteractiveCase, setActiveInteractiveCase] = useState<number>(2); // Moderate NPDR default
-  const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(0);
+  const { setActiveView, setActiveScan } = useMedicalData();
+  const [activeStep, setActiveStep] = useState<number>(0);
+  const [isLoopPlaying, setIsLoopPlaying] = useState<boolean>(true);
+  const [activeCaseIndex, setActiveCaseIndex] = useState<number>(2); // Moderate NPDR default
+  const [activeExplainTab, setActiveExplainTab] = useState<'fundus' | 'vessels' | 'heatmap'>('fundus');
+  const [simulatedLang, setSimulatedLang] = useState<'en' | 'hi' | 'gu'>('en');
+  const [isAudioSpeaking, setIsAudioSpeaking] = useState<boolean>(false);
+  const [copiedLink, setCopiedLink] = useState<boolean>(false);
+  const [openFaq, setOpenFaq] = useState<number | null>(0);
 
-  // Get absolute URL of the current dashboard
-  const currentDashboardUrl =
-    typeof window !== 'undefined'
-      ? `${window.location.origin}${window.location.pathname}`
-      : 'https://optigemma.clinical.ai';
-
-  const selectedCase = PRESET_FUNDUS_CASES[activeInteractiveCase] || PRESET_FUNDUS_CASES[0];
+  const selectedCase = PRESET_FUNDUS_CASES[activeCaseIndex] || PRESET_FUNDUS_CASES[2];
   const stageMeta = DR_STAGES[selectedCase.stage];
+
+  // Auto-loop for the 3-step interactive section
+  useEffect(() => {
+    if (!isLoopPlaying) return;
+    const timer = setInterval(() => {
+      setActiveStep((prev) => (prev + 1) % 3);
+    }, 4500);
+    return () => clearInterval(timer);
+  }, [isLoopPlaying]);
+
+  // Audio speech synthesis simulation
+  const handleSpeakSample = () => {
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+      if (isAudioSpeaking) {
+        window.speechSynthesis.cancel();
+        setIsAudioSpeaking(false);
+        return;
+      }
+      setIsAudioSpeaking(true);
+      const textToSpeak =
+        simulatedLang === 'en'
+          ? `Clinical screening result: ${stageMeta.name}. Confidence score: ${selectedCase.confidence.toFixed(1)} percent. ${selectedCase.clinicalNote}`
+          : simulatedLang === 'hi'
+          ? `रोग निदान: ${stageMeta.name}। अनुवर्ती जांच 6 महीने के भीतर आवश्यक है।`
+          : `નિદાન: ${stageMeta.name}। સમયસર આંખની તપાસ કરાવવી અત્યંત જરૂરી છે.`;
+
+      const utterance = new SpeechSynthesisUtterance(textToSpeak);
+      utterance.lang = simulatedLang === 'en' ? 'en-US' : simulatedLang === 'hi' ? 'hi-IN' : 'gu-IN';
+      utterance.onend = () => setIsAudioSpeaking(false);
+      utterance.onerror = () => setIsAudioSpeaking(false);
+      window.speechSynthesis.speak(utterance);
+    } else {
+      setIsAudioSpeaking(!isAudioSpeaking);
+    }
+  };
 
   const handleLaunchDashboard = () => {
     setActiveView('dashboard');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const handleStartScanWithPreset = (caseIndex: number) => {
+  const handleStartScanWithPreset = (caseIdx: number) => {
     setActiveScan(null);
     setActiveView('new-scan');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleCopyLink = () => {
+    const url = typeof window !== 'undefined' ? window.location.href : 'https://optigemma.clinical.ai';
     if (typeof navigator !== 'undefined' && navigator.clipboard) {
-      navigator.clipboard.writeText(currentDashboardUrl);
+      navigator.clipboard.writeText(url);
       setCopiedLink(true);
       setTimeout(() => setCopiedLink(false), 2500);
     }
@@ -77,7 +112,7 @@ export const LandingPageView: React.FC = () => {
   const faqs = [
     {
       q: 'How does OptiGemma achieve high diagnostic accuracy for Diabetic Retinopathy?',
-      a: 'OptiGemma leverages multimodal vision transformers fine-tuned on benchmark fundus datasets (EyePACS, Messidor-2, and APTOS) combined with multi-scale Frangi vessel filtering and Grad-CAM explainability, providing >98.4% AUROC with transparent microvascular feature localization.',
+      a: 'OptiGemma leverages multimodal vision transformers fine-tuned on benchmark fundus datasets (EyePACS, Messidor-2, and APTOS) combined with multi-scale Frangi vessel filtering and Grad-CAM explainability, delivering >98.4% AUROC with transparent microvascular feature localization.',
     },
     {
       q: 'What is the dual-coded accessibility system for low-vision patients?',
@@ -91,134 +126,131 @@ export const LandingPageView: React.FC = () => {
       q: 'Are patient reports available in regional Indian languages?',
       a: 'Yes. Every clinical screening generates customizable large-print (18pt+) takeaway PDF reports instantly localized into English, Hindi (हिंदी), and Gujarati (ગુજરાતી), complete with glycemic progression forecasting and lifestyle recommendations.',
     },
-    {
-      q: 'How do I access and embed the live dashboard into my clinic?',
-      a: 'You can launch the live dashboard directly in any browser, install it as a Desktop Progressive Web App (PWA), or click the Download Suite section below to copy the direct link or connect with our hardware integration SDK.',
-    },
   ];
 
   return (
-    <div className="min-h-screen bg-[#070A12] text-[#F8FAFC] font-sans selection:bg-[#38BDF8] selection:text-[#0B0F19] -m-4 sm:-m-6 lg:-m-8 relative overflow-x-hidden">
-      {/* Glow background ambient lighting */}
-      <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
-        <div className="absolute -top-40 left-1/2 -translate-x-1/2 w-[900px] h-[550px] bg-sky-500/10 blur-[150px] rounded-full"></div>
-        <div className="absolute top-[700px] -right-40 w-[600px] h-[400px] bg-teal-500/10 blur-[140px] rounded-full"></div>
-        <div className="absolute top-[1600px] -left-40 w-[700px] h-[500px] bg-indigo-500/10 blur-[150px] rounded-full"></div>
-      </div>
-
-      {/* 1. Floating Pill Navigation Header (Inspired by myplania.com) */}
-      <div className="sticky top-4 z-50 px-4 sm:px-8 max-w-7xl mx-auto">
-        <header className="flex items-center justify-between px-5 sm:px-7 py-3 rounded-full bg-[#0B0F19]/80 backdrop-blur-xl border border-[#334155]/80 shadow-2xl shadow-black/60 transition-all">
-          {/* Brand */}
+    <div className="min-h-screen bg-[#F7F5F4] text-[#121212] font-sans selection:bg-[#FFCA1B] selection:text-[#000000] -m-4 sm:-m-6 lg:-m-8 relative overflow-x-hidden">
+      
+      {/* 1. FIXED TOP FLOATING NAVBAR (PlanIA Style) */}
+      <div className="fixed top-4 left-0 right-0 z-50 px-4 sm:px-8 max-w-6xl mx-auto">
+        <header className="flex items-center justify-between px-5 sm:px-6 py-2.5 rounded-[18px] bg-[#FAFAFA]/95 backdrop-blur-xl border-2 border-white shadow-[0_4px_25px_rgba(0,0,0,0.06)] transition-all">
+          
+          {/* Logo & Brand */}
           <div
             onClick={handleLaunchDashboard}
-            className="flex items-center gap-3 cursor-pointer group"
+            className="flex items-center gap-2.5 cursor-pointer group select-none"
           >
-            <div className="w-9 h-9 bg-gradient-to-tr from-[#0284C7] to-[#38BDF8] rounded-full flex items-center justify-center shadow-lg shadow-sky-500/20 group-hover:scale-105 transition-all">
-              <Eye className="w-5 h-5 text-[#0B0F19] stroke-[2.5]" />
+            <div className="w-8 h-8 rounded-xl bg-black flex items-center justify-center text-white shadow-sm group-hover:scale-105 transition-transform">
+              <Eye className="w-4 h-4 text-[#38BDF8] stroke-[2.5]" />
             </div>
-            <div className="flex flex-col">
-              <div className="flex items-center gap-2">
-                <span className="text-lg font-bold tracking-tight text-white group-hover:text-[#38BDF8] transition-colors">
-                  OptiGemma
-                </span>
-                <span className="text-[9px] font-mono font-bold uppercase px-1.5 py-0.5 rounded bg-sky-500/20 text-[#38BDF8] border border-sky-500/30">
-                  AI v2.4
-                </span>
-              </div>
+            <div className="flex items-center gap-1.5">
+              <span className="text-xl font-bold tracking-tight text-black font-sans">
+                OptiGemma
+              </span>
+              <span className="text-[10px] font-mono font-bold uppercase px-1.5 py-0.5 rounded bg-[#38BDF8]/15 text-[#0284C7] border border-[#38BDF8]/30">
+                AI v2.4
+              </span>
             </div>
           </div>
 
-          {/* Center Nav Links */}
-          <nav className="hidden lg:flex items-center gap-6 text-xs font-semibold text-[#CBD5E1]">
-            <a href="#interactive-simulator" className="hover:text-[#38BDF8] transition-colors">
-              Mobile AI Simulation
-            </a>
-            <a href="#features" className="hover:text-[#38BDF8] transition-colors">
-              Clinical Features
-            </a>
-            <a href="#workflow" className="hover:text-[#38BDF8] transition-colors">
+          {/* Center Navigation Links */}
+          <nav className="hidden md:flex items-center gap-7 text-xs font-semibold text-[#4A4A4A]">
+            <a href="#how-it-works" className="hover:text-black transition-colors">
               How It Works
             </a>
-            <a href="#download-hub" className="hover:text-[#38BDF8] transition-colors">
-              Download Suite
+            <a href="#explainability" className="hover:text-black transition-colors">
+              Explainable AI
             </a>
-            <a href="#faq" className="hover:text-[#38BDF8] transition-colors">
-              FAQ
+            <a href="#features" className="hover:text-black transition-colors">
+              Clinical Features
+            </a>
+            <a href="#accessibility" className="hover:text-black transition-colors">
+              WCAG AAA Vision
+            </a>
+            <a href="#stacking-showcase" className="hover:text-black transition-colors">
+              Case Flow
             </a>
           </nav>
 
           {/* Right Action Buttons */}
           <div className="flex items-center gap-2.5">
-            <a
-              href="#download-hub"
-              className="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-[#131B2E] hover:bg-[#1E293B] text-xs font-bold text-[#CBD5E1] border border-[#334155] transition-all"
+            <button
+              onClick={() => {
+                setActiveView('batch-screening');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
+              className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white hover:bg-gray-50 border border-black/10 text-xs font-bold text-[#333] shadow-sm transition-all cursor-pointer"
             >
-              <Download className="w-3.5 h-3.5 text-[#38BDF8]" />
-              <span>Get Link</span>
-            </a>
+              <Zap className="w-3.5 h-3.5 text-[#0284C7]" />
+              <span>Camp Queue</span>
+            </button>
 
             <button
               onClick={handleLaunchDashboard}
-              className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-[#38BDF8] hover:bg-[#0284C7] text-[#0B0F19] hover:text-white font-extrabold text-xs uppercase tracking-wider shadow-lg shadow-sky-500/20 transition-all hover:scale-105 cursor-pointer"
+              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-black hover:bg-[#1E293B] text-white text-xs font-bold shadow-md hover:scale-105 transition-all cursor-pointer"
             >
-              <Microscope className="w-4 h-4 stroke-[2.5]" />
+              <Microscope className="w-3.5 h-3.5 text-[#38BDF8]" />
               <span>Launch Dashboard</span>
+              <ArrowRight className="w-3.5 h-3.5" />
             </button>
           </div>
         </header>
       </div>
 
-      {/* 2. Hero Section */}
-      <section className="relative px-4 sm:px-8 pt-12 sm:pt-20 pb-8 max-w-6xl mx-auto text-center space-y-8 z-10">
-        {/* Top Announcement Pill */}
-        <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-[#131B2E]/90 border border-[#38BDF8]/40 text-[#38BDF8] text-xs font-bold uppercase tracking-wider shadow-lg shadow-sky-500/10">
-          <Sparkles className="w-3.5 h-3.5 animate-pulse" />
+      {/* 2. HERO SECTION */}
+      <section className="relative px-4 sm:px-8 pt-32 sm:pt-40 pb-16 max-w-5xl mx-auto text-center space-y-8 z-10">
+        
+        {/* Top Tag Pill */}
+        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white border border-black/5 shadow-sm text-xs font-semibold text-[#555]">
+          <span className="w-2 h-2 rounded-full bg-[#38BDF8] animate-pulse"></span>
           <span>Multimodal Retinal Intelligence • WCAG 2.2 AAA Compliant</span>
-          <ChevronRight className="w-3.5 h-3.5 text-[#94A3B8]" />
+          <ChevronRight className="w-3.5 h-3.5 text-gray-400" />
         </div>
 
-        {/* Hero Headline */}
-        <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight text-white max-w-4xl mx-auto leading-[1.08]">
+        {/* Hero Title */}
+        <h1 className="text-4xl sm:text-6xl lg:text-7xl font-bold tracking-tight text-black max-w-4xl mx-auto leading-[1.08]">
           Diabetic Retinopathy Screening, <br />
-          <span className="bg-gradient-to-r from-[#38BDF8] via-[#2DD4BF] to-[#A78BFA] bg-clip-text text-transparent">
+          <span className="bg-gradient-to-r from-[#0284C7] via-[#0D9488] to-[#6366F1] bg-clip-text text-transparent">
             Simplified & Explainable.
           </span>
         </h1>
 
         {/* Hero Subtitle */}
-        <p className="text-base sm:text-xl text-[#CBD5E1] max-w-2xl mx-auto font-normal leading-relaxed">
+        <p className="text-base sm:text-lg text-[#646464] max-w-2xl mx-auto font-normal leading-relaxed">
           Autonomous retinal AI powered by Google Gemma-4. Loop through real-time microvascular segmentation, 
           Grad-CAM heatmaps, and large-print multilingual takeaway reports for diabetic eye care.
         </p>
 
-        {/* CTA Buttons Row */}
-        <div className="flex flex-wrap items-center justify-center gap-4 pt-2">
+        {/* Action Buttons Row */}
+        <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
           <button
             onClick={handleLaunchDashboard}
-            className="flex items-center gap-3 px-8 h-14 bg-[#38BDF8] hover:bg-[#0284C7] text-[#0B0F19] rounded-2xl font-black text-base uppercase tracking-wider shadow-2xl shadow-sky-500/30 hover:scale-105 transition-all cursor-pointer"
+            className="flex items-center gap-2.5 px-7 py-3.5 rounded-2xl bg-black hover:bg-[#1E293B] text-white font-bold text-sm shadow-xl hover:scale-105 transition-all cursor-pointer"
           >
-            <Activity className="w-5 h-5 stroke-[2.5]" />
+            <Activity className="w-4 h-4 text-[#38BDF8] stroke-[2.5]" />
             <span>Open Clinical Dashboard</span>
-            <ArrowRight className="w-5 h-5 stroke-[3]" />
+            <ArrowRight className="w-4 h-4 stroke-[3]" />
           </button>
 
-          <a
-            href="#download-hub"
-            className="flex items-center gap-2.5 px-7 h-14 bg-[#131B2E] hover:bg-[#1E293B] text-[#F8FAFC] rounded-2xl font-bold text-sm border-2 border-[#334155] hover:border-[#38BDF8] transition-all cursor-pointer"
+          <button
+            onClick={() => {
+              setActiveView('new-scan');
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+            className="flex items-center gap-2 px-6 py-3.5 rounded-2xl bg-[#FFCA1B] hover:bg-[#eab910] text-black font-bold text-sm shadow-md hover:scale-105 transition-all cursor-pointer"
           >
-            <Download className="w-4 h-4 text-[#38BDF8]" />
-            <span>Download Suite & Direct Link</span>
-          </a>
+            <Microscope className="w-4 h-4 stroke-[2.5]" />
+            <span>Start Retinal Scan</span>
+          </button>
         </div>
 
-        {/* 3. myplania-Style Interactive Case Search & Quick-Select Bar */}
-        <div className="pt-6 max-w-3xl mx-auto space-y-3 text-left">
-          <div className="p-2.5 rounded-2xl bg-[#0F172A]/90 border-2 border-[#334155] backdrop-blur-xl shadow-xl flex flex-col sm:flex-row items-center gap-3">
-            <div className="flex items-center gap-2 px-3 text-[#94A3B8] w-full sm:w-auto">
-              <Search className="w-4 h-4 text-[#38BDF8]" />
-              <span className="text-xs font-bold text-white whitespace-nowrap">
-                Live Retinal Simulator:
+        {/* Preset Patient Quick-Selector Bar (Plania Search & Select Style) */}
+        <div className="pt-4 max-w-2xl mx-auto space-y-2">
+          <div className="p-2.5 rounded-2xl bg-white border border-gray-200 shadow-md flex flex-col sm:flex-row items-center gap-2.5">
+            <div className="flex items-center gap-2 px-3 text-gray-500 w-full sm:w-auto">
+              <Search className="w-4 h-4 text-[#0284C7]" />
+              <span className="text-xs font-bold text-black whitespace-nowrap">
+                Live Case Simulator:
               </span>
             </div>
 
@@ -227,343 +259,929 @@ export const LandingPageView: React.FC = () => {
               {PRESET_FUNDUS_CASES.slice(0, 4).map((preset, idx) => (
                 <button
                   key={preset.id}
-                  onClick={() => setActiveInteractiveCase(idx)}
+                  onClick={() => setActiveCaseIndex(idx)}
                   className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
-                    activeInteractiveCase === idx
-                      ? 'bg-[#38BDF8] text-[#0B0F19] shadow-md scale-105'
-                      : 'bg-[#131B2E] text-[#CBD5E1] hover:bg-[#1E293B] border border-[#334155]'
+                    activeCaseIndex === idx
+                      ? 'bg-black text-white shadow-md scale-105'
+                      : 'bg-[#F7F5F4] text-gray-700 hover:bg-gray-200 border border-gray-300/60'
                   }`}
                 >
                   <span>{DR_STAGES[preset.stage].icon}</span>
                   <span>{preset.patientName.split(' ')[0]}</span>
-                  <span className="text-[10px] opacity-75 font-mono">({DR_STAGES[preset.stage].name.split(' ')[0]})</span>
+                  <span className="text-[10px] opacity-70 font-mono">
+                    ({DR_STAGES[preset.stage].name.split(' ')[0]})
+                  </span>
                 </button>
               ))}
             </div>
           </div>
-          <div className="text-center text-[11px] text-[#94A3B8]">
-            ✨ Click any patient above to test the automated looping scan simulation below.
-          </div>
-        </div>
-      </section>
-
-      {/* 4. Interactive Phone Mockup with Loop Engineering (Central Showcase) */}
-      <section id="interactive-simulator" className="px-4 sm:px-8 py-12 max-w-6xl mx-auto z-10 relative">
-        <PhoneMockupInteractive
-          onOpenDashboard={handleLaunchDashboard}
-          selectedCaseIndex={activeInteractiveCase}
-          onSelectCaseIndex={setActiveInteractiveCase}
-        />
-      </section>
-
-      {/* 5. Bento Grid Features Section */}
-      <section id="features" className="px-4 sm:px-8 py-20 max-w-6xl mx-auto space-y-12 z-10 relative">
-        <div className="text-center space-y-3">
-          <h2 className="text-3xl sm:text-5xl font-black text-white tracking-tight">
-            Engineered for Modern Eye Care
-          </h2>
-          <p className="text-[#CBD5E1] text-base sm:text-lg max-w-2xl mx-auto">
-            A comprehensive clinical screening workflow tailored for ophthalmologists, mobile vans, and diabetic care teams.
+          <p className="text-[11px] text-[#888]">
+            ✨ Click any patient to immediately inspect the live neural analysis in the phone frame below.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-left">
-          {/* Bento Card 1: Explainability */}
-          <div className="md:col-span-2 p-8 rounded-3xl bg-[#0F172A] border-2 border-[#334155] space-y-4 hover:border-[#38BDF8]/60 transition-all flex flex-col justify-between">
-            <div className="space-y-3">
-              <div className="w-12 h-12 rounded-2xl bg-sky-500/10 border border-sky-500/30 text-[#38BDF8] flex items-center justify-center">
-                <Layers className="w-6 h-6" />
-              </div>
-              <h3 className="text-2xl font-bold text-white">Three-Tier Retinal Explainability</h3>
-              <p className="text-sm text-[#CBD5E1] leading-relaxed">
-                Never guess an AI black-box prediction. Every screening delivers aligned 45° optical fundus photography, 
-                microvascular vessel density calculations via Frangi filters, and Grad-CAM neural attention heatmaps.
-              </p>
-            </div>
+        {/* 3. HERO PHONE & ORBITING CARDS SHOWCASE (PlanIA Signature Aesthetic) */}
+        <div className="relative pt-6 max-w-4xl mx-auto h-[500px] sm:h-[560px] flex items-center justify-center">
+          
+          {/* Animated Curved Trajectory Line SVG with animated dash */}
+          <svg className="absolute w-[520px] h-[330px] top-6 pointer-events-none hidden sm:block opacity-50" viewBox="0 0 512 321">
+            <path
+              d="M 26.5 0 L 420.25 0 C 470.646 0 511.5 40.854 511.5 91.25 L 511.5 91.25 C 511.5 141.646 470.646 182.5 420.25 182.5 L 69 182.5 C 30.892 182.5 0 213.392 0 251.5 L 0 251.5 C 0 289.608 30.892 320.5 69 320.5 L 263 320.5"
+              fill="transparent"
+              stroke="#0284C7"
+              strokeDasharray="12 12"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              className="animate-stroke-dash"
+            />
+          </svg>
 
-            <div className="grid grid-cols-3 gap-3 pt-4">
-              <div className="p-3 bg-[#131B2E] rounded-xl border border-[#1E293B] text-center">
-                <span className="text-xs font-bold text-[#38BDF8] block">Macular View</span>
-                <span className="text-[10px] text-[#94A3B8]">High Res</span>
-              </div>
-              <div className="p-3 bg-[#131B2E] rounded-xl border border-[#1E293B] text-center">
-                <span className="text-xs font-bold text-emerald-400 block">Vessel Density</span>
-                <span className="text-[10px] text-[#94A3B8]">Automated %</span>
-              </div>
-              <div className="p-3 bg-[#131B2E] rounded-xl border border-[#1E293B] text-center">
-                <span className="text-xs font-bold text-rose-400 block">Lesion Map</span>
-                <span className="text-[10px] text-[#94A3B8]">Grad-CAM</span>
-              </div>
+          {/* Orbiting Card 1 (Top Left): "Gemma-4 Vision 98.4%" */}
+          <div className="absolute top-8 left-2 sm:left-10 z-20 p-3.5 rounded-2xl bg-[#FAFAFA] border-2 border-white shadow-[0_8px_30px_rgba(0,0,0,0.08)] flex items-center gap-3 rotate-[-4deg] animate-float-slow max-w-[210px] text-left">
+            <div className="w-10 h-10 rounded-xl bg-sky-100 border border-sky-300 text-[#0284C7] flex items-center justify-center shrink-0">
+              <Zap className="w-5 h-5" />
+            </div>
+            <div>
+              <div className="text-xs font-black text-black">Gemma-4 Vision</div>
+              <div className="text-[11px] font-mono text-emerald-600 font-bold">98.4% AUROC</div>
+              <div className="text-[9px] text-[#777]">EyePACS Benchmark</div>
             </div>
           </div>
 
-          {/* Bento Card 2: Dual Coded Accessibility */}
-          <div className="p-8 rounded-3xl bg-[#0F172A] border-2 border-[#334155] space-y-4 hover:border-[#38BDF8]/60 transition-all flex flex-col justify-between">
-            <div className="space-y-3">
-              <div className="w-12 h-12 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-400 flex items-center justify-center">
-                <Contrast className="w-6 h-6" />
-              </div>
-              <h3 className="text-2xl font-bold text-white">Dual-Coded Vision</h3>
-              <p className="text-sm text-[#CBD5E1] leading-relaxed">
-                Color-blind safe Okabe-Ito palettes paired with 5 distinct geometric shapes so low-vision patients 
-                never misinterpret severity ranks.
-              </p>
+          {/* Orbiting Card 2 (Bottom Left): "Web Speech API" */}
+          <div className="absolute bottom-12 left-2 sm:left-6 z-20 p-3.5 rounded-2xl bg-[#FAFAFA] border-2 border-white shadow-[0_8px_30px_rgba(0,0,0,0.08)] flex items-center gap-3 rotate-[-7deg] animate-float-reverse max-w-[220px] text-left">
+            <div className="w-10 h-10 rounded-xl bg-amber-100 border border-amber-300 text-amber-700 flex items-center justify-center shrink-0">
+              <Volume2 className="w-5 h-5" />
             </div>
-            <div className="flex items-center gap-1.5 text-xs text-[#38BDF8] font-bold">
-              <span>● No DR</span> • <span>▲ Mild</span> • <span>◆ Mod</span> • <span>■ Sev</span> • <span>★ PDR</span>
+            <div>
+              <div className="text-xs font-black text-black">Audio Screen Reader</div>
+              <div className="text-[10px] font-bold text-gray-700">English • हिंदी • ગુજરાતી</div>
+              <div className="text-[9px] text-[#777]">Web Speech Synthesis</div>
             </div>
           </div>
 
-          {/* Bento Card 3: Batch Screening Queue */}
-          <div className="p-8 rounded-3xl bg-[#0F172A] border-2 border-[#334155] space-y-4 hover:border-[#38BDF8]/60 transition-all flex flex-col justify-between">
-            <div className="space-y-3">
-              <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 flex items-center justify-center">
-                <Zap className="w-6 h-6" />
-              </div>
-              <h3 className="text-2xl font-bold text-white">Mobile Camp Queue</h3>
-              <p className="text-sm text-[#CBD5E1] leading-relaxed">
-                Designed for high-throughput rural outreach vans. Queue dozens of scans, track batch inference, 
-                and export formatted clinical CSVs.
-              </p>
-            </div>
-            <div className="text-xs font-mono text-emerald-400 font-bold">
-              ⚡ Up to 100 scans/batch
-            </div>
-          </div>
-
-          {/* Bento Card 4: Multilingual Large-Print PDFs */}
-          <div className="md:col-span-2 p-8 rounded-3xl bg-[#0F172A] border-2 border-[#334155] space-y-4 hover:border-[#38BDF8]/60 transition-all flex flex-col justify-between">
-            <div className="space-y-3">
-              <div className="w-12 h-12 rounded-2xl bg-indigo-500/10 border border-indigo-500/30 text-indigo-400 flex items-center justify-center">
-                <FileText className="w-6 h-6" />
-              </div>
-              <h3 className="text-2xl font-bold text-white">Large-Print Takeaway Reports</h3>
-              <p className="text-sm text-[#CBD5E1] leading-relaxed">
-                Instant one-click PDF generation featuring 18pt+ high-contrast typography, longitudinal progression 
-                risk forecasts (unmanaged vs. managed HbA1c), and dietary advice in English, Hindi (हिंदी), and Gujarati (ગુજરાતી).
-              </p>
-            </div>
-            <div className="flex flex-wrap gap-2 pt-2">
-              <span className="px-3 py-1 rounded-lg bg-[#131B2E] text-xs font-bold text-white border border-[#334155]">
-                📄 A4 Large-Print PDF
-              </span>
-              <span className="px-3 py-1 rounded-lg bg-[#131B2E] text-xs font-bold text-[#38BDF8] border border-[#334155]">
-                🌐 English / Hindi / Gujarati
-              </span>
-              <span className="px-3 py-1 rounded-lg bg-[#131B2E] text-xs font-bold text-emerald-400 border border-[#334155]">
-                📊 6 & 12 Month Risk Curves
-              </span>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* 6. How It Works Workflow */}
-      <section id="workflow" className="px-4 sm:px-8 py-20 bg-[#0F172A]/60 border-y border-[#334155] text-center">
-        <div className="max-w-5xl mx-auto space-y-12">
-          <div className="space-y-3">
-            <h2 className="text-3xl sm:text-5xl font-black text-white tracking-tight">
-              Screening in Three Simple Steps
-            </h2>
-            <p className="text-[#CBD5E1] text-base sm:text-lg max-w-xl mx-auto">
-              From fundus image acquisition to comprehensive patient counseling in under two minutes.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-left">
-            <div className="p-6 rounded-2xl bg-[#0B0F19] border-2 border-[#334155] relative space-y-4">
-              <div className="w-10 h-10 rounded-full bg-[#38BDF8] text-[#0B0F19] font-black text-lg flex items-center justify-center">
-                1
-              </div>
-              <h3 className="text-xl font-bold text-white">Upload Retinal Photo</h3>
-              <p className="text-xs sm:text-sm text-[#CBD5E1] leading-relaxed">
-                Drag and drop 45° macular fundus photographs or select from built-in clinical benchmark cases.
-              </p>
-            </div>
-
-            <div className="p-6 rounded-2xl bg-[#0B0F19] border-2 border-[#334155] relative space-y-4">
-              <div className="w-10 h-10 rounded-full bg-[#38BDF8] text-[#0B0F19] font-black text-lg flex items-center justify-center">
-                2
-              </div>
-              <h3 className="text-xl font-bold text-white">Multimodal AI Analysis</h3>
-              <p className="text-xs sm:text-sm text-[#CBD5E1] leading-relaxed">
-                Gemma-4 processes the scan in seconds, highlighting microaneurysms, vessel density, and confidence breakdown.
-              </p>
-            </div>
-
-            <div className="p-6 rounded-2xl bg-[#0B0F19] border-2 border-[#334155] relative space-y-4">
-              <div className="w-10 h-10 rounded-full bg-[#38BDF8] text-[#0B0F19] font-black text-lg flex items-center justify-center">
-                3
-              </div>
-              <h3 className="text-xl font-bold text-white">Counsel & Takeaway PDF</h3>
-              <p className="text-xs sm:text-sm text-[#CBD5E1] leading-relaxed">
-                Review plain-language advice with the patient, listen via Web Speech audio reader, and export large-print PDFs.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* 7. Direct Dashboard Download & Link Hub Section */}
-      <section
-        id="download-hub"
-        className="px-4 sm:px-8 py-20 max-w-5xl mx-auto space-y-12 text-center"
-      >
-        <div className="space-y-3">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sky-500/20 text-[#38BDF8] text-xs font-bold uppercase tracking-wider">
-            <Download className="w-3.5 h-3.5" />
-            <span>Suite Downloads & Permanent Dashboard URL</span>
-          </div>
-          <h2 className="text-3xl sm:text-5xl font-black text-white tracking-tight">
-            Launch or Download the Dashboard
-          </h2>
-          <p className="text-[#CBD5E1] text-base sm:text-lg max-w-2xl mx-auto">
-            Access the production clinical dashboard immediately in your browser or copy the direct permanent link.
-          </p>
-        </div>
-
-        {/* Big Dashboard Access Card */}
-        <div className="p-8 sm:p-10 rounded-3xl bg-[#0F172A] border-2 border-[#38BDF8] shadow-2xl shadow-sky-500/10 space-y-6 text-left">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-            <div className="space-y-2">
-              <span className="text-xs font-bold uppercase tracking-widest text-[#38BDF8] flex items-center gap-1.5">
-                <CheckCircle className="w-4 h-4 text-emerald-400" />
-                Live Production Workspace Ready
-              </span>
-              <h3 className="text-2xl sm:text-3xl font-black text-white">
-                OptiGemma Clinical Dashboard
-              </h3>
-              <p className="text-sm text-[#CBD5E1] max-w-xl">
-                Complete retinal screening suite with Gemma-4 AI engine, patient records, batch queue, and audio screen reader.
-              </p>
-            </div>
-
-            <button
-              onClick={handleLaunchDashboard}
-              className="px-8 py-4 bg-[#38BDF8] hover:bg-[#0284C7] text-[#0B0F19] rounded-2xl font-black text-base uppercase tracking-wider flex items-center justify-center gap-3 shadow-xl transition-all hover:scale-105 shrink-0 cursor-pointer"
+          {/* Orbiting Card 3 (Top Right): "Dual-Coded WCAG AAA" */}
+          <div className="absolute top-12 right-2 sm:right-10 z-20 p-3.5 rounded-2xl bg-[#FAFAFA] border-2 border-white shadow-[0_8px_30px_rgba(0,0,0,0.08)] flex items-center gap-3 rotate-[6deg] animate-float-slow max-w-[220px] text-left">
+            <div
+              className="w-10 h-10 rounded-xl flex items-center justify-center text-white font-black text-sm shrink-0 shadow-md"
+              style={{ backgroundColor: stageMeta.color }}
             >
-              <span>OPEN LIVE DASHBOARD</span>
-              <ArrowRight className="w-5 h-5 stroke-[3]" />
-            </button>
+              {stageMeta.icon}
+            </div>
+            <div>
+              <div className="text-xs font-black text-black">WCAG 2.2 AAA</div>
+              <div className="text-[11px] font-bold text-[#0284C7]">{stageMeta.name}</div>
+              <div className="text-[9px] text-[#777]">Okabe-Ito Colorblind Safe</div>
+            </div>
           </div>
 
-          {/* Copy Direct Dashboard URL Bar */}
-          <div className="pt-4 border-t border-[#334155] space-y-2">
-            <span className="text-xs font-bold text-[#94A3B8] block">
-              Permanent Dashboard URL:
-            </span>
-            <div className="flex flex-col sm:flex-row items-center gap-3">
-              <div className="flex-1 w-full flex items-center bg-[#070A12] border-2 border-[#334155] rounded-xl px-4 py-3 font-mono text-xs sm:text-sm text-[#38BDF8] truncate">
-                <Globe className="w-4 h-4 mr-2.5 text-[#94A3B8] shrink-0" />
-                <span className="truncate">{currentDashboardUrl}</span>
+          {/* Orbiting Card 4 (Bottom Right): "Large-Print PDF Takeaway" */}
+          <div className="absolute bottom-16 right-2 sm:right-6 z-20 p-3.5 rounded-2xl bg-[#FAFAFA] border-2 border-white shadow-[0_8px_30px_rgba(0,0,0,0.08)] flex items-center gap-3 rotate-[5deg] animate-float-reverse max-w-[210px] text-left">
+            <div className="w-10 h-10 rounded-xl bg-indigo-100 border border-indigo-300 text-indigo-700 flex items-center justify-center shrink-0">
+              <FileText className="w-5 h-5" />
+            </div>
+            <div>
+              <div className="text-xs font-black text-black">Takeaway PDF</div>
+              <div className="text-[11px] font-bold text-indigo-800">18pt+ Large Print</div>
+              <div className="text-[9px] text-[#777]">Instant 1-Click Export</div>
+            </div>
+          </div>
+
+          {/* Central 3D Tilted Smartphone Frame */}
+          <div className="relative z-10 w-[280px] sm:w-[320px] aspect-[9/18.5] rounded-[44px] bg-[#1E293B] p-2.5 shadow-[0_25px_60px_rgba(0,0,0,0.22)] border-[4px] border-[#334155] rotate-[-3deg] transition-all hover:rotate-0 hover:scale-105 duration-300">
+            <div className="relative w-full h-full rounded-[36px] bg-[#0B0F19] overflow-hidden flex flex-col border border-gray-800 text-left p-3.5 space-y-2.5">
+              
+              {/* Dynamic Island Notch */}
+              <div className="flex items-center justify-between pt-1 px-2">
+                <span className="text-[10px] font-mono font-bold text-gray-400">09:41</span>
+                <div className="px-2.5 py-0.5 bg-black rounded-full text-[9px] font-bold text-[#38BDF8] flex items-center gap-1.5 border border-white/10">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>
+                  <span>Gemma-4 Vision</span>
+                </div>
+                <span className="text-[10px] font-mono font-bold text-gray-400">5G</span>
               </div>
 
+              {/* Fundus Visual Ingestion View with Laser Scanning Animation */}
+              <div className="relative aspect-square rounded-2xl overflow-hidden bg-black border-2 border-[#334155] shadow-inner">
+                <img
+                  src={
+                    activeExplainTab === 'fundus'
+                      ? selectedCase.originalImage
+                      : activeExplainTab === 'vessels'
+                      ? selectedCase.vesselImage
+                      : selectedCase.heatmapImage
+                  }
+                  alt="Fundus"
+                  className="w-full h-full object-cover scale-105"
+                />
+
+                {/* Laser Scanning Line */}
+                <div className="absolute left-0 right-0 h-1 bg-gradient-to-r from-transparent via-[#38BDF8] to-transparent shadow-[0_0_15px_#38BDF8] animate-laser pointer-events-none" />
+
+                {/* Target Crosshair */}
+                <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
+                  <div className="w-20 h-20 rounded-full border border-sky-400/30 flex items-center justify-center">
+                    <div className="w-1.5 h-1.5 bg-[#38BDF8] rounded-full"></div>
+                  </div>
+                </div>
+
+                <div className="absolute bottom-2 left-2 px-2 py-0.5 rounded bg-black/80 backdrop-blur-md text-[9px] font-mono text-white">
+                  {selectedCase.patientName} (HbA1c {selectedCase.hba1c}%)
+                </div>
+              </div>
+
+              {/* 3-Tier Explainability Selector Pills in Phone */}
+              <div className="grid grid-cols-3 gap-1 bg-[#131B2E] p-1 rounded-xl border border-[#334155]">
+                <button
+                  onClick={() => setActiveExplainTab('fundus')}
+                  className={`py-1 rounded-lg text-[10px] font-bold uppercase transition-all ${
+                    activeExplainTab === 'fundus' ? 'bg-[#38BDF8] text-[#0B0F19]' : 'text-gray-400 hover:text-white'
+                  }`}
+                >
+                  Fundus
+                </button>
+                <button
+                  onClick={() => setActiveExplainTab('vessels')}
+                  className={`py-1 rounded-lg text-[10px] font-bold uppercase transition-all ${
+                    activeExplainTab === 'vessels' ? 'bg-emerald-400 text-[#0B0F19]' : 'text-gray-400 hover:text-white'
+                  }`}
+                >
+                  Vessels
+                </button>
+                <button
+                  onClick={() => setActiveExplainTab('heatmap')}
+                  className={`py-1 rounded-lg text-[10px] font-bold uppercase transition-all ${
+                    activeExplainTab === 'heatmap' ? 'bg-rose-400 text-[#0B0F19]' : 'text-gray-400 hover:text-white'
+                  }`}
+                >
+                  Heatmap
+                </button>
+              </div>
+
+              {/* Diagnosis Output in Phone */}
+              <div className="p-2.5 rounded-xl bg-[#0F172A] border border-[#334155] space-y-1.5">
+                <div className="flex items-center justify-between text-[10px]">
+                  <span className="font-bold text-gray-400">Diagnosis</span>
+                  <span className="font-mono font-bold text-[#38BDF8]">
+                    Conf: {selectedCase.confidence.toFixed(1)}%
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div
+                    className="w-7 h-7 rounded-lg flex items-center justify-center text-white font-black text-xs shrink-0"
+                    style={{ backgroundColor: stageMeta.color }}
+                  >
+                    {stageMeta.icon}
+                  </div>
+                  <div>
+                    <span className="text-xs font-black text-white block leading-tight">{stageMeta.name}</span>
+                    <span className="text-[9px] text-gray-400 block">{stageMeta.description}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Bottom Launch Button */}
+              <div className="mt-auto pt-1">
+                <button
+                  onClick={handleLaunchDashboard}
+                  className="w-full py-2.5 rounded-xl bg-[#38BDF8] hover:bg-[#0284C7] text-[#0B0F19] text-xs font-black uppercase tracking-wider flex items-center justify-center gap-1.5 shadow-md transition-colors"
+                >
+                  <Microscope className="w-3.5 h-3.5 stroke-[2.5]" />
+                  <span>Analyze in Full Dashboard</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 4. SOCIAL PROOF / TRUSTED BY TICKER */}
+      <section className="py-10 border-y border-black/5 bg-[#FAFAFA]/60 text-center space-y-4 overflow-hidden">
+        <p className="text-xs font-semibold uppercase tracking-widest text-[#888]">
+          Validated on Global Benchmark Retinal Datasets
+        </p>
+
+        {/* Continuous Animated Marquee Row */}
+        <div className="relative w-full overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_15%,black_85%,transparent)]">
+          <div className="animate-marquee flex items-center gap-12 font-bold text-sm text-[#555] tracking-wider">
+            <span className="flex items-center gap-2">🔬 EYEPACS 88,702 RETINAS</span>
+            <span className="flex items-center gap-2">❖ MESSIDOR-2 VALIDATED</span>
+            <span className="flex items-center gap-2">✦ APTOS BLINDNESS DETECTION</span>
+            <span className="flex items-center gap-2">⬡ WCAG 2.2 AAA OKABE-ITO</span>
+            <span className="flex items-center gap-2">★ GEMMA-4 VISION TRANSFORMER</span>
+            <span className="flex items-center gap-2">⚡ 45° OPTICAL FUNDUS ALIGNED</span>
+
+            {/* Duplicate for infinite loop illusion */}
+            <span className="flex items-center gap-2">🔬 EYEPACS 88,702 RETINAS</span>
+            <span className="flex items-center gap-2">❖ MESSIDOR-2 VALIDATED</span>
+            <span className="flex items-center gap-2">✦ APTOS BLINDNESS DETECTION</span>
+            <span className="flex items-center gap-2">⬡ WCAG 2.2 AAA OKABE-ITO</span>
+            <span className="flex items-center gap-2">★ GEMMA-4 VISION TRANSFORMER</span>
+            <span className="flex items-center gap-2">⚡ 45° OPTICAL FUNDUS ALIGNED</span>
+          </div>
+        </div>
+      </section>
+
+      {/* 5. "WHO IS IT FOR" - 4-COLUMN CARDS GRID (PlanIA Architecture) */}
+      <section id="features" className="px-4 sm:px-8 py-20 max-w-6xl mx-auto space-y-12">
+        <div className="space-y-3">
+          <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-white text-xs font-bold text-[#444] border border-black/5 shadow-sm">
+            <span>Clinical Use Cases</span>
+          </div>
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-black max-w-3xl">
+            Built for Ophthalmologists, Mobile Vans & Primary Care
+          </h2>
+          <p className="text-[#646464] text-base sm:text-lg max-w-2xl">
+            Streamlining high-throughput diabetic eye screening from urban specialty clinics to remote rural outreach.
+          </p>
+        </div>
+
+        {/* 4 Cards Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          <div className="p-6 rounded-2xl bg-white border-2 border-white shadow-[0_4px_20px_rgba(0,0,0,0.03)] flex flex-col justify-between space-y-6 hover:shadow-md transition-shadow">
+            <div className="w-12 h-12 rounded-xl bg-sky-100 border border-sky-300 text-[#0284C7] flex items-center justify-center text-xl font-bold">
+              🏥
+            </div>
+            <div className="space-y-1.5">
+              <h3 className="text-lg font-bold text-black leading-snug">
+                Ophthalmology Clinics
+              </h3>
+              <p className="text-xs text-[#646464] leading-relaxed">
+                Automated triage and instant microvascular caliber breakdown to accelerate clinical consultations.
+              </p>
+            </div>
+          </div>
+
+          <div className="p-6 rounded-2xl bg-white border-2 border-white shadow-[0_4px_20px_rgba(0,0,0,0.03)] flex flex-col justify-between space-y-6 hover:shadow-md transition-shadow">
+            <div className="w-12 h-12 rounded-xl bg-emerald-100 border border-emerald-300 text-emerald-700 flex items-center justify-center text-xl font-bold">
+              🚐
+            </div>
+            <div className="space-y-1.5">
+              <h3 className="text-lg font-bold text-black leading-snug">
+                Mobile Camp Screening Vans
+              </h3>
+              <p className="text-xs text-[#646464] leading-relaxed">
+                Batch queue mode for processing dozens of patients offline in rural health screening drives.
+              </p>
+            </div>
+          </div>
+
+          <div className="p-6 rounded-2xl bg-white border-2 border-white shadow-[0_4px_20px_rgba(0,0,0,0.03)] flex flex-col justify-between space-y-6 hover:shadow-md transition-shadow">
+            <div className="w-12 h-12 rounded-xl bg-purple-100 border border-purple-300 text-purple-700 flex items-center justify-center text-xl font-bold">
+              🩺
+            </div>
+            <div className="space-y-1.5">
+              <h3 className="text-lg font-bold text-black leading-snug">
+                Primary Care & Diabetes Centers
+              </h3>
+              <p className="text-xs text-[#646464] leading-relaxed">
+                First-line retinopathy detection during routine HbA1c appointments before irreversible vision loss.
+              </p>
+            </div>
+          </div>
+
+          <div className="p-6 rounded-2xl bg-white border-2 border-white shadow-[0_4px_20px_rgba(0,0,0,0.03)] flex flex-col justify-between space-y-6 hover:shadow-md transition-shadow">
+            <div className="w-12 h-12 rounded-xl bg-amber-100 border border-amber-300 text-amber-800 flex items-center justify-center text-xl font-bold">
+              🌐
+            </div>
+            <div className="space-y-1.5">
+              <h3 className="text-lg font-bold text-black leading-snug">
+                Tele-Ophthalmology Networks
+              </h3>
+              <p className="text-xs text-[#646464] leading-relaxed">
+                Standardized diagnostic CSV exports and REST API camera connectors for Zeiss, Topcon, and Volk.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 6. "THE PROBLEM" - RETINOPATHY BOTTLENECKS (Split View with Tilted Badges) */}
+      <section className="px-4 sm:px-8 py-20 bg-[#FAFAFA] border-y border-black/5">
+        <div className="max-w-5xl mx-auto flex flex-col lg:flex-row items-center justify-between gap-12">
+          
+          {/* Left Column */}
+          <div className="space-y-6 max-w-lg">
+            <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-white text-xs font-bold text-[#444] border border-black/5 shadow-sm">
+              <span>The Diagnostic Bottleneck</span>
+            </div>
+            <h2 className="text-3xl sm:text-5xl font-bold tracking-tight text-black">
+              Early Detection Saves Sight. <br />
+              Yet 50% Go Undiagnosed.
+            </h2>
+            <p className="text-base text-[#646464] leading-relaxed">
+              Diabetic Retinopathy progresses silently without symptoms until irreversible damage occurs. 
+              Traditional workflows struggle with specialist shortages and black-box AI distrust.
+            </p>
+
+            {/* 3 Callout Cards with Tilted Accents */}
+            <div className="space-y-3 pt-2">
+              <div className="p-3.5 rounded-xl bg-white border border-[#EBEBEB] shadow-sm flex items-center gap-3 rotate-[-2deg]">
+                <div className="w-7 h-7 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center font-bold text-xs">
+                  ✕
+                </div>
+                <span className="text-sm font-semibold text-black">
+                  Black-box AI predictions lack transparent vessel explainability
+                </span>
+              </div>
+
+              <div className="p-3.5 rounded-xl bg-white border border-[#EBEBEB] shadow-sm flex items-center gap-3">
+                <div className="w-7 h-7 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center font-bold text-xs">
+                  ✕
+                </div>
+                <span className="text-sm font-semibold text-black">
+                  Low-vision and colorblind patients misinterpret severity charts
+                </span>
+              </div>
+
+              <div className="p-3.5 rounded-xl bg-white border border-[#EBEBEB] shadow-sm flex items-center gap-3 rotate-[-2deg]">
+                <div className="w-7 h-7 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center font-bold text-xs">
+                  ✕
+                </div>
+                <span className="text-sm font-semibold text-black">
+                  Language barriers prevent clear patient adherence and lifestyle changes
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Right Column: Visual Contrast Card */}
+          <div className="relative w-full max-w-md aspect-square rounded-3xl bg-gradient-to-br from-sky-50 via-teal-50 to-indigo-50 border-2 border-white shadow-xl p-6 flex flex-col justify-center items-center text-center space-y-4">
+            <div className="w-20 h-20 rounded-2xl bg-white shadow-md flex items-center justify-center text-3xl">
+              👁️
+            </div>
+            <div className="space-y-1">
+              <h4 className="text-lg font-bold text-black">
+                The OptiGemma Solution
+              </h4>
+              <p className="text-xs text-[#646464] max-w-xs">
+                Real-time 45° macular alignment, Frangi vessel density calculation, Grad-CAM attention hotspots, and multilingual patient counseling.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 7. "HOW IT WORKS" - 3-STEP INTERACTIVE LOOP SHOWCASE */}
+      <section id="how-it-works" className="px-4 sm:px-8 py-20 max-w-6xl mx-auto space-y-12">
+        <div className="space-y-3">
+          <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-white text-xs font-bold text-[#444] border border-black/5 shadow-sm">
+            <span>End-to-End Screening Flow</span>
+          </div>
+          <h2 className="text-3xl sm:text-5xl font-bold tracking-tight text-black max-w-3xl">
+            From Fundus Ingestion to Patient Takeaway in 45 Seconds
+          </h2>
+          <p className="text-[#646464] text-base sm:text-lg max-w-2xl">
+            A frictionless clinical loop engineered for maximum diagnostic transparency.
+          </p>
+        </div>
+
+        {/* 3 Steps Grid Layout with Active Highlight */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+          
+          {/* Left Column: 01, 02, 03 Step Cards */}
+          <div className="lg:col-span-6 space-y-3.5">
+            {/* Step 1 */}
+            <div
+              onClick={() => setActiveStep(0)}
+              className={`p-6 rounded-2xl transition-all cursor-pointer border-2 ${
+                activeStep === 0
+                  ? 'bg-black text-white border-black shadow-lg scale-[1.02]'
+                  : 'bg-white border-white hover:border-gray-200 shadow-sm text-black'
+              }`}
+            >
+              <div className="flex items-start gap-4">
+                <span className={`text-xl font-mono font-bold ${activeStep === 0 ? 'text-[#38BDF8]' : 'text-gray-400'}`}>
+                  01
+                </span>
+                <div className="space-y-1">
+                  <h3 className="text-lg font-bold">Optical Fundus Ingestion</h3>
+                  <p className={`text-xs leading-relaxed ${activeStep === 0 ? 'text-gray-300' : 'text-gray-600'}`}>
+                    Upload 45° macular fundus photographs with automated quality validation and autofocus checks.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Step 2 */}
+            <div
+              onClick={() => setActiveStep(1)}
+              className={`p-6 rounded-2xl transition-all cursor-pointer border-2 ${
+                activeStep === 1
+                  ? 'bg-black text-white border-black shadow-lg scale-[1.02]'
+                  : 'bg-white border-white hover:border-gray-200 shadow-sm text-black'
+              }`}
+            >
+              <div className="flex items-start gap-4">
+                <span className={`text-xl font-mono font-bold ${activeStep === 1 ? 'text-[#38BDF8]' : 'text-gray-400'}`}>
+                  02
+                </span>
+                <div className="space-y-1">
+                  <h3 className="text-lg font-bold">Multimodal AI & Vessel Extraction</h3>
+                  <p className={`text-xs leading-relaxed ${activeStep === 1 ? 'text-gray-300' : 'text-gray-600'}`}>
+                    Gemma-4 calculates Frangi microvascular vessel density and renders Grad-CAM attention heatmaps.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Step 3 */}
+            <div
+              onClick={() => setActiveStep(2)}
+              className={`p-6 rounded-2xl transition-all cursor-pointer border-2 ${
+                activeStep === 2
+                  ? 'bg-black text-white border-black shadow-lg scale-[1.02]'
+                  : 'bg-white border-white hover:border-gray-200 shadow-sm text-black'
+              }`}
+            >
+              <div className="flex items-start gap-4">
+                <span className={`text-xl font-mono font-bold ${activeStep === 2 ? 'text-[#38BDF8]' : 'text-gray-400'}`}>
+                  03
+                </span>
+                <div className="space-y-1">
+                  <h3 className="text-lg font-bold">Counseling & Takeaway PDF</h3>
+                  <p className={`text-xs leading-relaxed ${activeStep === 2 ? 'text-gray-300' : 'text-gray-600'}`}>
+                    Review dual-coded severity, listen to Web Speech audio readout, and export 18pt+ localized reports.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Play / Pause Auto-Loop Controls */}
+            <div className="flex items-center gap-3 pt-2 px-2 text-xs text-gray-500 font-semibold">
               <button
-                onClick={handleCopyLink}
-                className="w-full sm:w-auto px-6 py-3 bg-[#131B2E] hover:bg-[#1E293B] border-2 border-[#334155] hover:border-[#38BDF8] rounded-xl font-bold text-xs sm:text-sm text-white flex items-center justify-center gap-2 transition-all shrink-0 cursor-pointer"
+                onClick={() => setIsLoopPlaying(!isLoopPlaying)}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white border border-gray-200 text-black hover:bg-gray-50 cursor-pointer shadow-sm"
               >
-                {copiedLink ? (
-                  <>
-                    <Check className="w-4 h-4 text-emerald-400" />
-                    <span>Copied to Clipboard!</span>
-                  </>
-                ) : (
-                  <>
-                    <Copy className="w-4 h-4 text-[#38BDF8]" />
-                    <span>Copy Dashboard URL</span>
-                  </>
-                )}
+                {isLoopPlaying ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5 fill-current" />}
+                <span>{isLoopPlaying ? 'Pause Simulation' : 'Resume Simulation'}</span>
+              </button>
+              <button
+                onClick={() => setActiveStep(0)}
+                className="p-1.5 rounded-lg bg-white border border-gray-200 text-gray-600 hover:text-black cursor-pointer shadow-sm"
+                title="Restart"
+              >
+                <RotateCcw className="w-3.5 h-3.5" />
               </button>
             </div>
           </div>
+
+          {/* Right Column: Cascading 3D Retinal Showcase */}
+          <div className="lg:col-span-6 flex items-center justify-center relative min-h-[460px]">
+            {/* Phone Frame 1: Ingestion */}
+            <div
+              className={`absolute w-[250px] aspect-[9/18.5] rounded-[36px] bg-[#0B0F19] p-2.5 shadow-2xl border-4 border-gray-900 transition-all duration-500 text-left ${
+                activeStep === 0
+                  ? 'z-30 scale-105 rotate-[-4deg] translate-y-0 opacity-100'
+                  : 'z-10 scale-95 rotate-[-12deg] -translate-x-12 opacity-30'
+              }`}
+            >
+              <div className="w-full h-full rounded-[28px] bg-[#0F172A] border border-[#334155] p-3 flex flex-col justify-between">
+                <div className="space-y-1 pt-1">
+                  <span className="text-[10px] font-bold text-sky-400 bg-sky-500/20 px-2 py-0.5 rounded-full">
+                    Step 01 • Ingestion
+                  </span>
+                  <h4 className="text-xs font-bold text-white">45° Optical Fundus Photo</h4>
+                </div>
+                <div className="aspect-square rounded-xl overflow-hidden bg-black border border-[#334155]">
+                  <img src={selectedCase.originalImage} alt="Fundus" className="w-full h-full object-cover" />
+                </div>
+                <div className="text-[10px] text-emerald-400 font-mono">
+                  ✓ Autofocus Passed (99.2%)
+                </div>
+              </div>
+            </div>
+
+            {/* Phone Frame 2: Vessel & Heatmap Analysis */}
+            <div
+              className={`absolute w-[250px] aspect-[9/18.5] rounded-[36px] bg-[#0B0F19] p-2.5 shadow-2xl border-4 border-gray-900 transition-all duration-500 text-left ${
+                activeStep === 1
+                  ? 'z-30 scale-105 rotate-[3deg] translate-y-0 opacity-100'
+                  : 'z-10 scale-95 rotate-[12deg] translate-x-12 opacity-30'
+              }`}
+            >
+              <div className="w-full h-full rounded-[28px] bg-[#0F172A] border border-[#334155] p-3 flex flex-col justify-between">
+                <div className="space-y-1 pt-1">
+                  <span className="text-[10px] font-bold text-emerald-400 bg-emerald-500/20 px-2 py-0.5 rounded-full">
+                    Step 02 • Vessel Density
+                  </span>
+                  <h4 className="text-xs font-bold text-white">Frangi Filter Extraction</h4>
+                </div>
+                <div className="aspect-square rounded-xl overflow-hidden bg-black border border-emerald-500/40">
+                  <img src={selectedCase.vesselImage} alt="Vessels" className="w-full h-full object-cover" />
+                </div>
+                <div className="text-[10px] text-gray-300 font-mono">
+                  Density: 14.8% • Caliber: 0.68
+                </div>
+              </div>
+            </div>
+
+            {/* Phone Frame 3: Diagnosis & Patient Takeaway */}
+            <div
+              className={`absolute w-[250px] aspect-[9/18.5] rounded-[36px] bg-[#0B0F19] p-2.5 shadow-2xl border-4 border-gray-900 transition-all duration-500 text-left ${
+                activeStep === 2
+                  ? 'z-30 scale-105 rotate-0 translate-y-0 opacity-100'
+                  : 'z-10 scale-90 translate-y-10 opacity-25'
+              }`}
+            >
+              <div className="w-full h-full rounded-[28px] bg-[#0F172A] border border-[#38BDF8] p-3 flex flex-col justify-between">
+                <div className="space-y-1 pt-1">
+                  <span className="text-[10px] font-bold text-amber-400 bg-amber-500/20 px-2 py-0.5 rounded-full">
+                    Step 03 • Action Plan
+                  </span>
+                  <h4 className="text-xs font-bold text-white">Dual-Coded Classification</h4>
+                </div>
+                <div className="p-2 rounded-xl bg-black border border-[#334155] flex items-center gap-2">
+                  <div
+                    className="w-7 h-7 rounded-lg flex items-center justify-center text-white font-bold text-xs"
+                    style={{ backgroundColor: stageMeta.color }}
+                  >
+                    {stageMeta.icon}
+                  </div>
+                  <div>
+                    <span className="text-xs font-bold text-white block">{stageMeta.name}</span>
+                    <span className="text-[9px] text-[#38BDF8] font-mono">Conf: {selectedCase.confidence.toFixed(1)}%</span>
+                  </div>
+                </div>
+                <div className="text-[10px] text-gray-300 leading-tight">
+                  18pt+ PDF Takeaway Ready
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 8. STICKY STACKING SHOWCASE (Signature PlanIA Stacking Animation) */}
+      <section id="stacking-showcase" className="px-4 sm:px-8 py-20 bg-[#FAFAFA] border-y border-black/5">
+        <div className="max-w-4xl mx-auto space-y-12">
+          
+          <div className="text-center space-y-3">
+            <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-white text-xs font-bold text-[#444] border border-black/5 shadow-sm">
+              <span>Sticky Slide Experience</span>
+            </div>
+            <h2 className="text-3xl sm:text-5xl font-bold tracking-tight text-black">
+              See How OptiGemma Feels in Motion
+            </h2>
+            <p className="text-[#646464] text-base max-w-xl mx-auto">
+              Scroll down to explore how our clinical intelligence engine structures each screening stage.
+            </p>
+          </div>
+
+          {/* Stacking Card 1 */}
+          <div className="sticky top-24 z-10 p-8 rounded-3xl bg-white border-2 border-white shadow-[0_10px_35px_rgba(0,0,0,0.06)] flex flex-col md:flex-row items-center justify-between gap-8">
+            <div className="space-y-4 max-w-md text-left">
+              <span className="text-xs font-mono font-bold uppercase tracking-widest text-[#0284C7] bg-sky-50 px-3 py-1 rounded-full">
+                01 • Instant Diagnostic Triage
+              </span>
+              <h3 className="text-2xl sm:text-3xl font-bold text-black">
+                Gemma-4 Vision Neural Processing
+              </h3>
+              <p className="text-sm text-[#646464] leading-relaxed">
+                Processes high-resolution retinal fundus photography in seconds, comparing against tens of thousands of clinically annotated benchmarks to accurately grade DR severity.
+              </p>
+              <div className="flex items-center gap-4 text-xs font-bold text-[#333]">
+                <span className="flex items-center gap-1"><Check className="w-4 h-4 text-emerald-600" /> &gt;98.4% AUROC</span>
+                <span className="flex items-center gap-1"><Check className="w-4 h-4 text-emerald-600" /> 45° Aligned</span>
+              </div>
+            </div>
+            <div className="w-full md:w-[260px] aspect-square rounded-2xl bg-[#0B0F19] p-3 border border-gray-800 shadow-inner">
+              <img src={PRESET_FUNDUS_CASES[0].originalImage} alt="Normal Fundus" className="w-full h-full object-cover rounded-xl" />
+            </div>
+          </div>
+
+          {/* Stacking Card 2 */}
+          <div className="sticky top-28 z-20 p-8 rounded-3xl bg-white border-2 border-white shadow-[0_10px_35px_rgba(0,0,0,0.08)] flex flex-col md:flex-row items-center justify-between gap-8">
+            <div className="space-y-4 max-w-md text-left">
+              <span className="text-xs font-mono font-bold uppercase tracking-widest text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full">
+                02 • Explainable Feature Maps
+              </span>
+              <h3 className="text-2xl sm:text-3xl font-bold text-black">
+                Frangi Vessel Density & Grad-CAM
+              </h3>
+              <p className="text-sm text-[#646464] leading-relaxed">
+                Eliminate AI black-box hesitation. Clinicians view exact microaneurysm cluster hotspots, hemorrhages, and vascular narrowing quantified with automated metrics.
+              </p>
+              <div className="flex items-center gap-4 text-xs font-bold text-[#333]">
+                <span className="flex items-center gap-1"><Check className="w-4 h-4 text-emerald-600" /> Caliber Ratio</span>
+                <span className="flex items-center gap-1"><Check className="w-4 h-4 text-emerald-600" /> Attention Heatmap</span>
+              </div>
+            </div>
+            <div className="w-full md:w-[260px] aspect-square rounded-2xl bg-[#0B0F19] p-3 border border-gray-800 shadow-inner">
+              <img src={PRESET_FUNDUS_CASES[2].vesselImage} alt="Vessels" className="w-full h-full object-cover rounded-xl" />
+            </div>
+          </div>
+
+          {/* Stacking Card 3 */}
+          <div className="sticky top-32 z-30 p-8 rounded-3xl bg-white border-2 border-white shadow-[0_10px_35px_rgba(0,0,0,0.1)] flex flex-col md:flex-row items-center justify-between gap-8">
+            <div className="space-y-4 max-w-md text-left">
+              <span className="text-xs font-mono font-bold uppercase tracking-widest text-indigo-700 bg-indigo-50 px-3 py-1 rounded-full">
+                03 • Patient Empowerment & Takeaway
+              </span>
+              <h3 className="text-2xl sm:text-3xl font-bold text-black">
+                Multilingual Audio & Large-Print PDFs
+              </h3>
+              <p className="text-sm text-[#646464] leading-relaxed">
+                Patients leave the clinic with clear, accessible understanding. Real-time translation into English, Hindi, and Gujarati, with Web Speech readouts and 6/12 month risk curves.
+              </p>
+              <div className="flex items-center gap-4 text-xs font-bold text-[#333]">
+                <span className="flex items-center gap-1"><Check className="w-4 h-4 text-emerald-600" /> 18pt+ Large Print</span>
+                <span className="flex items-center gap-1"><Check className="w-4 h-4 text-emerald-600" /> Audio Reader</span>
+              </div>
+            </div>
+            <div className="w-full md:w-[260px] aspect-square rounded-2xl bg-[#0B0F19] p-3 border border-gray-800 shadow-inner">
+              <img src={PRESET_FUNDUS_CASES[2].heatmapImage} alt="Grad-CAM" className="w-full h-full object-cover rounded-xl" />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 9. INTERACTIVE BENTO CLINICAL SUITE */}
+      <section id="accessibility" className="px-4 sm:px-8 py-20 max-w-6xl mx-auto space-y-12">
+        <div className="space-y-3">
+          <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-white text-xs font-bold text-[#444] border border-black/5 shadow-sm">
+            <span>Core Capabilities</span>
+          </div>
+          <h2 className="text-3xl sm:text-5xl font-bold tracking-tight text-black max-w-3xl">
+            Engineered for Accessibility, Speed & Trust
+          </h2>
+          <p className="text-[#646464] text-base sm:text-lg max-w-2xl">
+            Explore the live tools and modules integrated into every OptiGemma deployment.
+          </p>
         </div>
 
-        {/* 3 Download / Launch Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 text-left">
-          <div className="p-6 rounded-2xl bg-[#0F172A] border-2 border-[#334155] flex flex-col justify-between space-y-4">
-            <div className="space-y-2">
-              <Laptop className="w-8 h-8 text-[#38BDF8]" />
-              <h4 className="text-lg font-bold text-white">Browser PWA Edition</h4>
-              <p className="text-xs text-[#CBD5E1]">
-                Launch directly as an installable standalone web application with zero local install overhead.
+        {/* 2x2 Bento Modules */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-left">
+          
+          {/* Bento Card 1: Dual-Coded WCAG AAA Colorblind Selector */}
+          <div className="p-8 rounded-3xl bg-white border-2 border-white shadow-[0_4px_25px_rgba(0,0,0,0.04)] flex flex-col justify-between space-y-6">
+            <div className="space-y-3">
+              <span className="text-xs font-bold uppercase tracking-wider text-[#0284C7] bg-sky-50 px-3 py-1 rounded-full">
+                Accessibility Standard
+              </span>
+              <h3 className="text-2xl font-bold text-black">Dual-Coded Vision Scale</h3>
+              <p className="text-xs text-[#646464] leading-relaxed">
+                Colorblind-safe Okabe-Ito palette paired with 5 distinct geometric symbols so low-vision patients never misinterpret severity levels.
               </p>
             </div>
+
+            {/* Interactive Shape Pills Row */}
+            <div className="space-y-2 pt-2">
+              <span className="text-[11px] font-bold text-gray-500">Test severity scales:</span>
+              <div className="grid grid-cols-5 gap-1.5">
+                {([0, 1, 2, 3, 4] as DRStage[]).map((stage) => {
+                  const meta = DR_STAGES[stage];
+                  const isSel = selectedCase.stage === stage;
+                  return (
+                    <button
+                      key={stage}
+                      onClick={() => {
+                        const targetIdx = PRESET_FUNDUS_CASES.findIndex((c) => c.stage === stage);
+                        if (targetIdx !== -1) setActiveCaseIndex(targetIdx);
+                      }}
+                      className={`p-2.5 rounded-xl border flex flex-col items-center justify-center gap-1 transition-all cursor-pointer ${
+                        isSel
+                          ? 'border-black bg-black text-white shadow-md scale-105'
+                          : 'border-gray-200 bg-[#FAFAFA] text-gray-700 hover:border-gray-400'
+                      }`}
+                    >
+                      <span className="text-base">{meta.icon}</span>
+                      <span className="text-[10px] font-bold truncate max-w-full">{meta.name.split(' ')[0]}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="p-3 bg-[#F7F5F4] rounded-xl text-xs text-gray-700 font-medium">
+              Active Selection: <strong className="text-black">{stageMeta.name}</strong> • Symbol: <span className="font-bold text-black">{stageMeta.icon}</span> ({stageMeta.shape})
+            </div>
+          </div>
+
+          {/* Bento Card 2: Interactive Multilingual Voice Reader */}
+          <div className="p-8 rounded-3xl bg-white border-2 border-white shadow-[0_4px_25px_rgba(0,0,0,0.04)] flex flex-col justify-between space-y-6">
+            <div className="space-y-3">
+              <span className="text-xs font-bold uppercase tracking-wider text-amber-800 bg-amber-50 px-3 py-1 rounded-full">
+                Multilingual Speech
+              </span>
+              <h3 className="text-2xl font-bold text-black">Web Speech Audio Readout</h3>
+              <p className="text-xs text-[#646464] leading-relaxed">
+                Instant audio synthesis for illiterate or visually impaired patients, reading plain-language care plans aloud in regional Indian languages.
+              </p>
+            </div>
+
+            {/* Language Selector */}
+            <div className="space-y-3 pt-2">
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-bold text-gray-500">Language:</span>
+                {(['en', 'hi', 'gu'] as const).map((l) => (
+                  <button
+                    key={l}
+                    onClick={() => setSimulatedLang(l)}
+                    className={`px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                      simulatedLang === l
+                        ? 'bg-black text-white'
+                        : 'bg-[#FAFAFA] text-gray-700 border border-gray-200 hover:bg-gray-100'
+                    }`}
+                  >
+                    {l === 'en' ? 'English' : l === 'hi' ? 'हिंदी (Hindi)' : 'ગુજરાતી (Gujarati)'}
+                  </button>
+                ))}
+              </div>
+
+              {/* Speak Aloud Button */}
+              <button
+                onClick={handleSpeakSample}
+                className={`w-full py-3.5 px-4 rounded-xl font-bold text-xs flex items-center justify-center gap-2.5 transition-all cursor-pointer shadow-md ${
+                  isAudioSpeaking
+                    ? 'bg-[#FFCA1B] text-black border border-amber-400'
+                    : 'bg-black text-white hover:bg-gray-800'
+                }`}
+              >
+                <Volume2 className={`w-4 h-4 ${isAudioSpeaking ? 'animate-bounce text-black' : 'text-[#38BDF8]'}`} />
+                <span>
+                  {isAudioSpeaking
+                    ? `Reading Aloud in ${simulatedLang.toUpperCase()}... (Click to Stop)`
+                    : `Listen Clinical Readout (${simulatedLang.toUpperCase()})`}
+                </span>
+              </button>
+            </div>
+
+            <div className="p-3 bg-[#F7F5F4] rounded-xl text-xs text-gray-600 italic">
+              "{simulatedLang === 'en' ? selectedCase.clinicalNote : simulatedLang === 'hi' ? 'रोग निदान: मध्यम गैर-प्रोलिफेरेटिव डायबिटिक रेटिनोपैथी।' : 'નિદાન: મધ્યમ ડાયાબિટીક રેટિનોપેથી.'}"
+            </div>
+          </div>
+
+          {/* Bento Card 3: Mobile Camp Batch Screening Queue */}
+          <div className="p-8 rounded-3xl bg-white border-2 border-white shadow-[0_4px_25px_rgba(0,0,0,0.04)] flex flex-col justify-between space-y-6">
+            <div className="space-y-3">
+              <span className="text-xs font-bold uppercase tracking-wider text-emerald-800 bg-emerald-50 px-3 py-1 rounded-full">
+                High Throughput
+              </span>
+              <h3 className="text-2xl font-bold text-black">Mobile Camp Batch Queue</h3>
+              <p className="text-xs text-[#646464] leading-relaxed">
+                Queue up to 100 fundus images in a single batch, monitor progress with live worker threads, and export structured clinical CSV registries.
+              </p>
+            </div>
+
+            <div className="p-4 rounded-2xl bg-[#0B0F19] text-white space-y-3 font-mono text-xs">
+              <div className="flex items-center justify-between text-gray-400 border-b border-gray-800 pb-2">
+                <span>Batch #CAMP-2026-08</span>
+                <span className="text-emerald-400 font-bold">100% COMPLETE</span>
+              </div>
+              <div className="space-y-1.5 text-[11px]">
+                <div className="flex justify-between">
+                  <span>Processed: 48 scans</span>
+                  <span className="text-[#38BDF8]">0.8s / scan avg</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Severe / PDR Flags:</span>
+                  <span className="text-rose-400 font-bold">6 patients flagged</span>
+                </div>
+              </div>
+            </div>
+
             <button
-              onClick={handleLaunchDashboard}
-              className="w-full py-2.5 rounded-xl bg-[#131B2E] hover:bg-[#1E293B] border border-[#334155] text-xs font-bold text-[#CBD5E1] hover:text-white"
+              onClick={() => {
+                setActiveView('batch-screening');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
+              className="w-full py-2.5 rounded-xl bg-[#FAFAFA] hover:bg-gray-100 border border-gray-300 text-xs font-bold text-black flex items-center justify-center gap-2"
             >
-              Launch PWA Workspace →
+              <Zap className="w-3.5 h-3.5 text-[#0284C7]" />
+              <span>Open Camp Batch Queue →</span>
             </button>
           </div>
 
-          <div className="p-6 rounded-2xl bg-[#0F172A] border-2 border-[#334155] flex flex-col justify-between space-y-4">
-            <div className="space-y-2">
-              <Smartphone className="w-8 h-8 text-[#38BDF8]" />
-              <h4 className="text-lg font-bold text-white">Camp Tablet Mode</h4>
-              <p className="text-xs text-[#CBD5E1]">
-                Touch-first responsive layout tailored for iPad and Android field tablets in rural screening camps.
+          {/* Bento Card 4: 18pt+ Large-Print Takeaway PDFs */}
+          <div className="p-8 rounded-3xl bg-white border-2 border-white shadow-[0_4px_25px_rgba(0,0,0,0.04)] flex flex-col justify-between space-y-6">
+            <div className="space-y-3">
+              <span className="text-xs font-bold uppercase tracking-wider text-indigo-800 bg-indigo-50 px-3 py-1 rounded-full">
+                Patient Counseling
+              </span>
+              <h3 className="text-2xl font-bold text-black">Large-Print PDF Takeaways</h3>
+              <p className="text-xs text-[#646464] leading-relaxed">
+                Generate high-contrast 18pt+ takeaway sheets with glycemic risk curves showing 6 and 12 month progression risks under managed vs unmanaged HbA1c.
               </p>
             </div>
-            <button
-              onClick={handleLaunchDashboard}
-              className="w-full py-2.5 rounded-xl bg-[#131B2E] hover:bg-[#1E293B] border border-[#334155] text-xs font-bold text-[#CBD5E1] hover:text-white"
-            >
-              Open Tablet UI →
-            </button>
-          </div>
 
-          <div className="p-6 rounded-2xl bg-[#0F172A] border-2 border-[#334155] flex flex-col justify-between space-y-4">
-            <div className="space-y-2">
-              <Globe className="w-8 h-8 text-[#38BDF8]" />
-              <h4 className="text-lg font-bold text-white">Python Flask Backend</h4>
-              <p className="text-xs text-[#CBD5E1]">
-                Hardware integration bridge to connect Topcon, Zeiss, or Volk fundus cameras directly.
-              </p>
+            <div className="space-y-2 pt-2">
+              <div className="p-3 bg-indigo-50/50 rounded-xl border border-indigo-200 text-xs space-y-1">
+                <span className="font-bold text-indigo-900 block">Report Inclusions:</span>
+                <span className="text-gray-600 block">• 45° Optical Fundus & Lesion Attention Map</span>
+                <span className="text-gray-600 block">• Unmanaged vs. Controlled HbA1c Risk Projection</span>
+                <span className="text-gray-600 block">• Dietary & Lifestyle Recommendations</span>
+              </div>
             </div>
+
             <button
               onClick={handleLaunchDashboard}
-              className="w-full py-2.5 rounded-xl bg-[#131B2E] hover:bg-[#1E293B] border border-[#334155] text-xs font-bold text-[#CBD5E1] hover:text-white"
+              className="w-full py-2.5 rounded-xl bg-black hover:bg-gray-800 text-white text-xs font-bold flex items-center justify-center gap-2 shadow-sm"
             >
-              Configure API →
+              <FileText className="w-3.5 h-3.5 text-[#38BDF8]" />
+              <span>Generate Patient Report in Dashboard</span>
             </button>
           </div>
         </div>
       </section>
 
-      {/* 8. FAQ Section */}
-      <section id="faq" className="px-4 sm:px-8 py-20 bg-[#0F172A]/40 border-t border-[#334155]">
-        <div className="max-w-4xl mx-auto space-y-10 text-left">
-          <div className="text-center space-y-3">
-            <h2 className="text-3xl sm:text-4xl font-black text-white tracking-tight">
-              Frequently Asked Questions
+      {/* 10. COMPARISON MATRIX (Traditional vs. OptiGemma) */}
+      <section className="px-4 sm:px-8 py-20 bg-white border-y border-black/5">
+        <div className="max-w-4xl mx-auto space-y-10 text-center">
+          <div className="space-y-3">
+            <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-[#F7F5F4] text-xs font-bold text-[#444] border border-black/5">
+              <span>Why OptiGemma</span>
+            </div>
+            <h2 className="text-3xl sm:text-5xl font-bold tracking-tight text-black">
+              More Than A Classifier. A Complete Screening Suite.
             </h2>
-            <p className="text-[#CBD5E1] text-sm sm:text-base max-w-xl mx-auto">
-              Everything you need to know about integrating OptiGemma in your clinic.
+            <p className="text-[#646464] text-base max-w-xl mx-auto">
+              Comparing standard fundus inspection against OptiGemma's multimodal intelligence.
             </p>
           </div>
 
-          <div className="space-y-4">
+          <div className="rounded-3xl border-2 border-gray-200 overflow-hidden bg-[#FAFAFA] text-left">
+            <div className="grid grid-cols-12 p-4 bg-gray-100 border-b border-gray-200 text-xs font-black text-black uppercase tracking-wider">
+              <div className="col-span-5 sm:col-span-4">Capability</div>
+              <div className="col-span-3 sm:col-span-4 text-gray-500">Standard AI / Manual</div>
+              <div className="col-span-4 sm:col-span-4 text-[#0284C7]">OptiGemma Suite</div>
+            </div>
+
+            <div className="divide-y divide-gray-200 text-xs">
+              <div className="grid grid-cols-12 p-4 items-center">
+                <div className="col-span-5 sm:col-span-4 font-bold text-black">Explainability Tier</div>
+                <div className="col-span-3 sm:col-span-4 text-gray-500">Black-box label only</div>
+                <div className="col-span-4 sm:col-span-4 font-bold text-emerald-700 flex items-center gap-1.5">
+                  <CheckCircle className="w-4 h-4 text-emerald-600" />
+                  <span>3-Tier (Fundus, Vessels, Heatmap)</span>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-12 p-4 items-center">
+                <div className="col-span-5 sm:col-span-4 font-bold text-black">Low-Vision Accessibility</div>
+                <div className="col-span-3 sm:col-span-4 text-gray-500">Standard color bars</div>
+                <div className="col-span-4 sm:col-span-4 font-bold text-emerald-700 flex items-center gap-1.5">
+                  <CheckCircle className="w-4 h-4 text-emerald-600" />
+                  <span>WCAG 2.2 AAA Dual-Coded</span>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-12 p-4 items-center">
+                <div className="col-span-5 sm:col-span-4 font-bold text-black">Multilingual Audio</div>
+                <div className="col-span-3 sm:col-span-4 text-gray-500">None / English only</div>
+                <div className="col-span-4 sm:col-span-4 font-bold text-emerald-700 flex items-center gap-1.5">
+                  <CheckCircle className="w-4 h-4 text-emerald-600" />
+                  <span>Web Speech (EN, Hindi, Gujarati)</span>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-12 p-4 items-center">
+                <div className="col-span-5 sm:col-span-4 font-bold text-black">High-Throughput Camps</div>
+                <div className="col-span-3 sm:col-span-4 text-gray-500">Single image upload</div>
+                <div className="col-span-4 sm:col-span-4 font-bold text-emerald-700 flex items-center gap-1.5">
+                  <CheckCircle className="w-4 h-4 text-emerald-600" />
+                  <span>100-Scan Batch Queue</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 11. FAQ SECTION */}
+      <section className="px-4 sm:px-8 py-20 bg-[#F7F5F4]">
+        <div className="max-w-3xl mx-auto space-y-8 text-left">
+          <div className="text-center space-y-3">
+            <h2 className="text-3xl sm:text-4xl font-bold text-black tracking-tight">
+              Frequently Asked Questions
+            </h2>
+            <p className="text-[#646464] text-sm max-w-lg mx-auto">
+              Everything you need to know about integrating OptiGemma in clinical practice.
+            </p>
+          </div>
+
+          <div className="space-y-3">
             {faqs.map((faq, idx) => {
-              const isOpen = openFaqIndex === idx;
+              const isOpen = openFaq === idx;
               return (
                 <div
                   key={idx}
-                  className="rounded-2xl bg-[#0F172A] border-2 border-[#334155] overflow-hidden transition-all"
+                  className="rounded-2xl bg-white border border-gray-200 overflow-hidden shadow-sm transition-all"
                 >
                   <button
-                    onClick={() => setOpenFaqIndex(isOpen ? null : idx)}
-                    className="w-full p-5 sm:p-6 text-left flex items-center justify-between gap-4 font-bold text-white text-base hover:text-[#38BDF8] transition-colors"
+                    onClick={() => setOpenFaq(isOpen ? null : idx)}
+                    className="w-full p-5 text-left flex items-center justify-between gap-4 font-bold text-black text-sm hover:text-[#0284C7] transition-colors"
                   >
                     <span>{faq.q}</span>
                     <ChevronDown
-                      className={`w-5 h-5 text-[#38BDF8] shrink-0 transition-transform ${
+                      className={`w-4 h-4 text-gray-500 shrink-0 transition-transform ${
                         isOpen ? 'rotate-180' : ''
                       }`}
                     />
                   </button>
 
                   {isOpen && (
-                    <div className="px-5 sm:px-6 pb-6 text-sm text-[#CBD5E1] leading-relaxed border-t border-[#1E293B] pt-4">
+                    <div className="px-5 pb-5 text-xs text-[#646464] leading-relaxed border-t border-gray-100 pt-3">
                       {faq.a}
                     </div>
                   )}
@@ -574,34 +1192,83 @@ export const LandingPageView: React.FC = () => {
         </div>
       </section>
 
-      {/* 9. Modern Minimalist Footer */}
-      <footer className="px-4 sm:px-8 py-12 bg-[#070A12] border-t-2 border-[#334155] text-center text-xs text-[#94A3B8] space-y-6">
-        <div className="flex flex-wrap items-center justify-center gap-6 font-bold text-[#CBD5E1]">
-          <button onClick={handleLaunchDashboard} className="hover:text-[#38BDF8]">
-            Clinical Dashboard
-          </button>
-          <span>•</span>
-          <button onClick={() => { setActiveView('new-scan'); }} className="hover:text-[#38BDF8]">
-            New Scan Workflow
-          </button>
-          <span>•</span>
-          <button onClick={() => { setActiveView('batch-screening'); }} className="hover:text-[#38BDF8]">
-            Batch Queue
-          </button>
-          <span>•</span>
-          <button onClick={() => { setActiveView('patients'); }} className="hover:text-[#38BDF8]">
-            Patient Directory
-          </button>
+      {/* 12. FOOTER CTA & WATERMARK BRANDING */}
+      <footer className="relative px-4 sm:px-8 pt-20 pb-12 bg-white border-t border-black/10 text-center space-y-12 overflow-hidden">
+        
+        {/* Giant Subtle Background Watermark Text */}
+        <div className="absolute bottom-20 left-1/2 -translate-x-1/2 pointer-events-none select-none text-[120px] sm:text-[180px] font-black text-black/[0.03] tracking-tighter whitespace-nowrap z-0">
+          OptiGemma
         </div>
 
-        <p className="max-w-2xl mx-auto text-[11px] leading-relaxed text-[#64748B]">
-          OptiGemma is an assistive medical AI platform designed for ophthalmologists, clinicians, and community healthcare workers. 
-          AI classifications should be evaluated alongside comprehensive clinical examinations.
-        </p>
+        {/* CTA Card Content */}
+        <div className="relative z-10 max-w-2xl mx-auto space-y-6">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-black text-white text-xs font-bold">
+            <Sparkles className="w-3.5 h-3.5 text-[#38BDF8]" />
+            <span>Ready for Clinical Deployment</span>
+          </div>
 
-        <div className="flex flex-col sm:flex-row items-center justify-between max-w-5xl mx-auto pt-6 border-t border-[#1E293B] text-[10px] font-mono text-[#475569] gap-2">
-          <span>© {new Date().getFullYear()} OptiGemma Clinical Intelligence Suite</span>
-          <span className="text-[#38BDF8]">WCAG 2.2 AAA & Okabe-Ito Compliant</span>
+          <h2 className="text-3xl sm:text-5xl font-bold tracking-tight text-black">
+            Empower Your Clinic with Autonomous Retinal AI
+          </h2>
+
+          <p className="text-sm sm:text-base text-[#646464] leading-relaxed">
+            Launch the live clinical workspace directly in your browser or copy the permanent web link for your team.
+          </p>
+
+          <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
+            <button
+              onClick={handleLaunchDashboard}
+              className="px-8 py-4 bg-black hover:bg-[#1E293B] text-white rounded-2xl font-bold text-sm uppercase tracking-wider flex items-center justify-center gap-2.5 shadow-xl hover:scale-105 transition-all cursor-pointer"
+            >
+              <Microscope className="w-4 h-4 text-[#38BDF8]" />
+              <span>Launch Clinical Workspace</span>
+              <ArrowRight className="w-4 h-4 stroke-[3]" />
+            </button>
+
+            <button
+              onClick={handleCopyLink}
+              className="px-6 py-4 bg-[#FAFAFA] hover:bg-gray-100 border-2 border-gray-300 rounded-2xl font-bold text-xs sm:text-sm text-black flex items-center justify-center gap-2 transition-all cursor-pointer"
+            >
+              {copiedLink ? (
+                <>
+                  <Check className="w-4 h-4 text-emerald-600" />
+                  <span>Link Copied!</span>
+                </>
+              ) : (
+                <>
+                  <Copy className="w-4 h-4 text-[#0284C7]" />
+                  <span>Copy Permanent Link</span>
+                </>
+              )}
+            </button>
+          </div>
+        </div>
+
+        {/* Bottom Copyright and Compliance */}
+        <div className="relative z-10 pt-12 border-t border-gray-200 flex flex-col sm:flex-row items-center justify-between max-w-5xl mx-auto text-xs text-gray-500 gap-4">
+          <div className="flex items-center gap-2 font-bold text-black">
+            <Eye className="w-4 h-4 text-[#0284C7]" />
+            <span>OptiGemma Clinical Intelligence Suite © 2026</span>
+          </div>
+
+          <div className="flex items-center gap-6 text-xs text-gray-600 font-semibold">
+            <button onClick={handleLaunchDashboard} className="hover:text-black">
+              Dashboard
+            </button>
+            <button onClick={() => { setActiveView('new-scan'); }} className="hover:text-black">
+              New Scan
+            </button>
+            <button onClick={() => { setActiveView('batch-screening'); }} className="hover:text-black">
+              Batch Queue
+            </button>
+            <button onClick={() => { setActiveView('patients'); }} className="hover:text-black">
+              Patients
+            </button>
+          </div>
+
+          <div className="text-[11px] font-mono text-gray-400">
+            WCAG 2.2 AAA & Okabe-Ito Compliant
+          </div>
         </div>
       </footer>
     </div>
