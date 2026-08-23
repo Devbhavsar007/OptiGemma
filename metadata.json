@@ -1,0 +1,6 @@
+{
+  "name": "OptiGemma",
+  "description": "Clinical-grade, accessible medical AI dashboard for Diabetic Retinopathy screening (WCAG 2.2 AAA compliant)",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
