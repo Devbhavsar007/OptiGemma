@@ -1,8 +1,69 @@
+# ============================================
+# OptiGemma .gitignore
+# ============================================
+
+# === Node.js / Frontend ===
 node_modules/
 build/
 dist/
 coverage/
-.DS_Store
 *.log
+
+# === Environment & Secrets ===
 .env*
 !.env.example
+*.key
+
+# === Python Cache ===
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+
+# === Virtual Environment ===
+venv/
+env/
+.venv/
+
+# === Large Model Files (too big for GitHub) ===
+*.h5
+*.pt
+*.pth
+best_model_final.pt
+models/*.h5
+models/*.pt
+models/vessel_model/*.pt
+models/vessel_model/*.pth
+
+# === Database ===
+optigemma.db
+
+# === Generated Files ===
+results/
+uploads/
+newprint.pdf
+
+# === Downloaded Dataset Images ===
+data/heimed/*.jpg
+data/heimed/*.meta
+data/heimed/*.GND
+data/heimed/validation_report.json
+data/aptos/
+
+# === Sample Data (auto-generated) ===
+sample_data/
+
+# === IDE / Editor ===
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# === OS Files ===
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# === Gemini/Antigravity ===
+.gemini/
+.agents/
