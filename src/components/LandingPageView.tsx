@@ -38,6 +38,7 @@ import {
   PhoneCall,
   ExternalLink,
   Info,
+  Menu,
 } from 'lucide-react';
 import { useMedicalData } from '../context/MedicalDataContext';
 import { PRESET_FUNDUS_CASES } from '../data/sampleFundusPresets';
@@ -53,6 +54,7 @@ export const LandingPageView: React.FC = () => {
   const [isAudioSpeaking, setIsAudioSpeaking] = useState<boolean>(false);
   const [copiedLink, setCopiedLink] = useState<boolean>(false);
   const [openFaq, setOpenFaq] = useState<number | null>(0);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
 
   const selectedCase = PRESET_FUNDUS_CASES[activeCaseIndex] || PRESET_FUNDUS_CASES[2];
   const stageMeta = DR_STAGES[selectedCase.stage];
@@ -134,29 +136,42 @@ export const LandingPageView: React.FC = () => {
   return (
     <div className="min-h-screen bg-[#619FE8] text-white font-sans selection:bg-[#E1FA4A] selection:text-black -m-4 sm:-m-6 lg:-m-8 relative overflow-x-hidden">
       
-      {/* 1. FLOATING MINIMALIST HEADER (Frosted Glassmorphic Aesthetic) */}
-      <div className="fixed top-4 left-0 right-0 z-50 px-4 sm:px-8 max-w-6xl mx-auto">
-        <header className="flex items-center justify-between px-5 sm:px-7 py-3 rounded-full bg-white/30 hover:bg-white/40 backdrop-blur-2xl border border-white/20 shadow-[0_8px_30px_rgb(0,0,0,0.08)] text-slate-900 transition-all">
+      {/* 1. FLOATING MINIMALIST HEADER (Frosted Glassmorphic Aesthetic with Mobile Left App Launcher) */}
+      <div className="fixed top-4 left-0 right-0 z-50 px-3 sm:px-8 max-w-6xl mx-auto">
+        <header className="flex items-center justify-between px-3.5 sm:px-7 py-2.5 sm:py-3 rounded-full bg-white/30 hover:bg-white/40 backdrop-blur-2xl border border-white/20 shadow-[0_8px_30px_rgb(0,0,0,0.08)] text-slate-900 transition-all">
           
-          {/* Logo & Brand */}
-          <div
-            onClick={handleLaunchDashboard}
-            className="flex items-center gap-2.5 cursor-pointer group select-none"
-          >
-            <div className="w-8 h-8 rounded-full bg-white/80 backdrop-blur-md border border-white/80 flex items-center justify-center text-[#1E54B7] shadow-sm group-hover:scale-110 transition-transform">
-              <Eye className="w-4 h-4 text-[#1E54B7] stroke-[2.5]" />
-            </div>
-            <div className="flex items-center gap-1.5">
-              <span className="text-xl font-black tracking-tight text-slate-950 font-sans drop-shadow-sm">
-                OptiGemma
-              </span>
-              <span className="text-[10px] font-mono font-black uppercase px-2 py-0.5 rounded-full bg-[#E1FA4A] text-black shadow-sm">
-                AI Vision
-              </span>
+          {/* Left Group: Mobile Menu Button + Logo */}
+          <div className="flex items-center gap-2 sm:gap-2.5">
+            {/* Mobile App Menu Launcher Button (Left button on mobile) */}
+            <button
+              onClick={() => setMobileMenuOpen(true)}
+              className="md:hidden flex items-center justify-center w-8 h-8 rounded-full bg-white/80 hover:bg-white text-slate-900 shadow-sm border border-white/60 transition-transform active:scale-95 cursor-pointer shrink-0"
+              aria-label="Open Navigation Menu"
+              title="Open Navigation"
+            >
+              <Menu className="w-4 h-4 stroke-[2.5]" />
+            </button>
+
+            {/* Logo & Brand */}
+            <div
+              onClick={handleLaunchDashboard}
+              className="flex items-center gap-2 cursor-pointer group select-none"
+            >
+              <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-white/80 backdrop-blur-md border border-white/80 flex items-center justify-center text-[#1E54B7] shadow-sm group-hover:scale-110 transition-transform shrink-0">
+                <Eye className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#1E54B7] stroke-[2.5]" />
+              </div>
+              <div className="flex items-center gap-1 sm:gap-1.5">
+                <span className="text-lg sm:text-xl font-black tracking-tight text-slate-950 font-sans drop-shadow-sm">
+                  OptiGemma
+                </span>
+                <span className="text-[9px] sm:text-[10px] font-mono font-black uppercase px-1.5 sm:px-2 py-0.5 rounded-full bg-[#E1FA4A] text-black shadow-sm">
+                  AI
+                </span>
+              </div>
             </div>
           </div>
 
-          {/* Center Navigation Links */}
+          {/* Center Navigation Links (Desktop) */}
           <nav className="hidden md:flex items-center gap-8 text-sm font-bold text-slate-900">
             <a href="#how-it-works" className="hover:text-slate-950 hover:font-black transition-all">
               How It Works
@@ -176,13 +191,13 @@ export const LandingPageView: React.FC = () => {
           </nav>
 
           {/* Right Action Buttons */}
-          <div className="flex items-center gap-2.5">
+          <div className="flex items-center gap-1.5 sm:gap-2.5">
             <button
               onClick={() => {
                 setActiveView('batch-screening');
                 window.scrollTo({ top: 0, behavior: 'smooth' });
               }}
-              className="hidden sm:inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-white/50 hover:bg-white/70 backdrop-blur-md border border-white/70 text-xs font-black text-slate-950 shadow-sm transition-all cursor-pointer"
+              className="hidden sm:inline-flex items-center gap-1.5 px-3.5 sm:px-4 py-2 rounded-full bg-white/50 hover:bg-white/70 backdrop-blur-md border border-white/70 text-xs font-black text-slate-950 shadow-sm transition-all cursor-pointer"
             >
               <Zap className="w-3.5 h-3.5 text-[#1E54B7]" />
               <span>Camp Queue</span>
@@ -191,14 +206,157 @@ export const LandingPageView: React.FC = () => {
             {/* Electric Lime Action Pill */}
             <button
               onClick={handleLaunchDashboard}
-              className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#E1FA4A] hover:bg-[#d6f236] text-slate-950 text-[10px] font-black uppercase tracking-widest shadow-lg hover:scale-[1.02] active:scale-[0.98] transition-transform cursor-pointer"
+              className="flex items-center gap-1 sm:gap-2 px-3.5 sm:px-5 py-2 sm:py-2.5 rounded-full bg-[#E1FA4A] hover:bg-[#d6f236] text-slate-950 text-[10px] sm:text-xs font-black uppercase tracking-wider sm:tracking-widest shadow-lg hover:scale-[1.02] active:scale-[0.98] transition-transform cursor-pointer"
             >
-              <span>Launch App</span>
-              <span className="text-sm font-black leading-none">↗</span>
+              <span>Launch</span>
+              <span className="text-xs sm:text-sm font-black leading-none">↗</span>
             </button>
           </div>
         </header>
       </div>
+
+      {/* 📱 PROFESSIONAL MOBILE APP DRAWER / NAVIGATION SHEET */}
+      {mobileMenuOpen && (
+        <div className="fixed inset-0 z-50 md:hidden flex" role="dialog" aria-modal="true" aria-label="Mobile Navigation">
+          {/* Backdrop with Blur */}
+          <div
+            onClick={() => setMobileMenuOpen(false)}
+            className="fixed inset-0 bg-slate-950/60 backdrop-blur-md transition-opacity animate-fadeIn"
+          />
+
+          {/* Slide-in Menu Panel */}
+          <div className="relative w-[85%] max-w-[340px] h-full bg-white/95 backdrop-blur-2xl text-slate-900 p-6 flex flex-col justify-between shadow-2xl border-r border-white/40 z-10 animate-slide-right overflow-y-auto">
+            <div className="space-y-5">
+              {/* Drawer Header with Brand & Close Button */}
+              <div className="flex items-center justify-between pb-4 border-b border-slate-200">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-9 h-9 rounded-full bg-[#619FE8]/20 border border-[#619FE8]/40 flex items-center justify-center text-[#1E54B7] shadow-sm">
+                    <Eye className="w-4 h-4 text-[#1E54B7] stroke-[2.5]" />
+                  </div>
+                  <div>
+                    <div className="text-base font-black text-slate-950 tracking-tight leading-tight">OptiGemma</div>
+                    <div className="text-[10px] font-mono text-[#1E54B7] font-bold">Clinical AI Vision</div>
+                  </div>
+                </div>
+
+                <button
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-600 hover:text-slate-900 transition-colors cursor-pointer"
+                  aria-label="Close Navigation"
+                >
+                  <X className="w-4 h-4 stroke-[2.5]" />
+                </button>
+              </div>
+
+              {/* Quick Language Switcher inside Drawer */}
+              <div className="p-3 bg-slate-100/80 rounded-2xl border border-slate-200/80 space-y-2">
+                <div className="flex items-center justify-between text-[11px] font-bold text-slate-600">
+                  <span className="flex items-center gap-1.5"><Globe className="w-3.5 h-3.5 text-[#1E54B7]" /> Language Mode</span>
+                  <span className="font-mono text-[10px] text-slate-500 uppercase">{simulatedLang}</span>
+                </div>
+                <div className="grid grid-cols-3 gap-1.5">
+                  {(['en', 'hi', 'gu'] as const).map((l) => (
+                    <button
+                      key={l}
+                      onClick={() => setSimulatedLang(l)}
+                      className={`py-1.5 rounded-xl text-xs font-black uppercase transition-all cursor-pointer ${
+                        simulatedLang === l
+                          ? 'bg-[#1E54B7] text-white shadow-md'
+                          : 'bg-white text-slate-700 hover:bg-slate-200'
+                      }`}
+                    >
+                      {l === 'en' ? 'EN' : l === 'hi' ? 'हिंदी' : 'ગુજરાતી'}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Navigation Link Items */}
+              <div className="space-y-1">
+                <div className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-400 px-3 pb-1">
+                  Navigation Menu
+                </div>
+
+                {[
+                  { href: '#how-it-works', label: 'How It Works', icon: <Zap className="w-4 h-4 text-amber-500" />, desc: '3-Step Pipeline' },
+                  { href: '#explainability', label: '3-Tier Explainability', icon: <Microscope className="w-4 h-4 text-[#1E54B7]" />, desc: 'Fundus, Frangi & CAM' },
+                  { href: '#features', label: 'Clinical Care', icon: <Activity className="w-4 h-4 text-emerald-600" />, desc: 'Target Audience' },
+                  { href: '#accessibility', label: 'WCAG AAA Standard', icon: <Sparkles className="w-4 h-4 text-indigo-600" />, desc: 'Colorblind & Audio' },
+                  { href: '#stacking-showcase', label: 'Live Clinical Flow', icon: <Layers className="w-4 h-4 text-rose-500" />, desc: 'Interactive Cards' },
+                ].map((item, idx) => (
+                  <a
+                    key={idx}
+                    href={item.href}
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="flex items-center justify-between p-2.5 rounded-2xl hover:bg-slate-100 text-slate-800 hover:text-slate-950 font-bold transition-all group cursor-pointer"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-xl bg-slate-100 group-hover:bg-white flex items-center justify-center shrink-0 border border-slate-200/60 shadow-sm">
+                        {item.icon}
+                      </div>
+                      <div className="text-left">
+                        <div className="text-xs font-black text-slate-900 group-hover:text-black">{item.label}</div>
+                        <div className="text-[10px] text-slate-500 font-normal">{item.desc}</div>
+                      </div>
+                    </div>
+                    <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-slate-900 transition-transform group-hover:translate-x-0.5" />
+                  </a>
+                ))}
+
+                <button
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    setActiveView('batch-screening');
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  }}
+                  className="w-full flex items-center justify-between p-2.5 rounded-2xl bg-sky-50 border border-sky-200 text-[#1E54B7] font-bold transition-all cursor-pointer mt-2"
+                >
+                  <div className="flex items-center gap-3 text-left">
+                    <div className="w-8 h-8 rounded-xl bg-[#1E54B7] text-white flex items-center justify-center shrink-0 shadow-sm">
+                      <Zap className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <div className="text-xs font-black text-[#1E54B7]">Mobile Camp Queue</div>
+                      <div className="text-[10px] text-sky-700/80 font-normal">Batch screening mode</div>
+                    </div>
+                  </div>
+                  <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-[#1E54B7] text-white">Open ↗</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Drawer Action Bottom CTAs */}
+            <div className="pt-4 border-t border-slate-200 space-y-2">
+              <button
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  handleLaunchDashboard();
+                }}
+                className="w-full py-3 rounded-full bg-[#E1FA4A] hover:bg-[#d6f236] text-slate-950 font-black text-xs uppercase tracking-widest flex items-center justify-center gap-2 shadow-md transition-transform active:scale-95 cursor-pointer"
+              >
+                <Activity className="w-4 h-4" />
+                <span>Launch Clinical Suite</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
+
+              <button
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  handleStartScanWithPreset(2);
+                }}
+                className="w-full py-2.5 rounded-full bg-slate-100 hover:bg-slate-200 border border-slate-300 text-slate-800 font-bold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer"
+              >
+                <Microscope className="w-3.5 h-3.5 text-[#1E54B7]" />
+                <span>Start Free Retinal Scan</span>
+              </button>
+
+              <div className="text-center text-[10px] text-slate-400 font-mono pt-0.5">
+                Gemma-4 Vision • WCAG 2.2 AAA
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* 2. HERO SECTION - PLANIA-STYLE FLOATING DEVICE WITH CONNECTED BADGES */}
       <section className="relative px-4 sm:px-8 pt-32 sm:pt-36 pb-20 max-w-6xl mx-auto z-10 text-center">
@@ -401,7 +559,7 @@ export const LandingPageView: React.FC = () => {
                   </div>
                   <div>
                     <div className="text-[11px] font-black text-white leading-tight">{stageMeta.name}</div>
-                    <div className="text-[9px] text-slate-400">{selectedCase.urgency} Action Plan</div>
+                    <div className="text-[9px] text-slate-400">{stageMeta.shortName} Action Plan</div>
                   </div>
                 </div>
 
