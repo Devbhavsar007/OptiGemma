@@ -58,6 +58,8 @@
     background-color: var(--bg-app);
     color: var(--text-primary);
     scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
   /* Accessible Font Size Adjustments */
@@ -71,11 +73,10 @@
     font-size: 21px;
   }
 
-  /* Strict Visible Focus Ring for low-vision accessibility (WCAG 2.2 AAA) */
+  /* Strict Visible Focus Ring for low-vision accessibility (WCAG 2.2 AAA), but elegant */
   :focus-visible {
-    outline: 3px solid var(--focus-ring) !important;
-    outline-offset: 2px !important;
-    box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.25) !important;
+    outline: none !important;
+    box-shadow: 0 0 0 2px var(--bg-app), 0 0 0 4px var(--focus-ring) !important;
   }
 
   button, input, select, textarea, [role="button"], a {
@@ -84,20 +85,20 @@
   }
 }
 
-/* Custom Scrollbar for High Contrast */
+/* Minimalist Scrollbar */
 ::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
+  width: 6px;
+  height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: var(--bg-surface);
+  background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: #475569;
-  border-radius: 5px;
+  background: rgba(148, 163, 184, 0.3);
+  border-radius: 6px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #64748B;
+  background: rgba(148, 163, 184, 0.6);
 }
 
 /* Plania-style Smooth Keyframe Animations */
@@ -150,11 +151,13 @@
 }
 
 .animate-float-slow {
-  animation: float-slow 5s ease-in-out infinite;
+  animation: float-slow 6s cubic-bezier(0.32, 0.72, 0, 1) infinite;
+  will-change: transform;
 }
 
 .animate-float-reverse {
-  animation: float-reverse 5.5s ease-in-out infinite;
+  animation: float-reverse 6.5s cubic-bezier(0.32, 0.72, 0, 1) infinite;
+  will-change: transform;
 }
 
 .animate-laser {

@@ -136,7 +136,7 @@ export const LandingPageView: React.FC = () => {
       
       {/* 1. FLOATING MINIMALIST HEADER (Frosted Glassmorphic Aesthetic) */}
       <div className="fixed top-4 left-0 right-0 z-50 px-4 sm:px-8 max-w-6xl mx-auto">
-        <header className="flex items-center justify-between px-5 sm:px-7 py-3 rounded-full bg-white/30 hover:bg-white/35 backdrop-blur-2xl border border-white/50 shadow-[0_12px_40px_rgba(0,0,0,0.12)] text-black transition-all">
+        <header className="flex items-center justify-between px-5 sm:px-7 py-3 rounded-full bg-white/30 hover:bg-white/40 backdrop-blur-2xl border border-white/20 shadow-[0_8px_30px_rgb(0,0,0,0.08)] text-slate-900 transition-all">
           
           {/* Logo & Brand */}
           <div
@@ -158,19 +158,19 @@ export const LandingPageView: React.FC = () => {
 
           {/* Center Navigation Links */}
           <nav className="hidden md:flex items-center gap-8 text-sm font-bold text-slate-900">
-            <a href="#how-it-works" className="hover:text-black hover:font-black transition-all">
+            <a href="#how-it-works" className="hover:text-slate-950 hover:font-black transition-all">
               How It Works
             </a>
-            <a href="#explainability" className="hover:text-black hover:font-black transition-all">
+            <a href="#explainability" className="hover:text-slate-950 hover:font-black transition-all">
               Explainability
             </a>
-            <a href="#features" className="hover:text-black hover:font-black transition-all">
+            <a href="#features" className="hover:text-slate-950 hover:font-black transition-all">
               Clinical Care
             </a>
-            <a href="#accessibility" className="hover:text-black hover:font-black transition-all">
+            <a href="#accessibility" className="hover:text-slate-950 hover:font-black transition-all">
               WCAG AAA
             </a>
-            <a href="#stacking-showcase" className="hover:text-black hover:font-black transition-all">
+            <a href="#stacking-showcase" className="hover:text-slate-950 hover:font-black transition-all">
               Live Flow
             </a>
           </nav>
@@ -191,7 +191,7 @@ export const LandingPageView: React.FC = () => {
             {/* Electric Lime Action Pill */}
             <button
               onClick={handleLaunchDashboard}
-              className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#E1FA4A] hover:bg-[#d6f236] text-black text-xs font-black uppercase tracking-wider shadow-lg hover:scale-105 transition-all cursor-pointer"
+              className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#E1FA4A] hover:bg-[#d6f236] text-slate-950 text-[10px] font-black uppercase tracking-widest shadow-lg hover:scale-[1.02] active:scale-[0.98] transition-transform cursor-pointer"
             >
               <span>Launch App</span>
               <span className="text-sm font-black leading-none">↗</span>
@@ -210,7 +210,7 @@ export const LandingPageView: React.FC = () => {
         </div>
 
         {/* Hero Title (PlanIA large centered typography) */}
-        <h1 className="text-4xl sm:text-6xl lg:text-7xl font-bold tracking-tight text-white leading-[1.08] max-w-4xl mx-auto">
+        <h1 className="text-4xl sm:text-6xl lg:text-7xl font-bold tracking-tighter text-white leading-[1.08] max-w-4xl mx-auto drop-shadow-sm">
           Autonomous Retinal AI. <br />
           <span className="font-light italic text-white/90">From Ingestion to Care</span> in Seconds.
         </h1>
@@ -319,7 +319,7 @@ export const LandingPageView: React.FC = () => {
           </div>
 
           {/* Centerpiece Phone Mockup */}
-          <div className="relative z-10 w-[290px] sm:w-[320px] aspect-[9/18.5] rounded-[48px] bg-slate-950 p-3 shadow-[0_30px_80px_rgba(0,0,0,0.35)] border-4 border-white/80 transition-all duration-300 hover:scale-[1.02]">
+          <div className="relative z-10 w-[290px] sm:w-[320px] aspect-[9/18.5] rounded-[48px] bg-slate-950 p-3 shadow-[0_8px_30px_rgba(0,0,0,0.12),0_30px_60px_rgba(0,0,0,0.2)] border border-white/10 transition-transform duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] hover:scale-[1.02]">
             
             {/* Dynamic Island / Camera Notch */}
             <div className="absolute top-5 left-1/2 -translate-x-1/2 w-24 h-5 bg-black rounded-full z-30 flex items-center justify-center">

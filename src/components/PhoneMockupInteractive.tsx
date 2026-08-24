@@ -186,9 +186,9 @@ export const PhoneMockupInteractive: React.FC<PhoneMockupInteractiveProps> = ({
       </div>
 
       {/* 3. The 3D Floating Smartphone Frame */}
-      <div className="relative w-full max-w-[380px] sm:max-w-[420px] aspect-[9/18.5] rounded-[52px] bg-[#1E293B] p-3 sm:p-3.5 shadow-[0_25px_70px_rgba(0,0,0,0.8),0_0_50px_rgba(56,189,248,0.2)] border-[4px] border-[#334155] transition-all">
+      <div className="relative w-full max-w-[380px] sm:max-w-[420px] aspect-[9/18.5] rounded-[52px] bg-[#1E293B] p-3 sm:p-3.5 shadow-[0_8px_32px_rgba(0,0,0,0.4),0_24px_64px_rgba(0,0,0,0.6),0_0_40px_rgba(56,189,248,0.1)] border-[2px] border-slate-700 transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)]">
         {/* Outer Titanium Edge Reflection */}
-        <div className="absolute inset-0 rounded-[48px] border-[2px] border-white/10 pointer-events-none"></div>
+        <div className="absolute inset-0 rounded-[50px] border-[1px] border-white/5 pointer-events-none"></div>
 
         {/* Phone Inner Screen */}
         <div className="relative w-full h-full rounded-[42px] bg-[#0B0F19] overflow-hidden flex flex-col border border-[#1E293B] text-left">
