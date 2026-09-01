@@ -44,6 +44,7 @@ from database import (
     get_dashboard_stats
 )
 
+import re
 from config import FLASK_SECRET, DEBUG
 
 # ---------------------------------------------------------------------------
@@ -54,14 +55,20 @@ app.secret_key = FLASK_SECRET
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16 MB upload limit
 
 # ---------------------------------------------------------------------------
-# CORS — restrict to same-origin + localhost dev
+# CORS — allow localhost, Vercel deployments, and production frontends
 # ---------------------------------------------------------------------------
-CORS(app, origins=[
+cors_origins = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
     "http://localhost:5000",
     "http://127.0.0.1:5000",
-])
+    re.compile(r"^https:\/\/.*\.vercel\.app$"),
+]
+frontend_url = os.getenv("FRONTEND_URL")
+if frontend_url:
+    cors_origins.append(frontend_url)
+
+CORS(app, origins=cors_origins, supports_credentials=True)
 
 # ---------------------------------------------------------------------------
 # Rate Limiting

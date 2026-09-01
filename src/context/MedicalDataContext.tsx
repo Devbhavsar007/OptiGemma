@@ -110,8 +110,23 @@ export const MedicalDataProvider: React.FC<{ children: React.ReactNode }> = ({ c
 
   const [activeView, setActiveView] = useState<ActiveView>('landing');
   const [reportLanguage, setReportLanguage] = useState<ReportLanguage>('english');
-  const [backendUrl, setBackendUrl] = useState<string>('http://127.0.0.1:5000');
+  const [backendUrl, setBackendUrlState] = useState<string>(() => {
+    return (
+      (import.meta as any).env?.VITE_BACKEND_URL ||
+      localStorage.getItem('optigemma_backend_url') ||
+      'http://127.0.0.1:5000'
+    );
+  });
   const [backendStatus, setBackendStatus] = useState<'connected' | 'disconnected' | 'testing' | 'offline-ai-mode'>('offline-ai-mode');
+
+  const setBackendUrl = useCallback((url: string) => {
+    setBackendUrlState(url);
+    try {
+      localStorage.setItem('optigemma_backend_url', url);
+    } catch {
+      // ignore
+    }
+  }, []);
 
   // Compute Dashboard Aggregations
   const dashboardStats: DashboardStats = useMemo(() => {
