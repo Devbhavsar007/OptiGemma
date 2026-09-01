@@ -8,6 +8,9 @@ import {
   Microscope,
   Calendar,
   Activity,
+  CheckCircle2,
+  AlertCircle,
+  AlertTriangle,
 } from 'lucide-react';
 import { useMedicalData } from '../context/MedicalDataContext';
 import { DR_STAGES, DRStage, Patient } from '../types';
@@ -106,33 +109,36 @@ export const PatientDirectoryView: React.FC = () => {
             </button>
             <button
               onClick={() => setFilter('no-dr')}
-              className={`px-4 py-2.5 rounded-full text-xs font-black transition-all cursor-pointer ${
+              className={`inline-flex items-center gap-1.5 px-4 py-2.5 rounded-full text-xs font-black transition-all cursor-pointer ${
                 filter === 'no-dr'
                   ? 'bg-[#009E73] text-white shadow-md'
                   : 'bg-emerald-50 text-emerald-800 hover:bg-emerald-100'
               }`}
             >
-              [●] No DR / Healthy
+              <CheckCircle2 className="w-3.5 h-3.5" />
+              <span>No DR / Healthy</span>
             </button>
             <button
               onClick={() => setFilter('mild-mod')}
-              className={`px-4 py-2.5 rounded-full text-xs font-black transition-all cursor-pointer ${
+              className={`inline-flex items-center gap-1.5 px-4 py-2.5 rounded-full text-xs font-black transition-all cursor-pointer ${
                 filter === 'mild-mod'
                   ? 'bg-[#E69F00] text-black shadow-md'
                   : 'bg-amber-50 text-amber-900 hover:bg-amber-100'
               }`}
             >
-              [▲] Mild / Moderate
+              <AlertCircle className="w-3.5 h-3.5" />
+              <span>Mild / Moderate</span>
             </button>
             <button
               onClick={() => setFilter('high-risk')}
-              className={`px-4 py-2.5 rounded-full text-xs font-black transition-all cursor-pointer ${
+              className={`inline-flex items-center gap-1.5 px-4 py-2.5 rounded-full text-xs font-black transition-all cursor-pointer ${
                 filter === 'high-risk'
                   ? 'bg-[#D55E00] text-white shadow-md'
                   : 'bg-rose-50 text-rose-900 hover:bg-rose-100'
               }`}
             >
-              [◆] High Risk (Severe/PDR)
+              <AlertTriangle className="w-3.5 h-3.5" />
+              <span>High Risk (Severe/PDR)</span>
             </button>
           </div>
         </div>

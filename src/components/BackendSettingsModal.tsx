@@ -40,12 +40,12 @@ export const BackendSettingsModal: React.FC<BackendSettingsModalProps> = ({
       aria-modal="true"
       aria-labelledby="backend-modal-title"
     >
-      <div className="w-full max-w-xl bg-[#131B2E] border-2 border-[#334155] rounded-2xl shadow-2xl overflow-hidden text-[#F8FAFC]">
+      <div className="w-full max-w-xl bg-[#131B2E] border-2 border-[#334155] rounded-3xl shadow-2xl overflow-hidden text-[#F8FAFC]">
         {/* Header */}
         <div className="flex items-center justify-between p-5 border-b border-[#334155] bg-[#0B0F19]">
           <div className="flex items-center gap-3">
-            <div className="p-2.5 rounded-xl bg-sky-500/10 text-[#38BDF8] border border-sky-500/20">
-              <Server className="w-6 h-6" />
+            <div className="p-2.5 rounded-xl bg-sky-50 text-[#1E54B7] border border-[#1E54B7]/20">
+              <Server className="w-5 h-5" />
             </div>
             <div>
               <h2 id="backend-modal-title" className="text-xl font-bold">
@@ -71,14 +71,14 @@ export const BackendSettingsModal: React.FC<BackendSettingsModalProps> = ({
           <div
             className={`p-4 rounded-xl border flex items-start gap-3 ${
               backendStatus === 'connected'
-                ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300'
-                : 'bg-sky-500/10 border-sky-500/30 text-sky-200'
+                ? 'bg-[#E1FA4A]/10 border-[#E1FA4A]/30 text-[#E1FA4A]'
+                : 'bg-sky-50 border-sky-300 text-[#22D3EE]'
             }`}
           >
             {backendStatus === 'connected' ? (
-              <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0 mt-0.5" />
+              <CheckCircle2 className="w-5 h-5 text-[#E1FA4A] shrink-0 mt-0.5" />
             ) : (
-              <Radio className="w-5 h-5 text-sky-400 shrink-0 mt-0.5 animate-pulse" />
+              <Radio className="w-5 h-5 text-[#1E54B7] shrink-0 mt-0.5 animate-pulse" />
             )}
             <div className="text-sm">
               <span className="font-bold block">
@@ -105,18 +105,18 @@ export const BackendSettingsModal: React.FC<BackendSettingsModalProps> = ({
               value={inputUrl}
               onChange={(e) => setInputUrl(e.target.value)}
               placeholder="http://127.0.0.1:5000"
-              className="w-full px-4 py-3 bg-[#0F172A] border-2 border-[#334155] rounded-xl text-white font-mono text-sm focus:border-[#38BDF8] focus:outline-none transition-colors"
+              className="w-full px-4 py-3 bg-[#0F172A] border border-white/10 rounded-xl text-white font-mono text-sm focus:border-[#1E54B7] focus:outline-none transition-colors"
             />
             <p className="text-xs text-[#94A3B8]">
               Standard endpoint: <code className="text-[#38BDF8]">http://127.0.0.1:5000</code> with routes{' '}
-              <code className="text-[#38BDF8]">/analyze</code>, <code className="text-[#38BDF8]">/translate</code>,{' '}
-              <code className="text-[#38BDF8]">/api/patients</code>.
+              <code className="text-[#1E54B7]">/analyze</code>, <code className="text-[#38BDF8]">/translate</code>,{' '}
+              <code className="text-[#1E54B7]">/api/patients</code>.
             </p>
           </div>
 
           {testResult && (
             <div className="p-3 bg-[#0B0F19] rounded-xl border border-[#334155] text-xs sm:text-sm text-[#CBD5E1] flex items-center gap-2">
-              <AlertCircle className="w-4 h-4 text-[#38BDF8] shrink-0" />
+              <AlertCircle className="w-4 h-4 text-[#1E54B7] shrink-0" />
               <span>{testResult}</span>
             </div>
           )}
@@ -131,10 +131,10 @@ export const BackendSettingsModal: React.FC<BackendSettingsModalProps> = ({
                 <span className="text-emerald-400 font-bold">GET</span> /api/dashboard
               </div>
               <div className="bg-[#131B2E] p-2 rounded-lg border border-[#1E293B]">
-                <span className="text-sky-400 font-bold">POST</span> /analyze
+                <span className="text-[#1E54B7] font-bold">POST</span> /analyze
               </div>
               <div className="bg-[#131B2E] p-2 rounded-lg border border-[#1E293B]">
-                <span className="text-sky-400 font-bold">POST</span> /translate
+                <span className="text-[#1E54B7] font-bold">POST</span> /translate
               </div>
               <div className="bg-[#131B2E] p-2 rounded-lg border border-[#1E293B]">
                 <span className="text-emerald-400 font-bold">GET</span> /api/patients
@@ -154,7 +154,7 @@ export const BackendSettingsModal: React.FC<BackendSettingsModalProps> = ({
             <button
               type="submit"
               disabled={testing}
-              className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[#38BDF8] hover:bg-[#0284C7] text-[#0B0F19] font-bold text-sm shadow-md transition-all disabled:opacity-50"
+              className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[#1E54B7] hover:bg-[#0E7490] text-white font-semibold text-sm btn-clinical disabled:opacity-50"
             >
               {testing ? (
                 <RefreshCw className="w-4 h-4 animate-spin" />

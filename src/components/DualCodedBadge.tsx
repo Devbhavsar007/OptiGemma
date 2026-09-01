@@ -1,4 +1,5 @@
 import React from 'react';
+import { Check, CircleDot, AlertCircle, ShieldAlert, AlertTriangle } from 'lucide-react';
 import { DRStage, DR_STAGES } from '../types';
 
 interface DualCodedBadgeProps {
@@ -31,6 +32,24 @@ export const DualCodedBadge: React.FC<DualCodedBadgeProps> = ({
     xl: 'w-7 h-7 text-lg',
   };
 
+  const renderStageIcon = () => {
+    const iconCls = size === 'sm' ? 'w-2.5 h-2.5 stroke-[3]' : size === 'md' ? 'w-3 h-3 stroke-[2.5]' : size === 'lg' ? 'w-3.5 h-3.5 stroke-[2.5]' : 'w-4 h-4 stroke-[2.5]';
+    switch (stage) {
+      case 0:
+        return <Check className={iconCls} />;
+      case 1:
+        return <CircleDot className={iconCls} />;
+      case 2:
+        return <AlertCircle className={iconCls} />;
+      case 3:
+        return <ShieldAlert className={iconCls} />;
+      case 4:
+        return <AlertTriangle className={iconCls} />;
+      default:
+        return <Check className={iconCls} />;
+    }
+  };
+
   return (
     <div
       className={`inline-flex items-center rounded-lg border shadow-sm transition-all select-none ${sizeClasses[size]} ${className}`}
@@ -48,7 +67,7 @@ export const DualCodedBadge: React.FC<DualCodedBadgeProps> = ({
         style={{ backgroundColor: meta.color }}
         aria-hidden="true"
       >
-        {meta.icon}
+        {renderStageIcon()}
       </span>
 
       {/* Text Label + Stage Number */}

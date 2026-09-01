@@ -53,18 +53,18 @@ const AppBody: React.FC = () => {
 
   if (activeView === 'landing') {
     return (
-      <div className="min-h-screen bg-[#619FE8] text-white transition-colors duration-150 font-sans selection:bg-[#E1FA4A] selection:text-black">
+      <div className="min-h-screen bg-[#619FE8] text-white transition-colors duration-150 font-sans selection:bg-[#E1FA4A] selection:text-black grain-overlay">
         <LandingPageView />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#619FE8] text-white transition-colors duration-150 flex flex-col font-sans selection:bg-[#E1FA4A] selection:text-black relative">
+    <div className="min-h-screen bg-[#619FE8] text-white transition-colors duration-150 flex flex-col font-sans selection:bg-[#E1FA4A] selection:text-black relative grain-overlay">
       {/* Skip link for screen-readers and keyboard navigators */}
       <a
         href="#main-content"
-        className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:p-4 focus:bg-[#E1FA4A] focus:text-black focus:font-black focus:rounded-xl focus:shadow-2xl"
+        className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:p-4 focus:bg-[#1E54B7] focus:text-white focus:font-bold focus:rounded-lg focus:shadow-xl"
       >
         Skip to primary clinical workspace
       </a>

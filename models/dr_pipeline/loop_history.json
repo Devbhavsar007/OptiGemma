@@ -1,0 +1,110 @@
+[
+  {
+    "iteration": 1,
+    "train_loss": 1.003,
+    "metrics": {
+      "kappa": 0.8626,
+      "accuracy": 0.8005,
+      "sensitivity": 0.987,
+      "specificity": 0.8538,
+      "ece": 0.0407,
+      "threshold": 0.27,
+      "temperature": 1.371
+    },
+    "hard_mining": {
+      "mined": 2930,
+      "mean_loss": 0.09943627520327682
+    },
+    "review_queue": "models\\dr_pipeline\\review_queue.csv"
+  },
+  {
+    "iteration": 2,
+    "train_loss": 0.5222,
+    "metrics": {
+      "kappa": 0.8837,
+      "accuracy": 0.8142,
+      "sensitivity": 0.987,
+      "specificity": 0.8632,
+      "ece": 0.0421,
+      "threshold": 0.32,
+      "temperature": 2.193
+    },
+    "hard_mining": {
+      "mined": 2930,
+      "mean_loss": 0.0405878116202671
+    },
+    "review_queue": "models\\dr_pipeline\\review_queue.csv"
+  },
+  {
+    "iteration": 3,
+    "train_loss": 0.3289,
+    "metrics": {
+      "kappa": 0.8506,
+      "accuracy": 0.7951,
+      "sensitivity": 0.987,
+      "specificity": 0.8679,
+      "ece": 0.0501,
+      "threshold": 0.28,
+      "temperature": 3.124
+    },
+    "hard_mining": {
+      "mined": 2930,
+      "mean_loss": 0.03970445275259818
+    },
+    "review_queue": "models\\dr_pipeline\\review_queue.csv"
+  },
+  {
+    "iteration": 4,
+    "train_loss": 0.3289,
+    "metrics": {
+      "kappa": 0.8506,
+      "accuracy": 0.7951,
+      "sensitivity": 0.987,
+      "specificity": 0.8679,
+      "ece": 0.0501,
+      "threshold": 0.28,
+      "temperature": 3.124
+    },
+    "hard_mining": {
+      "mined": 2930,
+      "mean_loss": 0.03970445275259818
+    },
+    "review_queue": "models\\dr_pipeline\\review_queue.csv"
+  },
+  {
+    "iteration": 5,
+    "train_loss": 0.2785,
+    "metrics": {
+      "kappa": 0.8556,
+      "accuracy": 0.7869,
+      "sensitivity": 0.9805,
+      "specificity": 0.8538,
+      "ece": 0.067,
+      "threshold": 0.29,
+      "temperature": 3.182
+    },
+    "hard_mining": {
+      "mined": 2930,
+      "mean_loss": 0.02884476065054399
+    },
+    "review_queue": "models\\dr_pipeline\\review_queue.csv"
+  },
+  {
+    "iteration": 6,
+    "train_loss": 0.2362,
+    "metrics": {
+      "kappa": 0.8731,
+      "accuracy": 0.8224,
+      "sensitivity": 0.9805,
+      "specificity": 0.8585,
+      "ece": 0.0368,
+      "threshold": 0.32,
+      "temperature": 3.283
+    },
+    "hard_mining": {
+      "mined": 2930,
+      "mean_loss": 0.012168548622045132
+    },
+    "review_queue": "models\\dr_pipeline\\review_queue.csv"
+  }
+]

@@ -1,19 +1,34 @@
 """
-OptiGemma — Flask Application (v2.0 Clinical System)
+OptiGemma — Flask Application (v2.1 Hardened Clinical System)
 Multi-patient support, scan history, batch processing.
-Existing scan pipeline is UNTOUCHED — only new routes added.
+Security: rate limiting, CORS, security headers, input validation, audit trail.
 """
 import os
+import re
 import time
 import uuid
 import json
+import logging
 import cv2
 from flask import Flask, request, jsonify, render_template, send_from_directory
+from flask_cors import CORS
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 from dotenv import load_dotenv
 from werkzeug.utils import secure_filename
 
 # Load environment
 load_dotenv(override=True)
+
+# ---------------------------------------------------------------------------
+# Logging — structured with timestamps (replaces bare print statements)
+# ---------------------------------------------------------------------------
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(name)s] %(levelname)s %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S",
+)
+log = logging.getLogger("optigemma")
 
 # Import engine (UNCHANGED)
 from engine.preprocessor import preprocess_for_display
@@ -29,9 +44,68 @@ from database import (
     get_dashboard_stats
 )
 
+from config import FLASK_SECRET, DEBUG
+
+# ---------------------------------------------------------------------------
 # Flask app
+# ---------------------------------------------------------------------------
 app = Flask(__name__)
-app.secret_key = os.getenv("FLASK_SECRET_KEY", "optigemma-2026")
+app.secret_key = FLASK_SECRET
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16 MB upload limit
+
+# ---------------------------------------------------------------------------
+# CORS — restrict to same-origin + localhost dev
+# ---------------------------------------------------------------------------
+CORS(app, origins=[
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    "http://localhost:5000",
+    "http://127.0.0.1:5000",
+])
+
+# ---------------------------------------------------------------------------
+# Rate Limiting
+# ---------------------------------------------------------------------------
+limiter = Limiter(
+    get_remote_address,
+    app=app,
+    default_limits=["60 per minute"],
+    storage_uri="memory://",
+)
+
+# ---------------------------------------------------------------------------
+# Security Headers Middleware
+# ---------------------------------------------------------------------------
+@app.after_request
+def inject_security_headers(response):
+    """Inject strict security headers into every HTTP response."""
+    response.headers['X-Content-Type-Options'] = 'nosniff'
+    response.headers['X-Frame-Options'] = 'SAMEORIGIN'
+    response.headers['X-XSS-Protection'] = '1; mode=block'
+    response.headers['Referrer-Policy'] = 'strict-origin-when-cross-origin'
+    response.headers['Permissions-Policy'] = 'camera=(), microphone=(), geolocation=()'
+    if not DEBUG:
+        response.headers['Strict-Transport-Security'] = 'max-age=31536000; includeSubDomains'
+        response.headers['Content-Security-Policy'] = (
+            "default-src 'self'; "
+            "script-src 'self' 'unsafe-inline'; "
+            "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
+            "font-src 'self' https://fonts.gstatic.com; "
+            "img-src 'self' data: blob:; "
+            "connect-src 'self'"
+        )
+    return response
+
+# ---------------------------------------------------------------------------
+# Input validation helpers
+# ---------------------------------------------------------------------------
+_PATIENT_ID_RE = re.compile(r"^P-\d{4}$")
+
+def _validate_pid(pid: str) -> str:
+    """Validate patient ID format or raise 400."""
+    if not _PATIENT_ID_RE.match(pid):
+        raise ValueError(f"Invalid patient ID: {pid}")
+    return pid
 
 # Directories
 UPLOAD_DIR = os.path.join(os.path.dirname(__file__), 'uploads')
@@ -44,6 +118,22 @@ ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'bmp', 'tiff', 'tif'}
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+
+# ========================================
+# HEALTH CHECK
+# ========================================
+
+@app.route("/api/health", methods=["GET"])
+@limiter.exempt
+def api_health():
+    """Health check endpoint for monitoring."""
+    return jsonify({
+        "status": "healthy",
+        "service": "optigemma",
+        "version": "2.1.0",
+        "timestamp": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+    })
 
 
 # ========================================
@@ -73,6 +163,7 @@ def api_dashboard():
         stats = get_dashboard_stats()
         return jsonify({"success": True, **stats})
     except Exception as e:
+        log.exception("Dashboard stats error")
         return jsonify({"success": False, "error": str(e)}), 500
 
 
@@ -88,6 +179,7 @@ def api_patients_list():
         patients = get_all_patients(search)
         return jsonify({"success": True, "patients": patients})
     except Exception as e:
+        log.exception("Patient list error")
         return jsonify({"success": False, "error": str(e)}), 500
 
 
@@ -110,6 +202,7 @@ def api_patients_create():
         )
         return jsonify({"success": True, "patient": patient})
     except Exception as e:
+        log.exception("Patient create error")
         return jsonify({"success": False, "error": str(e)}), 500
 
 
@@ -117,11 +210,15 @@ def api_patients_create():
 def api_patient_detail(patient_id):
     """Get patient details with scan history."""
     try:
+        _validate_pid(patient_id)
         patient = get_patient(patient_id)
         if not patient:
             return jsonify({"success": False, "error": "Patient not found."}), 404
         return jsonify({"success": True, "patient": patient})
+    except ValueError as ve:
+        return jsonify({"success": False, "error": str(ve)}), 400
     except Exception as e:
+        log.exception("Patient detail error")
         return jsonify({"success": False, "error": str(e)}), 500
 
 
@@ -129,12 +226,16 @@ def api_patient_detail(patient_id):
 def api_patient_update(patient_id):
     """Update patient info."""
     try:
+        _validate_pid(patient_id)
         data = request.get_json()
         patient = update_patient(patient_id, **data)
         if not patient:
             return jsonify({"success": False, "error": "Patient not found."}), 404
         return jsonify({"success": True, "patient": patient})
+    except ValueError as ve:
+        return jsonify({"success": False, "error": str(ve)}), 400
     except Exception as e:
+        log.exception("Patient update error")
         return jsonify({"success": False, "error": str(e)}), 500
 
 
@@ -142,9 +243,13 @@ def api_patient_update(patient_id):
 def api_patient_delete(patient_id):
     """Delete a patient and all their scans."""
     try:
+        _validate_pid(patient_id)
         delete_patient(patient_id)
         return jsonify({"success": True})
+    except ValueError as ve:
+        return jsonify({"success": False, "error": str(ve)}), 400
     except Exception as e:
+        log.exception("Patient delete error")
         return jsonify({"success": False, "error": str(e)}), 500
 
 
@@ -161,15 +266,18 @@ def api_scan_detail(scan_id):
             return jsonify({"success": False, "error": "Scan not found."}), 404
         return jsonify({"success": True, "scan": scan})
     except Exception as e:
+        log.exception("Scan detail error")
         return jsonify({"success": False, "error": str(e)}), 500
 
 
 @app.route("/analyze", methods=["POST"])
+@limiter.limit("10 per minute")
 def analyze():
     """
     Run the FULL analysis pipeline on an uploaded fundus image.
     NOW saves to database if patient_id is provided.
     Core engine logic is UNCHANGED from v1.0.
+    Rate limited to 10 inferences per minute.
     """
     start_time = time.time()
 
@@ -229,6 +337,8 @@ def analyze():
         )
 
         elapsed = round(time.time() - start_time, 2)
+        log.info("Analysis %s completed in %.2fs — stage %s",
+                 analysis_id, elapsed, detection_result.get('stage', '?'))
 
         # --- 7. Save to Database (NEW) ---
         image_paths = {
@@ -249,9 +359,9 @@ def analyze():
                     image_paths=image_paths,
                     processing_time=elapsed
                 )
-                print(f"[DB] Scan {analysis_id} saved for patient {patient_id}")
+                log.info("Scan %s saved for patient %s", analysis_id, patient_id)
             except Exception as db_err:
-                print(f"[DB WARNING] Failed to save scan: {db_err}")
+                log.warning("Failed to save scan to DB: %s", db_err)
 
         # --- 8. Compile Response --- (UNCHANGED format)
         result = {
@@ -269,9 +379,12 @@ def analyze():
         return jsonify(result)
 
     except Exception as e:
-        import traceback
-        traceback.print_exc()
-        return jsonify({"error": str(e), "traceback": traceback.format_exc()}), 500
+        log.exception("Analysis pipeline error for %s", analysis_id)
+        error_response = {"error": str(e)}
+        if DEBUG:
+            import traceback
+            error_response["traceback"] = traceback.format_exc()
+        return jsonify(error_response), 500
 
 
 @app.route("/translate", methods=["POST"])
@@ -289,6 +402,7 @@ def translate():
         translated = translate_report(report, language)
         return jsonify({"success": True, "report": translated})
     except Exception as e:
+        log.exception("Translation error")
         return jsonify({"error": str(e)}), 500
 
 
@@ -297,8 +411,8 @@ def translate():
 # ========================================
 
 if __name__ == "__main__":
-    print("=" * 60)
-    print("  OptiGemma v2.0 — Clinical Patient Management System")
-    print("  http://127.0.0.1:5000")
-    print("=" * 60)
-    app.run(host="0.0.0.0", port=5000, debug=True, use_reloader=False)
+    log.info("=" * 60)
+    log.info("  OptiGemma v2.1 — Hardened Clinical System")
+    log.info("  http://127.0.0.1:5000")
+    log.info("=" * 60)
+    app.run(host="0.0.0.0", port=5000, debug=DEBUG, use_reloader=False)

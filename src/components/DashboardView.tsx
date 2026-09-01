@@ -9,6 +9,7 @@ import {
   TrendingUp,
   Filter,
   Eye,
+  X,
 } from 'lucide-react';
 import { useMedicalData } from '../context/MedicalDataContext';
 import { DR_STAGES, DRStage, ScanAnalysis } from '../types';
@@ -46,15 +47,15 @@ export const DashboardView: React.FC = () => {
     <div className="space-y-6 sm:space-y-8 animate-fadeIn text-white">
       {/* 1. Header with CTA */}
       <header className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
-        <div className="space-y-1">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-white/20 backdrop-blur-md border border-white/40 text-xs font-bold text-white shadow-sm">
-            <span className="w-2 h-2 rounded-full bg-[#E1FA4A] animate-pulse"></span>
+        <div className="space-y-1.5">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md border border-white/15 text-xs font-medium text-white/90">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#E1FA4A] animate-pulse"></span>
             <span>Live Clinical Triage • Active Screening Center</span>
           </div>
-          <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-white font-sans">
+          <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-white" style={{ fontFamily: 'var(--font-heading)' }}>
             Clinical Overview
           </h1>
-          <p className="text-white/90 text-base sm:text-lg font-medium max-w-2xl">
+          <p className="text-white/70 text-sm sm:text-base font-normal max-w-2xl">
             Real-time screening metrics, microvascular risk distribution, and urgent ophthalmology triage queue.
           </p>
         </div>
@@ -64,93 +65,93 @@ export const DashboardView: React.FC = () => {
             setActiveScan(null);
             setActiveView('new-scan');
           }}
-          className="bg-[#E1FA4A] hover:bg-[#d6f236] text-black px-7 sm:px-9 h-12 sm:h-14 rounded-full font-black text-sm sm:text-base flex items-center justify-center gap-3 shadow-xl hover:scale-105 transition-all shrink-0 cursor-pointer uppercase tracking-wider"
+          className="bg-[#E1FA4A] hover:bg-[#d6f236] text-black px-6 sm:px-8 h-11 sm:h-12 rounded-xl font-semibold text-sm flex items-center justify-center gap-2.5 btn-clinical shrink-0 cursor-pointer shadow-[0_4px_12px_rgba(22,163,74,0.25)] focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#E1FA4A]"
           aria-label="Start new retinal scan analysis"
         >
-          <Microscope className="w-5 h-5 stroke-[2.5]" />
-          <span>Start New Scan ↗</span>
+          <Microscope className="w-4.5 h-4.5 stroke-[2]" />
+          <span>Start New Scan</span>
         </button>
       </header>
 
       {/* 2. Key Metrics Row (4 Enamel White Cards) */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" data-reveal-stagger>
         {/* Card 1: Total Patients Screened */}
-        <div className="bg-white text-black p-6 rounded-[28px] shadow-[0_10px_30px_rgba(0,0,0,0.12)] border-4 border-white flex flex-col justify-between hover:translate-y-[-2px] transition-all">
+        <div className="bg-white text-black rounded-[36px] p-6 shadow-2xl border-4 border-white flex flex-col justify-between hover:scale-[1.02] transition-all">
           <div>
             <div className="flex items-center justify-between">
-              <p className="text-gray-500 font-black text-xs uppercase tracking-wider">
+              <p className="text-gray-500 font-bold text-xs uppercase tracking-wider">
                 Total Screened
               </p>
-              <span className="w-8 h-8 rounded-xl bg-sky-100 text-[#1E54B7] flex items-center justify-center font-bold text-xs">
+              <span className="w-9 h-9 rounded-2xl bg-sky-100 text-[#1E54B7] flex items-center justify-center font-bold">
                 <Users className="w-4 h-4" />
               </span>
             </div>
-            <p className="text-4xl font-black font-mono text-[#1E54B7] mt-3">
+            <p className="text-4xl font-extrabold font-mono text-black mt-3 animate-count-up">
               {dashboardStats.total_patients.toLocaleString()}
             </p>
           </div>
-          <div className="mt-3 pt-3 border-t border-gray-100 flex items-center gap-1.5 text-emerald-700 text-xs font-black">
-            <TrendingUp className="w-4 h-4 stroke-[3]" />
+          <div className="mt-4 pt-3 border-t border-gray-100 flex items-center gap-1.5 text-emerald-600 text-xs font-bold">
+            <TrendingUp className="w-3.5 h-3.5 stroke-[2.5]" />
             <span>+12% volume this month</span>
           </div>
         </div>
 
-        {/* Card 2: High Risk Cases (Stage 2+) with Pulsing Crimson Dot */}
-        <div className="bg-white text-black p-6 rounded-[28px] shadow-[0_10px_30px_rgba(0,0,0,0.12)] border-4 border-rose-200/80 relative overflow-hidden flex flex-col justify-between hover:translate-y-[-2px] transition-all">
-          <div className="absolute top-4 right-4 flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-rose-100 text-rose-700 text-[10px] font-black uppercase">
-            <span className="w-2 h-2 bg-rose-600 rounded-full animate-ping"></span>
+        {/* Card 2: High Risk Cases (Stage 2+) */}
+        <div className="bg-white text-black rounded-[36px] p-6 shadow-2xl border-4 border-white relative overflow-hidden flex flex-col justify-between hover:scale-[1.02] transition-all">
+          <div className="absolute top-4 right-4 flex items-center gap-1 px-2.5 py-1 rounded-full bg-rose-100 text-rose-700 text-[10px] font-black uppercase tracking-wide">
+            <span className="w-1.5 h-1.5 bg-rose-600 rounded-full animate-pulse"></span>
             <span>Urgent</span>
           </div>
           <div>
-            <p className="text-gray-500 font-black text-xs uppercase tracking-wider">
+            <p className="text-gray-500 font-bold text-xs uppercase tracking-wider">
               High Risk Cases
             </p>
-            <p className="text-4xl font-black font-mono text-rose-600 mt-3">
+            <p className="text-4xl font-extrabold font-mono text-[#D55E00] mt-3 animate-count-up">
               {dashboardStats.high_risk_cases}
             </p>
           </div>
-          <div className="mt-3 pt-3 border-t border-rose-100 text-rose-700 text-xs font-bold flex items-center gap-1">
+          <div className="mt-4 pt-3 border-t border-gray-100 text-rose-600 text-xs font-bold flex items-center gap-1">
             <AlertTriangle className="w-3.5 h-3.5" />
             <span>Stages 3 & 4 detected</span>
           </div>
         </div>
 
         {/* Card 3: Referrals Pending */}
-        <div className="bg-white text-black p-6 rounded-[28px] shadow-[0_10px_30px_rgba(0,0,0,0.12)] border-4 border-white flex flex-col justify-between hover:translate-y-[-2px] transition-all">
+        <div className="bg-white text-black rounded-[36px] p-6 shadow-2xl border-4 border-white flex flex-col justify-between hover:scale-[1.02] transition-all">
           <div>
             <div className="flex items-center justify-between">
-              <p className="text-gray-500 font-black text-xs uppercase tracking-wider">
+              <p className="text-gray-500 font-bold text-xs uppercase tracking-wider">
                 Referrals Pending
               </p>
-              <span className="w-8 h-8 rounded-xl bg-purple-100 text-purple-700 flex items-center justify-center font-bold text-xs">
+              <span className="w-9 h-9 rounded-2xl bg-amber-100 text-amber-700 flex items-center justify-center font-bold">
                 <Hospital className="w-4 h-4" />
               </span>
             </div>
-            <p className="text-4xl font-black font-mono text-gray-900 mt-3">
+            <p className="text-4xl font-extrabold font-mono text-black mt-3 animate-count-up">
               {dashboardStats.referrals_needed}
             </p>
           </div>
-          <div className="mt-3 pt-3 border-t border-gray-100 text-gray-600 text-xs font-bold">
-            Avg triage turnaround: <strong className="text-black">48h</strong>
+          <div className="mt-4 pt-3 border-t border-gray-100 text-gray-500 text-xs font-medium">
+            Avg triage turnaround: <strong className="text-black font-bold">48h</strong>
           </div>
         </div>
 
         {/* Card 4: AI Accuracy */}
-        <div className="bg-white text-black p-6 rounded-[28px] shadow-[0_10px_30px_rgba(0,0,0,0.12)] border-4 border-white flex flex-col justify-between hover:translate-y-[-2px] transition-all">
+        <div className="bg-white text-black rounded-[36px] p-6 shadow-2xl border-4 border-white flex flex-col justify-between hover:scale-[1.02] transition-all">
           <div>
             <div className="flex items-center justify-between">
-              <p className="text-gray-500 font-black text-xs uppercase tracking-wider">
+              <p className="text-gray-500 font-bold text-xs uppercase tracking-wider">
                 Model Accuracy
               </p>
-              <span className="w-8 h-8 rounded-xl bg-[#E1FA4A] text-black flex items-center justify-center font-black text-xs shadow-sm">
-                ★
+              <span className="w-9 h-9 rounded-2xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold">
+                <Target className="w-4 h-4" />
               </span>
             </div>
-            <p className="text-4xl font-black font-mono text-[#1E54B7] mt-3">
+            <p className="text-4xl font-extrabold font-mono text-[#009E73] mt-3 animate-count-up">
               {dashboardStats.diagnostic_accuracy}%
             </p>
           </div>
-          <div className="mt-3 pt-3 border-t border-gray-100 text-gray-600 text-xs font-bold">
+          <div className="mt-4 pt-3 border-t border-gray-100 text-gray-500 text-xs font-medium">
             EyePACS &amp; Messidor-2 Verified
           </div>
         </div>
@@ -166,16 +167,17 @@ export const DashboardView: React.FC = () => {
                 <div className="w-8 h-8 rounded-full bg-sky-100 flex items-center justify-center text-[#1E54B7]">
                   <Eye className="w-4 h-4 stroke-[2.5]" />
                 </div>
-                <h2 className="text-xl font-bold text-black">
+                <h2 className="text-xl font-bold text-black font-sans">
                   DR Stage Distribution
                 </h2>
               </div>
               {selectedStageFilter !== 'all' && (
                 <button
                   onClick={() => setSelectedStageFilter('all')}
-                  className="text-xs font-black text-[#1E54B7] bg-sky-100 hover:bg-sky-200 px-3 py-1 rounded-full transition-all cursor-pointer"
+                  className="inline-flex items-center gap-1 text-xs font-black text-[#1E54B7] bg-sky-100 hover:bg-sky-200 px-3 py-1 rounded-full transition-all cursor-pointer"
                 >
-                  Clear Filter ✕
+                  <span>Clear Filter</span>
+                  <X className="w-3.5 h-3.5 stroke-[2.5]" />
                 </button>
               )}
             </div>

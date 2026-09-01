@@ -49,34 +49,33 @@ export const Navigation: React.FC = () => {
     <>
       {/* Desktop Left Sidebar (240px wide) */}
       <aside
-        className="hidden md:flex flex-col w-64 shrink-0 bg-white/15 backdrop-blur-2xl border-r border-white/30 min-h-[calc(100vh-72px)] p-4 gap-2 select-none text-white shadow-[4px_0_24px_rgba(0,0,0,0.04)]"
+        className="hidden md:flex flex-col w-64 shrink-0 bg-white/10 backdrop-blur-2xl border-r border-white/15 min-h-[calc(100vh-72px)] p-4 gap-2 select-none text-white"
         aria-label="Main Navigation Menu"
       >
-        <div className="space-y-2">
-          {navItems.map((item) => {
+        <div className="space-y-1.5">
+          {navItems.map((item, idx) => {
             const isActive = activeView === item.id || (item.id === 'patients' && activeView === 'patient-detail');
             return (
               <button
                 key={item.id}
                 onClick={() => setActiveView(item.id)}
-                className={`flex items-center w-full gap-3.5 p-3.5 rounded-2xl font-bold transition-all cursor-pointer ${
+                style={{ animationDelay: `${idx * 60}ms` }}
+                className={`animate-slide-up flex items-center w-full gap-3 p-3 rounded-xl font-semibold btn-clinical cursor-pointer transition-all duration-200 ${
                   isActive
-                    ? 'bg-white text-[#1E54B7] shadow-[0_8px_20px_rgba(0,0,0,0.12)] scale-[1.02] font-black'
-                    : 'text-white/85 hover:bg-white/20 hover:text-white'
-                }`}
+                    ? 'bg-white text-[#1E54B7] shadow-[0_4px_12px_rgba(8,145,178,0.15)] font-bold'
+                    : 'text-white/80 hover:bg-white/12 hover:text-white active:bg-white/20'
+                } focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#1E54B7]`}
                 aria-current={isActive ? 'page' : undefined}
               >
-                <div className={isActive ? 'text-[#1E54B7]' : 'text-white/90'}>
+                <div className={`transition-colors duration-150 ${isActive ? 'text-[#1E54B7]' : 'text-white/75'}`}>
                   {item.icon}
                 </div>
 
                 <div className="flex-1 min-w-0 text-left">
                   <div className="flex items-center justify-between">
-                    <span className="text-sm font-black tracking-tight truncate block">{item.shortLabel}</span>
+                    <span className="text-[13px] font-semibold tracking-tight truncate block">{item.shortLabel}</span>
                     {item.id === 'batch-screening' && batchQueue.length > 0 && (
-                      <span className={`ml-1 text-xs px-2 py-0.5 rounded-full font-mono font-black ${
-                        isActive ? 'bg-[#E1FA4A] text-black shadow-sm' : 'bg-[#E1FA4A] text-black shadow-sm'
-                      }`}>
+                      <span className="ml-1.5 text-[10px] px-1.5 py-0.5 rounded-full font-mono font-bold bg-[#E1FA4A] text-black shadow-sm">
                         {batchQueue.length}
                       </span>
                     )}
@@ -91,22 +90,22 @@ export const Navigation: React.FC = () => {
         <div className="mt-auto space-y-2.5">
           <button
             onClick={() => setActiveView('landing')}
-            className="w-full flex items-center justify-between p-3 rounded-2xl bg-white/20 hover:bg-white/30 border border-white/40 text-xs font-black text-white shadow-sm transition-all cursor-pointer"
+            className="w-full flex items-center justify-between p-3 rounded-xl bg-white/10 hover:bg-white/18 active:bg-white/25 border border-white/15 text-xs font-semibold text-white/90 btn-clinical cursor-pointer focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#1E54B7]"
           >
             <span>Landing Page</span>
-            <span className="text-[#E1FA4A]">Overview ↗</span>
+            <span className="text-[#E1FA4A] font-bold">Overview ↗</span>
           </button>
 
-          <div className="p-4 bg-white/90 backdrop-blur-md text-black border border-white rounded-2xl space-y-1.5 shadow-lg">
-            <p className="text-[10px] font-black text-gray-500 uppercase tracking-wider">
+          <div className="p-3.5 rounded-2xl bg-white/15 border border-white/20 text-white space-y-1.5 backdrop-blur-md">
+            <p className="text-[10px] font-bold text-white/70 uppercase tracking-[0.1em]">
               Active Camp / Clinic
             </p>
-            <p className="text-xs font-black text-gray-900 leading-snug">
+            <p className="text-xs font-semibold text-white leading-snug">
               General Hospital - Mumbai
             </p>
-            <div className="flex items-center justify-between pt-2 border-t border-gray-200 text-[10px] font-mono font-bold text-gray-600">
+            <div className="flex items-center justify-between pt-2 border-t border-white/15 text-[10px] font-mono text-white/70">
               <span>Gemma-4 AI</span>
-              <span className="text-[#1E54B7] font-black">WCAG AAA</span>
+              <span className="text-[#E1FA4A] font-bold">WCAG AAA</span>
             </div>
           </div>
         </div>

@@ -23,6 +23,7 @@ import {
   CheckSquare,
   Utensils,
   ShieldAlert,
+  AlertOctagon,
 } from 'lucide-react';
 import { useMedicalData } from '../context/MedicalDataContext';
 import { useAccessibility } from '../context/AccessibilityContext';
@@ -329,7 +330,7 @@ export const NewScanView: React.FC = () => {
                         onClick={() => setActivePatient(p)}
                         className={`p-4 rounded-2xl border cursor-pointer transition-all ${
                           isSelected
-                            ? 'bg-sky-50/90 border-[#1E54B7] shadow-md ring-2 ring-[#1E54B7]/20'
+                            ? 'bg-sky-50/90 border-[#1E54B7] shadow-md ring-2 ring-sky-100'
                             : 'bg-gray-50/70 border-gray-200 hover:bg-white hover:border-gray-300 hover:shadow-sm'
                         }`}
                       >
@@ -431,7 +432,10 @@ export const NewScanView: React.FC = () => {
             {/* Mode 3: Quick Camp Screening Banner */}
             {patientMode === 'quick' && (
               <div className="p-4 rounded-2xl bg-sky-50 border border-sky-200 text-gray-800 text-sm">
-                <span className="font-bold text-black block mb-1">⚡ Quick Camp Outreach Mode</span>
+                <span className="font-bold text-black flex items-center gap-1.5 mb-1">
+                  <Zap className="w-4 h-4 text-amber-500 fill-amber-500" />
+                  <span>Quick Camp Outreach Mode</span>
+                </span>
                 Quickly process community scans with automated temporary identification. Patient records can be detailed and linked post-diagnosis.
               </div>
             )}
@@ -495,7 +499,7 @@ export const NewScanView: React.FC = () => {
                       onClick={() => handleSelectPreset(preset)}
                       className={`p-3.5 rounded-2xl border-2 text-left transition-all relative overflow-hidden cursor-pointer ${
                         isSelected
-                          ? 'bg-sky-50/80 border-[#1E54B7] shadow-lg ring-2 ring-[#1E54B7]/20 scale-[1.02]'
+                          ? 'bg-sky-50/80 border-[#1E54B7] shadow-lg ring-2 ring-sky-100 scale-[1.02]'
                           : 'bg-gray-50 border-gray-200 hover:border-gray-300 hover:bg-white'
                       }`}
                     >
@@ -692,13 +696,23 @@ export const NewScanView: React.FC = () => {
                       {DR_STAGES[activeScan.detection.stage].name}
                     </h1>
                     <span
-                      className={`px-3 py-1 rounded-full text-xs font-black border ${
+                      className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black border ${
                         activeScan.report.urgency === 'IMMEDIATE' || activeScan.report.urgency === 'URGENT'
                           ? 'bg-rose-100 text-rose-800 border-rose-200'
                           : 'bg-amber-100 text-amber-900 border-amber-200'
                       }`}
                     >
-                      {activeScan.report.urgency === 'IMMEDIATE' ? '🚨 EMERGENCY' : `⚠️ ${activeScan.report.urgency}`}
+                      {activeScan.report.urgency === 'IMMEDIATE' ? (
+                        <>
+                          <AlertOctagon className="w-3.5 h-3.5 text-rose-700" />
+                          <span>EMERGENCY</span>
+                        </>
+                      ) : (
+                        <>
+                          <AlertTriangle className="w-3.5 h-3.5 text-amber-700" />
+                          <span>{activeScan.report.urgency}</span>
+                        </>
+                      )}
                     </span>
                   </div>
 
@@ -886,7 +900,7 @@ export const NewScanView: React.FC = () => {
                     key={stageNum}
                     className={`p-3.5 rounded-2xl border transition-all ${
                       isPredicted
-                        ? 'bg-sky-50 border-[#1E54B7] shadow-sm ring-1 ring-[#1E54B7]/20'
+                        ? 'bg-sky-50 border-[#1E54B7] shadow-sm ring-1 ring-sky-100'
                         : 'bg-gray-50 border-gray-200'
                     }`}
                   >
@@ -982,7 +996,7 @@ export const NewScanView: React.FC = () => {
                 </div>
               </div>
 
-              {/* a) 🩺 Current Ocular Status */}
+              {/* a) Current Ocular Status */}
               <div className="space-y-2 p-5 bg-sky-50/70 rounded-3xl border border-sky-100">
                 <h4 className="text-base font-bold text-[#1E54B7] flex items-center gap-2">
                   <Activity className="w-5 h-5" />
@@ -993,7 +1007,7 @@ export const NewScanView: React.FC = () => {
                 </p>
               </div>
 
-              {/* b) 👁️ Visual Biomarkers */}
+              {/* b) Visual Biomarkers */}
               <div className="space-y-3 p-5 bg-gray-50 rounded-3xl border border-gray-200">
                 <h4 className="text-base font-bold text-black flex items-center gap-2">
                   <Eye className="w-5 h-5 text-[#1E54B7]" />
@@ -1011,7 +1025,7 @@ export const NewScanView: React.FC = () => {
                 </div>
               </div>
 
-              {/* c) 📊 Time-Aware Risk Progression */}
+              {/* c) Time-Aware Risk Progression */}
               <div className="space-y-3 p-5 bg-amber-50/60 rounded-3xl border border-amber-200">
                 <h4 className="text-base font-bold text-amber-950 flex items-center gap-2">
                   <Calendar className="w-5 h-5 text-amber-700" />
@@ -1056,7 +1070,7 @@ export const NewScanView: React.FC = () => {
                 </div>
               </div>
 
-              {/* d) ✅ Clinical Action Plan */}
+              {/* d) Clinical Action Plan */}
               <div className="space-y-3 p-5 bg-gray-50 rounded-3xl border border-gray-200">
                 <h4 className="text-base font-bold text-black flex items-center gap-2">
                   <CheckSquare className="w-5 h-5 text-emerald-600" />
@@ -1077,7 +1091,7 @@ export const NewScanView: React.FC = () => {
                 </div>
               </div>
 
-              {/* e) 🥗 Diabetic Eye-Care Dietary Guidance */}
+              {/* e) Diabetic Eye-Care Dietary Guidance */}
               <div className="space-y-3 p-5 bg-teal-50/50 rounded-3xl border border-teal-200">
                 <h4 className="text-base font-bold text-teal-950 flex items-center gap-2">
                   <Utensils className="w-5 h-5 text-teal-700" />
@@ -1096,7 +1110,7 @@ export const NewScanView: React.FC = () => {
                 </div>
               </div>
 
-              {/* f) 📅 Recommended Follow-Up & g) Disclaimer */}
+              {/* f) Recommended Follow-Up & g) Disclaimer */}
               <div className="p-4 rounded-2xl bg-sky-50 border border-sky-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs sm:text-sm">
                 <div className="flex items-center gap-2 font-bold text-[#1E54B7]">
                   <Calendar className="w-5 h-5 text-[#1E54B7]" />

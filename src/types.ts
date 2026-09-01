@@ -71,7 +71,7 @@ export const DR_STAGES: Record<DRStage, DRStageMeta> = {
     stage: 4,
     name: 'Stage 4: Proliferative DR',
     shortName: 'Proliferative DR',
-    icon: '⚠️',
+    icon: '!',
     shape: 'diamond',
     color: '#9333EA', // Vivid Purple
     textColor: '#C084FC',

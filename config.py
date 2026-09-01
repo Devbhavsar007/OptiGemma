@@ -3,22 +3,32 @@ OptiGemma Configuration
 Handles API key rotation, model paths, and app settings.
 """
 import os
+import re
+import secrets
 import itertools
+import logging
 from dotenv import load_dotenv
 
 load_dotenv(override=True)
 
+log = logging.getLogger("optigemma.config")
+
 # ---------------------------------------------------------------------------
 # Gemma API Key Pool — Round-Robin Rotation
 # ---------------------------------------------------------------------------
+_API_KEY_PATTERN = re.compile(r"^[A-Za-z0-9_\-]{20,}$")
+
 def _load_gemma_keys():
     """Load all GEMMA_API_KEY_* from .env and return as a list."""
     keys = []
     for key, value in os.environ.items():
         if key.startswith("GEMMA_API_KEY_") and value and value != "your_key_here":
-            keys.append(value)
+            if _API_KEY_PATTERN.match(value):
+                keys.append(value)
+            else:
+                log.warning("Skipping %s — does not match expected API key format", key)
     if not keys:
-        print("[WARNING] No Gemma API keys found in .env! Add at least one GEMMA_API_KEY_1=...")
+        log.warning("No Gemma API keys found in .env! Add at least one GEMMA_API_KEY_1=...")
     return keys
 
 GEMMA_KEYS = _load_gemma_keys()
@@ -29,6 +39,18 @@ def get_next_gemma_key():
     if _key_cycle is None:
         raise RuntimeError("No Gemma API keys configured. Add keys to .env file.")
     return next(_key_cycle)
+
+# ---------------------------------------------------------------------------
+# Flask Secret — cryptographically secure fallback
+# ---------------------------------------------------------------------------
+_env_secret = os.getenv("FLASK_SECRET_KEY", "")
+_INSECURE_DEFAULTS = {"optigemma-dev-key", "optigemma-secret-key-change-me", "optigemma-2026", ""}
+
+if _env_secret in _INSECURE_DEFAULTS:
+    FLASK_SECRET = secrets.token_hex(32)
+    log.warning("FLASK_SECRET_KEY not set or insecure — generated ephemeral key. Set a persistent key in .env for production.")
+else:
+    FLASK_SECRET = _env_secret
 
 # ---------------------------------------------------------------------------
 # Model Paths
@@ -47,7 +69,6 @@ VESSEL_MODEL_DIR = os.path.join(MODELS_DIR, "vessel_model")
 # ---------------------------------------------------------------------------
 # App Settings
 # ---------------------------------------------------------------------------
-FLASK_SECRET = os.getenv("FLASK_SECRET_KEY", "optigemma-dev-key")
 DEBUG = os.getenv("FLASK_DEBUG", "true").lower() == "true"
 
 # Image settings

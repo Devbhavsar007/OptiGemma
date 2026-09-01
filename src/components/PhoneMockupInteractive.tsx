@@ -248,7 +248,7 @@ export const PhoneMockupInteractive: React.FC<PhoneMockupInteractiveProps> = ({
                     <Microscope className="w-3.5 h-3.5 text-[#38BDF8]" />
                     Optical Fundus Image
                   </span>
-                  <span className="text-[10px] font-mono text-sky-400 bg-sky-500/10 px-2 py-0.5 rounded">
+                  <span className="text-[10px] font-mono text-[#1E54B7] bg-sky-500/10 px-2 py-0.5 rounded">
                     Autofocus 45°
                   </span>
                 </div>
