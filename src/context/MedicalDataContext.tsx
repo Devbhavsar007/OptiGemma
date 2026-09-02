@@ -113,7 +113,7 @@ export const MedicalDataProvider: React.FC<{ children: React.ReactNode }> = ({ c
   const [backendUrl, setBackendUrlState] = useState<string>(() => {
     return (
       (import.meta as any).env?.VITE_BACKEND_URL ||
-      localStorage.getItem('optigemma_backend_url') ||
+      localStorage.getItem('DrishtiAI_backend_url') ||
       'http://127.0.0.1:5000'
     );
   });
@@ -122,7 +122,7 @@ export const MedicalDataProvider: React.FC<{ children: React.ReactNode }> = ({ c
   const setBackendUrl = useCallback((url: string) => {
     setBackendUrlState(url);
     try {
-      localStorage.setItem('optigemma_backend_url', url);
+      localStorage.setItem('DrishtiAI_backend_url', url);
     } catch {
       // ignore
     }

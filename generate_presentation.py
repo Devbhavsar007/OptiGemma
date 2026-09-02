@@ -1,15 +1,15 @@
 """
-Generate OptiGemma SIH 2025 Presentation — 8-page HTML → Print to PDF.
+Generate DrishtiAI SIH 2025 Presentation — 8-page HTML → Print to PDF.
 
 Usage:
     python generate_presentation.py
-    Then open OptiGemma_SIH_Presentation.html in a browser and print (Ctrl+P)
+    Then open DrishtiAI_SIH_Presentation.html in a browser and print (Ctrl+P)
     with: A4 Landscape, Background Graphics ON, Margins: None.
 """
 
 import os
 
-OUT = os.path.join(os.path.dirname(__file__), "OptiGemma_SIH_Presentation.html")
+OUT = os.path.join(os.path.dirname(__file__), "DrishtiAI_SIH_Presentation.html")
 
 CSS = r"""
 :root{--bg:#0a0e1a;--sf:#111827;--sf2:#1a2236;--bd:rgba(255,255,255,.06);--tx:#e2e8f0;--dm:#94a3b8;--ac:#60a5fa;--ac2:#818cf8;--gn:#34d399;--am:#fbbf24;--rs:#fb7185;--cy:#22d3ee}
@@ -60,7 +60,7 @@ ul{padding-left:16px}ul li{font-size:.8rem;color:var(--dm);margin-bottom:3px}ul 
 
 
 def hdr(tag):
-    return f'''<div class="hd"><div class="la"><div class="li">👁</div><span class="lt">OptiGemma</span></div><span class="pt">{tag}</span></div>'''
+    return f'''<div class="hd"><div class="la"><div class="li">👁</div><span class="lt">DrishtiAI</span></div><span class="pt">{tag}</span></div>'''
 
 
 def ftr(left, page):
@@ -73,7 +73,7 @@ P1 = f'''<div class="pg">
 <div style="flex:1;display:flex;flex-direction:column;justify-content:center;position:relative;z-index:1">
 <div style="margin-bottom:6px"><span class="tg tb">Problem Statement ID — SIH1234</span> <span class="tg tp">Theme — MedTech / Life Sciences</span></div>
 <h1>Autonomous Retinal Diagnostic AI<br>for Diabetic Retinopathy Screening</h1>
-<p class="sub" style="margin-top:4px">OptiGemma is an end-to-end clinical platform that combines dual-model deep learning (EfficientNet-B3 + Tanwar-12 CNN), closed-loop self-optimizing training, MATLAB Simulink state-machine orchestration, and Google Gemma-4 intelligence to democratize DR screening across India.</p>
+<p class="sub" style="margin-top:4px">DrishtiAI is an end-to-end clinical platform that combines dual-model deep learning (EfficientNet-B3 + Tanwar-12 CNN), closed-loop self-optimizing training, MATLAB Simulink state-machine orchestration, and Google Gemma-4 intelligence to democratize DR screening across India.</p>
 <div class="sr" style="margin-top:18px">
 <div class="st"><div class="sv" style="color:var(--ac)">98.7%</div><div class="sl">Sensitivity</div></div>
 <div class="st"><div class="sv" style="color:var(--gn)">86.3%</div><div class="sl">Specificity</div></div>
@@ -95,7 +95,7 @@ P1 = f'''<div class="pg">
 <span class="tg tb">EfficientNet-B3</span><span class="tg tgn">PyTorch 2.x</span><span class="tg ta">TensorFlow 2.x</span><span class="tg tc">Gemma-4 31B-IT</span><span class="tg tp">MATLAB / Simulink</span><span class="tg tr">ONNX Runtime</span><span class="tg tgn">React 18 + Vite</span><span class="tg tb">Flask REST</span>
 </div>
 </div>
-{ftr("OptiGemma v3.0 — Powered by Gemma-4 Vision AI — Dual-Model EfficientNet-B3 + Tanwar-12 CNN", 1)}
+{ftr("DrishtiAI v3.0 — Powered by Gemma-4 Vision AI — Dual-Model EfficientNet-B3 + Tanwar-12 CNN", 1)}
 </div>'''
 
 # ─── PAGE 2 ───
@@ -112,7 +112,7 @@ P2 = f'''<div class="pg">
 <div class="cd ca" style="margin-bottom:8px"><h4>🏕️ No Rural Camp Support</h4><p>Current tools lack offline batch processing for mobile eye camps serving thousands of patients in a single day.</p></div>
 </div>
 <div>
-<h2>Our Solution: OptiGemma</h2>
+<h2>Our Solution: DrishtiAI</h2>
 <p style="margin-bottom:10px;color:var(--gn)">End-to-End Autonomous Retinal Diagnostic AI</p>
 <div class="cd cg" style="margin-bottom:8px"><h4>🧠 Dual-Model AI Engine</h4><p>EfficientNet-B3 (PyTorch) + Tanwar-12 CNN (TensorFlow) with automated fallback. 98.7% sensitivity, 0.884 Cohen's κ on APTOS 2019.</p></div>
 <div class="cd ca" style="margin-bottom:8px"><h4>🔬 3-Tier Explainable AI</h4><p>Raw Fundus + Frangi Vessel Segmentation + Grad-CAM Attention Heatmaps eliminate black-box clinical distrust.</p></div>
@@ -125,7 +125,7 @@ P2 = f'''<div class="pg">
 </div></div>
 </div>
 </div>
-{ftr("OptiGemma v3.0 — Smart India Hackathon 2025", 2)}
+{ftr("DrishtiAI v3.0 — Smart India Hackathon 2025", 2)}
 </div>'''
 
 # ─── PAGE 3 ───
@@ -161,7 +161,7 @@ P3 = f'''<div class="pg">
 <div class="cd"><h4 style="color:var(--cy)">Database Schema</h4><p class="mn" style="font-size:.7rem;line-height:1.7">PATIENTS: id, name, age, gender, hba1c<br>SCANS: id, patient_id(FK), stage, confidence<br>CONSULTATIONS: id, scan_id(FK), audio_lang, pdf</p></div>
 </div>
 </div>
-{ftr("OptiGemma v3.0 — Smart India Hackathon 2025", 3)}
+{ftr("DrishtiAI v3.0 — Smart India Hackathon 2025", 3)}
 </div>'''
 
 # ─── PAGE 4: CLOSED-LOOP TRAINING ───
@@ -212,7 +212,7 @@ P4 = f'''<div class="pg">
 </table></div>
 </div>
 </div>
-{ftr("OptiGemma v3.0 — Closed-Loop Self-Optimizing Training Pipeline", 4)}
+{ftr("DrishtiAI v3.0 — Closed-Loop Self-Optimizing Training Pipeline", 4)}
 </div>'''
 
 # ─── PAGE 5: MATLAB/SIMULINK ───
@@ -269,7 +269,7 @@ P5 = f'''<div class="pg">
 </div>
 </div>
 </div>
-{ftr("OptiGemma v3.0 — MATLAB/Simulink Model-Based Design", 5)}
+{ftr("DrishtiAI v3.0 — MATLAB/Simulink Model-Based Design", 5)}
 </div>'''
 
 # ─── PAGE 6: IMPACT ───
@@ -311,7 +311,7 @@ P6 = f'''<div class="pg">
 <div class="cd" style="margin-top:12px;background:linear-gradient(135deg,rgba(96,165,250,.08),rgba(129,140,248,.08));border-color:var(--ac)"><h4 style="color:var(--ac)">🔄 Self-Improving System <span class="nb">NEW</span></h4><p>Closed-loop training continuously improves accuracy through hard-example mining and clinical feedback, ensuring the model never stagnates.</p></div>
 </div>
 </div>
-{ftr("OptiGemma v3.0 — Smart India Hackathon 2025", 6)}
+{ftr("DrishtiAI v3.0 — Smart India Hackathon 2025", 6)}
 </div>'''
 
 # ─── PAGE 7: FEASIBILITY ───
@@ -346,7 +346,7 @@ P7 = f'''<div class="pg">
 <div class="cd ca"><h4>Model Drift Over Time</h4><p><strong>Challenge:</strong> Camera models and populations evolve.<br><strong>Strategy:</strong> Closed-loop retraining with IQA gating and temperature recalibration.</p></div>
 </div>
 </div>
-{ftr("OptiGemma v3.0 — Smart India Hackathon 2025", 7)}
+{ftr("DrishtiAI v3.0 — Smart India Hackathon 2025", 7)}
 </div>'''
 
 # ─── PAGE 8: COMPARISON & REFS ───
@@ -354,9 +354,9 @@ P8 = f'''<div class="pg">
 {hdr("Comparison &amp; References")}
 <h2>Feature Comparison &amp; Research References</h2>
 <div style="flex:1;position:relative;z-index:1">
-<h3>⚖️ OptiGemma vs. Existing Solutions</h3>
+<h3>⚖️ DrishtiAI vs. Existing Solutions</h3>
 <div class="cd" style="margin-top:8px;margin-bottom:14px"><table class="tbl" style="font-size:.72rem">
-<thead><tr><th style="width:14%">Feature</th><th style="width:43%">OptiGemma (Ours)</th><th style="width:43%">Existing Solutions</th></tr></thead>
+<thead><tr><th style="width:14%">Feature</th><th style="width:43%">DrishtiAI (Ours)</th><th style="width:43%">Existing Solutions</th></tr></thead>
 <tbody>
 <tr><td style="font-weight:600;color:#fff">Methodology</td><td>Multimodal: Dual-model CNN + Frangi vessel + Grad-CAM + Gemma-4 LLM + closed-loop self-training</td><td>Single-model CNN, no explainability or narrative.</td></tr>
 <tr><td style="font-weight:600;color:#fff">Explainability</td><td>3-tier: Raw fundus + vessel segmentation + attention heatmap with confidence scores</td><td>Black-box: stage number only, no visual evidence.</td></tr>
@@ -403,7 +403,7 @@ P8 = f'''<div class="pg">
 </div>
 </div>
 </div>
-{ftr("OptiGemma v3.0 — github.com/Devbhavsar007/OptiGemma", 8)}
+{ftr("DrishtiAI v3.0 — github.com/Devbhavsar007/DrishtiAI", 8)}
 </div>'''
 
 # ─── Assemble ───
@@ -412,7 +412,7 @@ html = f'''<!DOCTYPE html>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>OptiGemma — SIH 2025 Presentation</title>
+<title>DrishtiAI — SIH 2025 Presentation</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>{CSS}</style>
@@ -429,6 +429,6 @@ print(f"[OK] Presentation written to {OUT}")
 print(f"[OK] {len(html):,} bytes, 8 pages")
 print()
 print("To generate PDF:")
-print("  1. Open OptiGemma_SIH_Presentation.html in Chrome/Edge")
+print("  1. Open DrishtiAI_SIH_Presentation.html in Chrome/Edge")
 print("  2. Press Ctrl+P → Save as PDF")
 print("  3. Settings: A4 Landscape, Background graphics ON, Margins: None")

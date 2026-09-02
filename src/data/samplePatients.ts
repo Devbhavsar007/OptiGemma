@@ -183,7 +183,7 @@ export function buildSyntheticScan(
       diet_recommendations: diets[stage],
       urgency,
       recommended_follow_up: followUp,
-      disclaimer: 'OptiGemma is an AI-assisted clinical diagnostic decision support tool. All findings must be clinically correlated and confirmed by a licensed ophthalmologist or retinal specialist.',
+      disclaimer: 'DrishtiAI is an AI-assisted clinical diagnostic decision support tool. All findings must be clinically correlated and confirmed by a licensed ophthalmologist or retinal specialist.',
     },
     images: {
       original: createFundusDataUrl(stage, 'original'),

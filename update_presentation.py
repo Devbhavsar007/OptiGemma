@@ -1,5 +1,5 @@
 """
-Update the existing OptiGemma SIH Presentation PDF in-place.
+Update the existing DrishtiAI SIH Presentation PDF in-place.
 
 Uses reportlab to create transparent overlays with updated metrics,
 new features, and additional info, then merges them onto the original
@@ -29,8 +29,8 @@ BG     = HexColor("#111827")
 BG2    = HexColor("#0f1629")
 BADGE_BG = HexColor("#059669")
 
-SRC = os.path.join(os.path.dirname(__file__), "OptiGemma_SIH_Presentation.pdf")
-DST = os.path.join(os.path.dirname(__file__), "OptiGemma_SIH_Presentation_Updated.pdf")
+SRC = os.path.join(os.path.dirname(__file__), "DrishtiAI_SIH_Presentation.pdf")
+DST = os.path.join(os.path.dirname(__file__), "DrishtiAI_SIH_Presentation_Updated.pdf")
 
 
 def new_badge(c, x, y):
@@ -190,7 +190,7 @@ def make_overlay_page4():
     # Add a "Self-Improving System" card at bottom of right column
     draw_info_box(c, 432, 50, 375, 38,
                   "Self-Improving System via Closed-Loop Training",
-                  "Unlike static models, OptiGemma continuously improves through hard-example mining "
+                  "Unlike static models, DrishtiAI continuously improves through hard-example mining "
                   "and clinical feedback integration. Each iteration boosts difficult-case sampling "
                   "weights by 0.8x and exports review queues for ophthalmologist verification.",
                   accent=GREEN)

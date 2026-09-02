@@ -50,7 +50,7 @@ def run_pipeline(image_path: str, weights_path: str | Path | None = None,
     if img_bgr is None:
         raise FileNotFoundError(image_path)
 
-    report: dict = {"case_id": Path(image_path).stem, "pipeline": "optigemma-v2"}
+    report: dict = {"case_id": Path(image_path).stem, "pipeline": "DrishtiAI-v2"}
 
     # ── Module 1: quality gate ──
     iqa, processed = run_iqa(img_bgr)
@@ -110,7 +110,7 @@ def run_pipeline(image_path: str, weights_path: str | Path | None = None,
 
 
 def main() -> None:
-    ap = argparse.ArgumentParser(description="OptiGemma full DR screening pipeline")
+    ap = argparse.ArgumentParser(description="DrishtiAI full DR screening pipeline")
     ap.add_argument("image", help="Path to fundus image")
     ap.add_argument("--weights", default=str(DEFAULT_WEIGHTS))
     ap.add_argument("--calibration", default=str(DEFAULT_CALIB))

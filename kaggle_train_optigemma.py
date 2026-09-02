@@ -1,5 +1,5 @@
 # ============================================================================
-# 🔬 OptiGemma — EfficientNet-B3 Training on Kaggle
+# 🔬 DrishtiAI — EfficientNet-B3 Training on Kaggle
 # Dataset: APTOS 2019 Blindness Detection
 # Platform: Kaggle Notebooks (T4 GPU, 9hr session)
 # Target: 85-90%+ accuracy with Transfer Learning
@@ -13,7 +13,7 @@
 # ============================================================================
 
 # %% [markdown]
-# # 🔬 OptiGemma — DR Detection Model Training
+# # 🔬 DrishtiAI — DR Detection Model Training
 # **EfficientNet-B3 + Transfer Learning + Advanced Techniques**
 
 # %% ============ CELL 1: GPU Check & Dependencies ============
@@ -322,7 +322,7 @@ for epoch in range(EPOCHS):
         best_val_acc = val_acc
         best_kappa = val_kappa
         patience_counter = 0
-        torch.save(model.model.state_dict(), os.path.join(OUTPUT_DIR, 'optigemma_effnetb3_best.pt'))
+        torch.save(model.model.state_dict(), os.path.join(OUTPUT_DIR, 'DrishtiAI_effnetb3_best.pt'))
         print(f"  💾 BEST! Saved (Acc:{val_acc:.1f}%, κ:{val_kappa:.1f}%)")
     else:
         patience_counter += 1
@@ -335,7 +335,7 @@ print(f"🏆 BEST — Accuracy: {best_val_acc:.1f}% | Kappa: {best_kappa:.1f}%")
 
 # %% ============ CELL 6: TTA (Test Time Augmentation) ============
 print("🔄 Running TTA (5 augmented passes)...")
-model.model.load_state_dict(torch.load(os.path.join(OUTPUT_DIR, 'optigemma_effnetb3_best.pt'), weights_only=True))
+model.model.load_state_dict(torch.load(os.path.join(OUTPUT_DIR, 'DrishtiAI_effnetb3_best.pt'), weights_only=True))
 model.eval()
 
 tta_all_probs = []
@@ -381,7 +381,7 @@ print(classification_report(all_labels_tta, tta_preds, target_names=labels_names
 cm = confusion_matrix(all_labels_tta, tta_preds)
 plt.figure(figsize=(8, 6))
 sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', xticklabels=labels_names, yticklabels=labels_names)
-plt.title(f'OptiGemma — Confusion Matrix (Acc: {tta_acc:.1f}%, κ: {tta_kappa:.1f}%)')
+plt.title(f'DrishtiAI — Confusion Matrix (Acc: {tta_acc:.1f}%, κ: {tta_kappa:.1f}%)')
 plt.xlabel('Predicted'); plt.ylabel('Actual')
 plt.tight_layout()
 plt.savefig(os.path.join(OUTPUT_DIR, 'confusion_matrix.png'), dpi=150)
@@ -400,13 +400,13 @@ plt.savefig(os.path.join(OUTPUT_DIR, 'training_curves.png'), dpi=150)
 plt.show()
 
 # %% ============ CELL 8: Save & Summary ============
-model_path = os.path.join(OUTPUT_DIR, 'optigemma_effnetb3_best.pt')
+model_path = os.path.join(OUTPUT_DIR, 'DrishtiAI_effnetb3_best.pt')
 model_size = os.path.getsize(model_path) / 1e6
 print(f"""
 {'='*60}
 🏆 TRAINING COMPLETE!
 {'='*60}
-📦 Model: optigemma_effnetb3_best.pt ({model_size:.1f} MB)
+📦 Model: DrishtiAI_effnetb3_best.pt ({model_size:.1f} MB)
 📊 Accuracy: {tta_acc:.1f}% (with TTA)
 📊 Kappa: {tta_kappa:.1f}% (with TTA)
 {'='*60}
@@ -415,7 +415,7 @@ print(f"""
    1. Click "Save Version" (top right)
    2. Select "Save & Run All"
    3. After completion → go to Output tab
-   4. Download: optigemma_effnetb3_best.pt
+   4. Download: DrishtiAI_effnetb3_best.pt
 
 🔧 HOW TO INTEGRATE:
    1. Copy file to: models/vessel_model/best_val_loss.pt

@@ -1,5 +1,5 @@
 """
-OptiGemma — Image Preprocessor
+DrishtiAI — Image Preprocessor
 Inspired by Bhimrazy + Tanwar-12 preprocessing pipelines.
 
 Performs:

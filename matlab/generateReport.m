@@ -70,7 +70,7 @@ function [report] = generateReport(screeningResult, originalImg)
     % ── Machine-readable JSON record ──
     % For local SQLite storage and opportunistic sync to central dashboard
     record = struct();
-    record.pipeline = 'optigemma-v2-matlab';
+    record.pipeline = 'DrishtiAI-v2-matlab';
     record.timestamp = datestr(now, 'yyyy-mm-ddTHH:MM:SS');
     record.iqa = struct('score', r.qualityScore, 'class', r.qualityClass, ...
                          'enhanced', r.enhanced);
@@ -104,7 +104,7 @@ function [report] = generateReport(screeningResult, originalImg)
     fprintf('\n');
     fprintf('╔%.0s', 1:60);
     fprintf('╗\n');
-    fprintf('║  OptiGemma DR Screening Report');
+    fprintf('║  DrishtiAI DR Screening Report');
     fprintf('%*.s║\n', 29, '');
     fprintf('║  %s', record.timestamp);
     fprintf('%*.s║\n', 41 - length(record.timestamp), '');

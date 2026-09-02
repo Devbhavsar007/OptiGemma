@@ -1,5 +1,5 @@
 """
-OptiGemma — EfficientNet-B3 Training Pipeline
+DrishtiAI — EfficientNet-B3 Training Pipeline
 Fine-tunes EfficientNet-B3 on Diabetic Retinopathy datasets to reach 95%+ accuracy.
 
 Supports:
@@ -510,7 +510,7 @@ def main():
     # ── Device ──
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f"\n{'='*60}")
-    print(f"  OptiGemma — EfficientNet-B3 Training Pipeline")
+    print(f"  DrishtiAI — EfficientNet-B3 Training Pipeline")
     print(f"  Device: {device}" + (f" ({torch.cuda.get_device_name(0)})" if device.type == 'cuda' else ""))
     print(f"  Target accuracy: {TARGET_ACC*100:.0f}%")
     print(f"{'='*60}\n")

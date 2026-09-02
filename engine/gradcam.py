@@ -1,5 +1,5 @@
 """
-OptiGemma — Grad-CAM Heatmap Generator
+DrishtiAI — Grad-CAM Heatmap Generator
 Generates visual explanations of WHERE the model is looking
 in the fundus image. This is the "Explainability" layer.
 """

@@ -1,5 +1,5 @@
 """
-OptiGemma — Database Layer (SQLite)
+DrishtiAI — Database Layer (SQLite)
 Stores patient records and scan history permanently.
 Hardened: audit logging, N+1 fix, input validation, context-managed connections.
 """
@@ -11,9 +11,9 @@ import logging
 from contextlib import contextmanager
 from datetime import datetime
 
-log = logging.getLogger("optigemma.db")
+log = logging.getLogger("DrishtiAI.db")
 
-DB_PATH = os.path.join(os.path.dirname(__file__), 'optigemma.db')
+DB_PATH = os.path.join(os.path.dirname(__file__), 'DrishtiAI.db')
 
 # ---------------------------------------------------------------------------
 # Validation helpers

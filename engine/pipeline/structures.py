@@ -267,7 +267,6 @@ def extract_structures(img_bgr: np.ndarray, fov: np.ndarray | None = None) -> St
     res.lesion_features = np.array(
         [res.microaneurysms, res.hemorrhages,
          res.exudate_area_px / 1000.0, res.vessel_density * 100.0,
-         res.tortuosity, float(res.nv_suspicion),
          *quad_counts(ma_map), *quad_counts(ex_map)],
         dtype=np.float32,
     )

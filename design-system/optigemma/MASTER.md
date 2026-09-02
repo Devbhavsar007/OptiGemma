@@ -6,7 +6,7 @@
 
 ---
 
-**Project:** OptiGemma
+**Project:** DrishtiAI
 **Generated:** 2026-09-01 08:30:35
 **Category:** Medical Clinic
 

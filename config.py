@@ -1,5 +1,5 @@
 """
-OptiGemma Configuration
+DrishtiAI Configuration
 Handles API key rotation, model paths, and app settings.
 """
 import os
@@ -11,7 +11,7 @@ from dotenv import load_dotenv
 
 load_dotenv(override=True)
 
-log = logging.getLogger("optigemma.config")
+log = logging.getLogger("DrishtiAI.config")
 
 # ---------------------------------------------------------------------------
 # Gemma API Key Pool — Round-Robin Rotation
@@ -44,7 +44,7 @@ def get_next_gemma_key():
 # Flask Secret — cryptographically secure fallback
 # ---------------------------------------------------------------------------
 _env_secret = os.getenv("FLASK_SECRET_KEY", "")
-_INSECURE_DEFAULTS = {"optigemma-dev-key", "optigemma-secret-key-change-me", "optigemma-2026", ""}
+_INSECURE_DEFAULTS = {"DrishtiAI-dev-key", "DrishtiAI-secret-key-change-me", "DrishtiAI-2026", ""}
 
 if _env_secret in _INSECURE_DEFAULTS:
     FLASK_SECRET = secrets.token_hex(32)
@@ -85,9 +85,25 @@ DR_STAGES = {
     4: {"name": "Proliferative DR", "severity": "proliferative", "color": "#dc2626"},
 }
 
-# Gemma Model
-GEMMA_MODEL_NAME = "gemma-4-31b-it"
+# ---------------------------------------------------------------------------
+# Offline Mode — bypass all cloud API calls (for rural deployments)
+# ---------------------------------------------------------------------------
+OFFLINE_MODE = os.getenv("DRISHTIAI_OFFLINE", "false").lower() == "true"
+if not GEMMA_KEYS:
+    OFFLINE_MODE = True
+    log.info("No API keys found — forcing OFFLINE_MODE=True")
+
+# Gemma Model — configurable via env to allow switching to MedGemma
+# Options: "gemma-4-31b-it", "medgemma-27b-it", "gemma-4-4b-it" (edge)
+GEMMA_MODEL_NAME = os.getenv("GEMMA_MODEL", "gemma-4-31b-it")
+
+# ---------------------------------------------------------------------------
+# Pipeline Model Paths (new ordinal grading model + calibration)
+# ---------------------------------------------------------------------------
+PIPELINE_DIR = os.path.join(MODELS_DIR, "dr_pipeline")
+PIPELINE_WEIGHTS = os.path.join(PIPELINE_DIR, "best_model.pt")
+PIPELINE_CALIBRATION = os.path.join(PIPELINE_DIR, "calibration.json")
 
 # Ensure directories exist
-for d in [MODELS_DIR, UPLOAD_DIR, RESULTS_DIR, VESSEL_MODEL_DIR]:
+for d in [MODELS_DIR, UPLOAD_DIR, RESULTS_DIR, VESSEL_MODEL_DIR, PIPELINE_DIR]:
     os.makedirs(d, exist_ok=True)

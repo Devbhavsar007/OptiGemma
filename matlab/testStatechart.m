@@ -17,7 +17,7 @@ function testStatechart()
 
     fprintf('\n');
     fprintf('=%.0s', 1:70);
-    fprintf('\n  OptiGemma Stateflow — State Machine Simulation Tests\n');
+    fprintf('\n  DrishtiAI Stateflow — State Machine Simulation Tests\n');
     fprintf('=%.0s', 1:70);
     fprintf('\n\n');
 

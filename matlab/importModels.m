@@ -32,7 +32,7 @@ function importModels(onnxDir)
 
     fprintf('\n');
     fprintf('=%.0s', 1:70);
-    fprintf('\n  OptiGemma — ONNX to MATLAB Model Import\n');
+    fprintf('\n  DrishtiAI — ONNX to MATLAB Model Import\n');
     fprintf('  Source: %s\n', onnxDir);
     fprintf('  Output: %s\n', outputDir);
     fprintf('=%.0s', 1:70);

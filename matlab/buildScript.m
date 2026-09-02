@@ -32,7 +32,7 @@ function buildScript(target)
 
     fprintf('\n');
     fprintf('=%.0s', 1:70);
-    fprintf('\n  OptiGemma — Code Generation Build Script\n');
+    fprintf('\n  DrishtiAI — Code Generation Build Script\n');
     fprintf('  Target: %s\n', upper(target));
     fprintf('=%.0s', 1:70);
     fprintf('\n\n');

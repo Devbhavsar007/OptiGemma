@@ -1,5 +1,5 @@
 """
-OptiGemma DR Screening Pipeline — 5-module architecture per SIH problem statement.
+DrishtiAI DR Screening Pipeline — 5-module architecture per SIH problem statement.
 
 Module 1: engine.pipeline.iqa        — quality gate + adaptive enhancement
 Module 2: engine.pipeline.structures — disc/fovea, vessels, MA/exudates/hemorrhages/NV

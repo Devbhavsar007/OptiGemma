@@ -25,7 +25,7 @@ function testEnhancement(imageFolder)
     fprintf('\n');
     fprintf('=%.0s', 1:90);
     fprintf('\n');
-    fprintf('  OptiGemma Enhancement Test — Before/After Quality Comparison\n');
+    fprintf('  DrishtiAI Enhancement Test — Before/After Quality Comparison\n');
     fprintf('  Folder: %s\n', imageFolder);
     fprintf('=%.0s', 1:90);
     fprintf('\n\n');

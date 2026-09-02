@@ -1,5 +1,5 @@
 """
-OptiGemma — closed-loop DR pipeline training entry point.
+DrishtiAI — closed-loop DR pipeline training entry point.
 
 Examples:
     python train_in_loop.py --data data/aptos
@@ -21,7 +21,7 @@ from training.loop_trainer import LoopConfig, LoopTrainer
 
 
 def main() -> None:
-    ap = argparse.ArgumentParser(description="OptiGemma in-loop trainer")
+    ap = argparse.ArgumentParser(description="DrishtiAI in-loop trainer")
     ap.add_argument("--data", default="data/aptos", help="APTOS dir or class folders")
     ap.add_argument("--out", default="models/dr_pipeline")
     ap.add_argument("--max-iters", type=int, default=6)

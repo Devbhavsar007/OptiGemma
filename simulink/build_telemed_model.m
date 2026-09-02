@@ -1,5 +1,5 @@
 %% ========================================================================
-%  OptiGemma — Module 5: Simulink telemedicine screening workflow model
+%  DrishtiAI — Module 5: Simulink telemedicine screening workflow model
 %  (SIH deliverable: "Model the telemedicine screening pipeline in Simulink")
 %
 %  Models, per district-level program serving 100,000+ patients / year:

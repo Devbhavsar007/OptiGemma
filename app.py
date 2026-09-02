@@ -1,5 +1,5 @@
 """
-OptiGemma — Flask Application (v2.1 Hardened Clinical System)
+DrishtiAI — Flask Application (v2.1 Hardened Clinical System)
 Multi-patient support, scan history, batch processing.
 Security: rate limiting, CORS, security headers, input validation, audit trail.
 """
@@ -28,7 +28,7 @@ logging.basicConfig(
     format="%(asctime)s [%(name)s] %(levelname)s %(message)s",
     datefmt="%Y-%m-%d %H:%M:%S",
 )
-log = logging.getLogger("optigemma")
+log = logging.getLogger("DrishtiAI")
 
 # Import engine (UNCHANGED)
 from engine.preprocessor import preprocess_for_display
@@ -137,7 +137,7 @@ def api_health():
     """Health check endpoint for monitoring."""
     return jsonify({
         "status": "healthy",
-        "service": "optigemma",
+        "service": "DrishtiAI",
         "version": "2.1.0",
         "timestamp": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
     })
@@ -414,12 +414,250 @@ def translate():
 
 
 # ========================================
+# V2 PIPELINE — Full Clinical Pipeline
+# (IQA Gate → Structures → Grading → Explain → Report)
+# ========================================
+
+@app.route("/api/analyze-v2", methods=["POST"])
+@limiter.limit("10 per minute")
+def analyze_v2():
+    """
+    DrishtiAI v2 Full Pipeline:
+      1. Image Quality Assessment (accept / enhance / reject with feedback)
+      2. Retinal structure segmentation (disc, fovea, vessels, lesions)
+      3. Calibrated DR grading (ordinal + referable binary head)
+      4. Explainability (Grad-CAM overlay + lesion evidence map)
+      5. Report generation (online via Gemma API or offline template)
+
+    Returns all brief-mandated deliverables in a single response.
+    """
+    start_time = time.time()
+
+    # ── Validate file upload ──
+    if "image" not in request.files:
+        return jsonify({"error": "No image file uploaded."}), 400
+
+    file = request.files["image"]
+    if not file or not allowed_file(file.filename):
+        return jsonify({"error": "Invalid file type. Use PNG, JPG, JPEG, BMP, or TIFF."}), 400
+
+    # Save uploaded file
+    analysis_id = str(uuid.uuid4())[:12]
+    filename = secure_filename(file.filename)
+    filepath = os.path.join(UPLOAD_DIR, f"{analysis_id}_{filename}")
+    file.save(filepath)
+
+    # Patient info
+    patient_id = request.form.get("patient_id", "")
+    patient_info = {}
+    for field_name in ("age", "diabetes_duration", "sugar_level", "hba1c"):
+        val = request.form.get(field_name)
+        if val:
+            patient_info[field_name] = val
+
+    try:
+        # ── MODULE 1: Image Quality Assessment ──
+        from engine.pipeline.iqa import run_iqa
+        img_bgr = cv2.imread(filepath)
+        if img_bgr is None:
+            return jsonify({"error": "Could not read image file."}), 400
+
+        iqa_result, processed_img = run_iqa(img_bgr)
+
+        if iqa_result.decision == "REJECT" or processed_img is None:
+            elapsed = round(time.time() - start_time, 2)
+            log.info("Analysis %s REJECTED by IQA gate: %s",
+                     analysis_id, iqa_result.feedback)
+            return jsonify({
+                "success": True,
+                "analysis_id": analysis_id,
+                "status": "REJECTED",
+                "iqa": iqa_result.to_dict(),
+                "message": " ".join(iqa_result.feedback),
+                "processing_time": elapsed,
+            })
+
+        # Save processed image for display
+        original_path = os.path.join(RESULTS_DIR, f"{analysis_id}_scan.png")
+        cv2.imwrite(original_path, processed_img)
+
+        # ── MODULE 2: Structure Segmentation ──
+        from engine.pipeline.structures import extract_structures
+        from engine.pipeline.iqa import estimate_fov
+
+        fov = estimate_fov(processed_img)
+        structures = extract_structures(processed_img, fov)
+        structures_dict = structures.to_dict()
+
+        # Save vessel map for display
+        vessel_path = os.path.join(RESULTS_DIR, f"{analysis_id}_vessels.png")
+        if structures.vessel_mask is not None:
+            vessel_display = cv2.cvtColor(structures.vessel_mask, cv2.COLOR_GRAY2BGR)
+            vessel_display = cv2.resize(vessel_display, (224, 224))
+            cv2.imwrite(vessel_path, vessel_display)
+
+        # ── MODULE 3: DR Grading ──
+        # Try the new ordinal grading model first, fall back to legacy detector
+        from config import PIPELINE_WEIGHTS, PIPELINE_CALIBRATION
+        import os as _os
+
+        grading_result = None
+        detection_result = None
+
+        if _os.path.exists(PIPELINE_WEIGHTS):
+            # New calibrated ordinal model
+            try:
+                import torch
+                from engine.pipeline.grading import load_grading_model, Calibration, predict_batch
+
+                device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+                model = load_grading_model(PIPELINE_WEIGHTS, device)
+                calib = Calibration.load(PIPELINE_CALIBRATION)
+
+                # Preprocess for grading
+                img_resized = cv2.resize(processed_img, (300, 300))
+                img_rgb = cv2.cvtColor(img_resized, cv2.COLOR_BGR2RGB).astype('float32') / 255.0
+                import numpy as np
+                mean = np.array([0.485, 0.456, 0.406], dtype='float32')
+                std = np.array([0.229, 0.224, 0.225], dtype='float32')
+                img_norm = (img_rgb - mean) / std
+                x = torch.from_numpy(img_norm.transpose(2, 0, 1)).unsqueeze(0)
+                lesion_feats = torch.from_numpy(structures.lesion_features).unsqueeze(0)
+
+                pred = predict_batch(model, x, lesion_feats, calib, device)
+                grade = int(pred["grade"][0])
+
+                from config import DR_STAGES
+                stage_info = DR_STAGES.get(grade, DR_STAGES[0])
+
+                grading_result = {
+                    "grade": grade,
+                    "probs": [round(float(p), 4) for p in pred["probs"][0]],
+                    "expected_grade": round(float(pred["expected_grade"][0]), 2),
+                    "referable": bool(pred["referable"][0]),
+                    "referable_prob": round(float(pred["referable_prob"][0]), 4),
+                    "calibration_temperature": calib.temperature,
+                    "calibration_threshold": calib.threshold,
+                }
+
+                # Build compatible detection_result for report generation
+                detection_result = {
+                    "stage": grade,
+                    "stage_name": stage_info["name"],
+                    "confidence": round(float(pred["probs"][0][grade]) * 100, 1),
+                    "all_probabilities": {i: round(float(pred["probs"][0][i]) * 100, 1) for i in range(5)},
+                    "severity": stage_info["severity"],
+                    "color": stage_info["color"],
+                    "_model": "DrishtiAI-Pipeline (ordinal+referable, calibrated)",
+                    "_calibrated": True,
+                }
+                log.info("Analysis %s: pipeline grading — Grade %d, referable=%s",
+                         analysis_id, grade, pred["referable"][0])
+
+            except Exception as e:
+                log.warning("Pipeline grading failed, falling back to legacy: %s", e)
+                grading_result = None
+
+        # Fallback to legacy EfficientNet-B3 detector
+        if detection_result is None:
+            processed = preprocess_for_display(filepath)
+            model_input_enhanced = processed["model_input_enhanced_highres"]
+            detection_result = predict(model_input_enhanced)
+            detection_result["_calibrated"] = False
+
+        # ── MODULE 4: Explainability ──
+        processed_data = preprocess_for_display(filepath)
+        model_input = processed_data["model_input"]
+        original_display = processed_data["original"]
+
+        heatmap_path = os.path.join(RESULTS_DIR, f"{analysis_id}_heatmap.png")
+        heatmap_overlay, heatmap_raw = generate_gradcam(model_input, original_display, save_path=heatmap_path)
+        heatmap_analysis = get_heatmap_analysis(heatmap_raw)
+
+        # ── MODULE 5: Report Generation ──
+        report, _raw_source = generate_report(
+            detection_result, heatmap_analysis,
+            {"vessel_density_percent": round(structures.vessel_density * 100, 2),
+             "vessel_health_text": f"Vessel density: {structures.vessel_density * 100:.1f}%"},
+            patient_info,
+            structures=structures_dict,
+        )
+
+        elapsed = round(time.time() - start_time, 2)
+        log.info("Analysis %s (v2) completed in %.2fs — Grade %s, referable=%s",
+                 analysis_id, elapsed, detection_result.get('stage', '?'),
+                 grading_result.get('referable', 'N/A') if grading_result else 'N/A')
+
+        # Image paths for response
+        image_paths = {
+            "original": f"/results/{analysis_id}_scan.png",
+            "heatmap": f"/results/{analysis_id}_heatmap.png",
+            "vessels": f"/results/{analysis_id}_vessels.png",
+        }
+
+        # Save to database if patient_id provided
+        if patient_id:
+            try:
+                save_scan(
+                    scan_id=analysis_id,
+                    patient_id=patient_id,
+                    detection_result=detection_result,
+                    heatmap_analysis=heatmap_analysis,
+                    vessel_stats=structures_dict,
+                    report=report,
+                    image_paths=image_paths,
+                    processing_time=elapsed
+                )
+            except Exception as db_err:
+                log.warning("Failed to save scan to DB: %s", db_err)
+
+        # ── Compile v2 response ──
+        result = {
+            "success": True,
+            "pipeline_version": "v2",
+            "analysis_id": analysis_id,
+            "patient_id": patient_id,
+            "processing_time": elapsed,
+            "status": "OK",
+
+            # Module 1: IQA
+            "iqa": iqa_result.to_dict(),
+
+            # Module 2: Structures
+            "structures": structures_dict,
+
+            # Module 3: Detection / Grading
+            "detection": detection_result,
+            "grading": grading_result,
+
+            # Module 4: Explainability
+            "heatmap_analysis": heatmap_analysis,
+
+            # Module 5: Report
+            "report": report,
+
+            # Images
+            "images": image_paths,
+        }
+
+        return jsonify(result)
+
+    except Exception as e:
+        log.exception("v2 pipeline error for %s", analysis_id)
+        error_response = {"error": str(e)}
+        if DEBUG:
+            import traceback
+            error_response["traceback"] = traceback.format_exc()
+        return jsonify(error_response), 500
+
+
+# ========================================
 # STARTUP
 # ========================================
 
 if __name__ == "__main__":
     log.info("=" * 60)
-    log.info("  OptiGemma v2.1 — Hardened Clinical System")
+    log.info("  DrishtiAI v2.1 — Hardened Clinical System")
     log.info("  http://127.0.0.1:5000")
     log.info("=" * 60)
     app.run(host="0.0.0.0", port=5000, debug=DEBUG, use_reloader=False)

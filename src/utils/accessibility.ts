@@ -78,7 +78,7 @@ export function generateDiagnosticSpeechScript(
   followUp: string,
   topActions: string[]
 ): string {
-  return `OptiGemma Clinical Screening Summary for ${patientName}. 
+  return `DrishtiAI Clinical Screening Summary for ${patientName}. 
 Diagnosis: ${stageName}, with an AI confidence rating of ${confidence}. 
 Clinical Urgency: ${urgency}. 
 Summary: ${plainLanguage}. 

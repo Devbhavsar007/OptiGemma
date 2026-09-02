@@ -1,5 +1,5 @@
 """
-Closed-loop ("train-in-loop") trainer for the OptiGemma DR grading model.
+Closed-loop ("train-in-loop") trainer for the DrishtiAI DR grading model.
 
 Each iteration of the loop:
   1. TRAIN   — progressive-unfreezing curriculum on the weighted dataset
@@ -504,7 +504,7 @@ class LoopTrainer:
                    self.out_dir / "best_model.pt")
 
     def run(self) -> dict:
-        print(f"\n{'=' * 64}\n  OptiGemma closed-loop training "
+        print(f"\n{'=' * 64}\n  DrishtiAI closed-loop training "
               f"(target: acc>={self.cfg.target_accuracy:.0%}, "
               f"sens>={self.cfg.target_sensitivity:.0%}, "
               f"spec>={self.cfg.target_specificity:.0%})\n{'=' * 64}")

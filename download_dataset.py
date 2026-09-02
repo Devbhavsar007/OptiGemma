@@ -157,7 +157,7 @@ def print_manual_instructions():
 
 if __name__ == "__main__":
     print("=" * 60)
-    print("  OptiGemma — Dataset Downloader")
+    print("  DrishtiAI — Dataset Downloader")
     print("=" * 60)
 
     if try_kaggle():

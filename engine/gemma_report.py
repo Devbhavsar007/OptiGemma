@@ -1,5 +1,5 @@
 """
-OptiGemma -- Gemma-4 Medical Intelligence Layer (REST API Version)
+DrishtiAI -- Gemma-4 Medical Intelligence Layer (REST API Version)
 Works with any Python version -- no SDK dependency needed.
 
 Uses Aadhya2811's Time-Aware concept for progression prediction
@@ -9,7 +9,7 @@ import json
 import re
 import time
 import requests
-from config import get_next_gemma_key, GEMMA_MODEL_NAME, DR_STAGES
+from config import get_next_gemma_key, GEMMA_MODEL_NAME, DR_STAGES, OFFLINE_MODE
 
 # ---------------------------------------------------------------------------
 # Gemma API Endpoint
@@ -19,7 +19,7 @@ GEMMA_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/{model}
 # ---------------------------------------------------------------------------
 # System Prompt -- The Core Medical Intelligence
 # ---------------------------------------------------------------------------
-SYSTEM_PROMPT = """You are OptiGemma's Medical Intelligence Engine -- a clinical decision support system for Diabetic Retinopathy screening. You assist healthcare providers in rural clinics who have retinal scanning equipment but lack specialist ophthalmologists.
+SYSTEM_PROMPT = """You are DrishtiAI's Medical Intelligence Engine -- a clinical decision support system for Diabetic Retinopathy screening. You assist healthcare providers in rural clinics who have retinal scanning equipment but lack specialist ophthalmologists.
 
 CRITICAL RULES:
 1. NEVER say "you have" or "you are diagnosed with". Always use "the screening suggests" or "the AI analysis indicates".
@@ -167,11 +167,23 @@ def _call_gemma_api(prompt, system_instruction=None, temperature=0.3, max_tokens
     raise RuntimeError(f"All Gemma API attempts failed. Last error: {last_error}")
 
 
-def generate_report(detection_result, heatmap_analysis, vessel_stats, patient_info=None):
+def generate_report(detection_result, heatmap_analysis, vessel_stats, patient_info=None,
+                    structures=None):
     """
-    Generate a comprehensive medical report using Gemma-4.
-    Uses a multi-stage approach to ensure data is always extracted.
+    Generate a comprehensive medical report.
+    - OFFLINE_MODE: uses deterministic, literature-derived template report (no API)
+    - ONLINE:       uses Gemma-4 API with fallback chain
     """
+    # ── Offline path: zero API calls, works in rural clinics ──
+    if OFFLINE_MODE:
+        print("[OFFLINE] Generating report without API (DRISHTIAI_OFFLINE=true)")
+        from engine.pipeline.offline_report import generate_offline_report
+        return generate_offline_report(
+            detection_result, heatmap_analysis, vessel_stats,
+            patient_info, structures,
+        )
+
+    # ── Online path: Gemma API with multi-stage fallback ──
     context = _build_context(detection_result, heatmap_analysis, vessel_stats, patient_info)
 
     try:
@@ -186,6 +198,7 @@ def generate_report(detection_result, heatmap_analysis, vessel_stats, patient_in
         # Try direct JSON parse
         report = _parse_response(raw_text)
         if 'error' not in report:
+            report.setdefault('risk_prediction', {})['_source'] = 'gemma_api_generated'
             return report, raw_text
 
         # Stage 2: Extract from Gemma's thinking/markdown output
@@ -463,6 +476,8 @@ def _fallback_report(detection, heatmap, vessels):
                 "scenario_if_untreated": "Higher risk of advancing to stage {}.".format(min(stage + 1, 4)),
                 "scenario_if_managed": "Good chance of stabilization with lifestyle changes.",
             },
+            "_source": "literature_heuristic",
+            "_note": "Rates derived from UKPDS/WESDR/ETDRS studies, not longitudinal patient data.",
         },
         "action_plan": [
             "Schedule an appointment with an ophthalmologist",

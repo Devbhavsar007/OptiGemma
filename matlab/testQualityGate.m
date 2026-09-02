@@ -40,7 +40,7 @@ function testQualityGate(imageFolder)
     fprintf('\n');
     fprintf('=%.0s', 1:90);
     fprintf('\n');
-    fprintf('  OptiGemma Quality Gate — Test Results\n');
+    fprintf('  DrishtiAI Quality Gate — Test Results\n');
     fprintf('  Folder: %s | Images: %d\n', imageFolder, length(files));
     fprintf('=%.0s', 1:90);
     fprintf('\n\n');

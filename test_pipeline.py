@@ -1,4 +1,4 @@
-"""Quick test of the full OptiGemma pipeline."""
+"""Quick test of the full DrishtiAI pipeline."""
 import requests
 import json
 import os

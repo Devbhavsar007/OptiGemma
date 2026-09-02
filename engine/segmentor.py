@@ -1,5 +1,5 @@
 """
-OptiGemma — Vessel Segmentation Engine
+DrishtiAI — Vessel Segmentation Engine
 Wrapper around RishiSwethan's vessel segmentation logic.
 
 If the full PyTorch segmentation model is not available,

@@ -332,7 +332,7 @@ def main():
     img_h, img_w = get_input_size(args.task)
 
     print(f"\n{'='*60}")
-    print(f"  OptiGemma Segmentation Training — {args.task}")
+    print(f"  DrishtiAI Segmentation Training — {args.task}")
     print(f"  Data: {data_dirs}")
     print(f"  Device: {device} | Epochs: {args.epochs} | Batch: {args.batch_size}")
     print(f"  Input size: {img_h}x{img_w}")

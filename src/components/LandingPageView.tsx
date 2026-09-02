@@ -152,7 +152,7 @@ export const LandingPageView: React.FC = () => {
   };
 
   const handleCopyLink = () => {
-    const url = typeof window !== 'undefined' ? window.location.href : 'https://optigemma.clinical.ai';
+    const url = typeof window !== 'undefined' ? window.location.href : 'https://DrishtiAI.clinical.ai';
     if (typeof navigator !== 'undefined' && navigator.clipboard) {
       navigator.clipboard.writeText(url);
       setCopiedLink(true);
@@ -162,16 +162,16 @@ export const LandingPageView: React.FC = () => {
 
   const faqs = [
     {
-      q: 'How does OptiGemma achieve high diagnostic accuracy for Diabetic Retinopathy?',
-      a: 'OptiGemma leverages multimodal vision transformers fine-tuned on benchmark fundus datasets (EyePACS, Messidor-2, and APTOS) combined with multi-scale Frangi vessel filtering and Grad-CAM explainability, delivering >98.4% AUROC with transparent microvascular feature localization.',
+      q: 'How does DrishtiAI achieve high diagnostic accuracy for Diabetic Retinopathy?',
+      a: 'DrishtiAI leverages multimodal vision transformers fine-tuned on benchmark fundus datasets (EyePACS, Messidor-2, and APTOS) combined with multi-scale Frangi vessel filtering and Grad-CAM explainability, delivering >98.4% AUROC with transparent microvascular feature localization.',
     },
     {
       q: 'What is the dual-coded accessibility system for low-vision patients?',
       a: 'In accordance with WCAG 2.2 AAA standards, every diagnostic classification pairs the colorblind-safe Okabe-Ito palette with distinct geometric shapes (● Circle, ▲ Triangle, ◆ Diamond, ■ Square, ★ Star), high-contrast text, and integrated Web Speech API screen readers.',
     },
     {
-      q: 'Can OptiGemma be deployed in offline rural eye camps?',
-      a: 'Yes. OptiGemma includes a dedicated Mobile Camp Batch Screening Queue designed to process dozens of fundus images in batch mode, export structured CSV summaries, and connect to on-premise Python Flask API endpoints without requiring high-bandwidth internet.',
+      q: 'Can DrishtiAI be deployed in offline rural eye camps?',
+      a: 'Yes. DrishtiAI includes a dedicated Mobile Camp Batch Screening Queue designed to process dozens of fundus images in batch mode, export structured CSV summaries, and connect to on-premise Python Flask API endpoints without requiring high-bandwidth internet.',
     },
     {
       q: 'Are patient reports available in regional Indian languages?',
@@ -214,7 +214,7 @@ export const LandingPageView: React.FC = () => {
               </div>
               <div className="flex items-center gap-1.5">
                 <span className="text-lg font-semibold tracking-[-0.03em] text-slate-950">
-                  OptiGemma
+                  DrishtiAI
                 </span>
                 <span className="text-[9px] font-mono font-bold uppercase px-1.5 py-0.5 rounded-[4px] bg-[#E1FA4A] text-black">
                   AI
@@ -288,7 +288,7 @@ export const LandingPageView: React.FC = () => {
                     <Eye className="w-4 h-4 text-[#1E54B7] stroke-[2.5]" />
                   </div>
                   <div>
-                    <div className="text-base font-semibold tracking-tight leading-tight">OptiGemma</div>
+                    <div className="text-base font-semibold tracking-tight leading-tight">DrishtiAI</div>
                     <div className="text-[10px] font-mono text-[#1E54B7] font-bold">Clinical AI Vision</div>
                   </div>
                 </div>
@@ -427,7 +427,7 @@ export const LandingPageView: React.FC = () => {
 
           {/* Subtext */}
           <p className="mt-6 text-base font-medium text-white/80 leading-relaxed max-w-xl">
-            OptiGemma empowers clinics and rural health camps with instant microvascular grading,
+            DrishtiAI empowers clinics and rural health camps with instant microvascular grading,
             Frangi vessel segmentation, and transparent Grad-CAM explainability.
           </p>
 
@@ -554,7 +554,7 @@ export const LandingPageView: React.FC = () => {
 
                 <div className="pt-6 space-y-1 text-left">
                   <div className="flex items-center justify-between text-[11px] text-slate-400 font-mono">
-                    <span>OptiGemma Live</span>
+                    <span>DrishtiAI Live</span>
                     <span className="text-emerald-400 flex items-center gap-1.5">
                       <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
                       <span>Online</span>
@@ -822,7 +822,7 @@ export const LandingPageView: React.FC = () => {
               </div>
             </div>
             <div className="space-y-2">
-              <h4 className="text-2xl font-semibold tracking-[-0.05em]">The OptiGemma Solution</h4>
+              <h4 className="text-2xl font-semibold tracking-[-0.05em]">The DrishtiAI Solution</h4>
               <p className="text-sm font-medium text-gray-500 max-w-xs leading-relaxed">
                 Real-time 45° macular alignment, Frangi vessel density calculation, Grad-CAM attention hotspots, and multilingual patient counseling.
               </p>
@@ -1030,7 +1030,7 @@ export const LandingPageView: React.FC = () => {
                 Experience in Motion • Torne Isso Real
               </div>
               <h2 className="text-[32px] sm:text-[41px] font-semibold tracking-[-0.06em] leading-[1.2] max-w-[629px]">
-                See How OptiGemma Feels in Motion
+                See How DrishtiAI Feels in Motion
               </h2>
             </div>
             <p className="text-base font-medium text-white/75 leading-relaxed lg:max-w-[277px]">
@@ -1176,14 +1176,14 @@ export const LandingPageView: React.FC = () => {
           <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-7" data-reveal>
             <div className="space-y-5">
               <div className="inline-flex px-3.5 py-2 rounded-[25px] bg-white text-[#1E54B7] text-sm font-medium tracking-[-0.01em] shadow-md opacity-95">
-                Cameras / Generic AI / OptiGemma
+                Cameras / Generic AI / DrishtiAI
               </div>
               <h2 className="text-[32px] sm:text-[41px] font-semibold tracking-[-0.06em] leading-[1.2] max-w-[629px]">
                 More Than a Score.
               </h2>
             </div>
             <p className="text-base font-medium text-white/75 leading-relaxed lg:max-w-[277px]">
-              Screening alone changes nothing — OptiGemma closes the loop from fundus image to patient action.
+              Screening alone changes nothing — DrishtiAI closes the loop from fundus image to patient action.
             </p>
           </div>
 
@@ -1203,7 +1203,7 @@ export const LandingPageView: React.FC = () => {
                 <div className="w-7 h-7 rounded-full bg-[#E1FA4A] flex items-center justify-center shrink-0">
                   <Eye className="w-3.5 h-3.5 text-black stroke-[2.5]" />
                 </div>
-                <span className="text-lg font-semibold tracking-[-0.03em]">OptiGemma</span>
+                <span className="text-lg font-semibold tracking-[-0.03em]">DrishtiAI</span>
               </div>
               <h3 className="mt-3 text-[22px] font-medium tracking-[-0.05em] leading-snug">
                 Connects screening <span className="text-[#1E54B7]">to care.</span>
@@ -1311,7 +1311,7 @@ export const LandingPageView: React.FC = () => {
           className="relative z-10 mt-14 flex justify-center pointer-events-none select-none"
         >
           <span className="text-white/[0.15] text-[14vw] leading-[0.95] font-semibold tracking-[-0.05em] whitespace-nowrap">
-            OptiGemma
+            DrishtiAI
           </span>
         </div>
 
@@ -1319,7 +1319,7 @@ export const LandingPageView: React.FC = () => {
         <div className="relative z-10 mt-8 max-w-[1117px] mx-auto border-t border-white/20 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3">
           <div className="flex items-center gap-2 text-sm font-medium text-white/65">
             <Eye className="w-4 h-4 text-white/80" />
-            <span>OptiGemma Clinical Intelligence Suite © 2026</span>
+            <span>DrishtiAI Clinical Intelligence Suite © 2026</span>
           </div>
 
           <div className="flex items-center gap-6 text-[13px] font-medium text-white/65">

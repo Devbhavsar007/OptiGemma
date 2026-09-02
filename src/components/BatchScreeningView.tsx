@@ -117,7 +117,7 @@ export const BatchScreeningView: React.FC = () => {
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement('a');
     link.setAttribute('href', encodedUri);
-    link.setAttribute('download', `OptiGemma_Batch_Screening_${new Date().toISOString().split('T')[0]}.csv`);
+    link.setAttribute('download', `DrishtiAI_Batch_Screening_${new Date().toISOString().split('T')[0]}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);

@@ -332,7 +332,7 @@ def main():
     val_sources = [all_sources[i] for i in val_idx]
 
     print(f"\n{'='*60}")
-    print(f"  OptiGemma Multi-Dataset Grading Training")
+    print(f"  DrishtiAI Multi-Dataset Grading Training")
     print(f"  Train: {len(train_paths)} | Val: {len(val_paths)}")
     print(f"  Train dist: {dict(Counter(train_labels))}")
     print(f"  Device: {device} | Epochs: {args.epochs}")

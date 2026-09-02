@@ -1,5 +1,5 @@
 """
-OptiGemma -- DR Detection Engine (Dual-Model Architecture)
+DrishtiAI -- DR Detection Engine (Dual-Model Architecture)
 Primary: EfficientNet-B3 (PyTorch, 43MB, 5-class, 300x300)
   Supports both timm (Kaggle-trained) and torchvision (RishiSwethan) formats.
 Fallback: Tanwar-12's CNN (TensorFlow, 0.4MB, regression, 64x64)
@@ -219,7 +219,7 @@ def _predict_pytorch(image, model):
         "all_probabilities": all_probs,
         "severity": stage_info["severity"],
         "color": stage_info["color"],
-        "_model": "EfficientNet-B3 (OptiGemma)",
+        "_model": "EfficientNet-B3 (DrishtiAI)",
     }
 
 

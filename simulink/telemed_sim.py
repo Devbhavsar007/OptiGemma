@@ -111,7 +111,7 @@ def optimize() -> None:
     feasible = [(r, s) for r, s in results if r.feasible]
 
     print("=" * 72)
-    print(" OptiGemma telemedicine resource allocation — "
+    print(" DrishtiAI telemedicine resource allocation — "
           f"{ANNUAL_PATIENTS:,} patients/year target")
     print("=" * 72)
 

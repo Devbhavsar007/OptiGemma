@@ -32,7 +32,7 @@ export function generateLargePrintPDF(
   doc.setTextColor(255, 255, 255);
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(18);
-  doc.text('OPTIGEMMA CLINICAL AI SUITE', margin + 6, y + 10);
+  doc.text('DrishtiAI CLINICAL AI SUITE', margin + 6, y + 10);
 
   doc.setFontSize(11);
   doc.setFont('helvetica', 'normal');
@@ -197,12 +197,12 @@ export function generateLargePrintPDF(
     282
   );
   doc.text(
-    `OptiGemma Clinical ID: ${scan.analysis_id} | Page 1 of 1`,
+    `DrishtiAI Clinical ID: ${scan.analysis_id} | Page 1 of 1`,
     margin + contentWidth - 75,
     282
   );
 
   // Save the PDF
-  const filename = `OptiGemma_Report_${patientName.replace(/\s+/g, '_')}_${scan.scan_date}.pdf`;
+  const filename = `DrishtiAI_Report_${patientName.replace(/\s+/g, '_')}_${scan.scan_date}.pdf`;
   doc.save(filename);
 }

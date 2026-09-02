@@ -217,7 +217,7 @@ export const PhoneMockupInteractive: React.FC<PhoneMockupInteractiveProps> = ({
                 <Eye className="w-3.5 h-3.5 text-[#0B0F19] stroke-[2.5]" />
               </div>
               <div>
-                <span className="text-xs font-black text-white block leading-tight">OptiGemma</span>
+                <span className="text-xs font-black text-white block leading-tight">DrishtiAI</span>
                 <span className="text-[9px] text-[#94A3B8] block">Mobile Camp Mode</span>
               </div>
             </div>

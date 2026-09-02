@@ -90,7 +90,7 @@ export const REPORT_TRANSLATIONS: Record<ReportLanguage, (report: GemmaReport) =
         'मीठा, कोल्ड ड्रिंक, तली-भुनी चीजें और अधिक नमक से पूरी तरह बचें।',
       ],
       followUp: followUpHindi[stage] || report.recommended_follow_up,
-      disclaimer: 'ऑप्टीजेम्मा (OptiGemma) एक एआई सहायता प्रणाली है। कृपया अंतिम निर्णय और इलाज के लिए नेत्र रोग विशेषज्ञ से संपर्क करें।',
+      disclaimer: 'ऑप्टीजेम्मा (DrishtiAI) एक एआई सहायता प्रणाली है। कृपया अंतिम निर्णय और इलाज के लिए नेत्र रोग विशेषज्ञ से संपर्क करें।',
       urgencyText: urgencyHindi[report.urgency] || report.urgency,
     };
   },
@@ -143,7 +143,7 @@ export const REPORT_TRANSLATIONS: Record<ReportLanguage, (report: GemmaReport) =
         'મીઠાઈ, તળેલા ખોરાક અને વધુ પડતા મીઠાથી દૂર રહો.',
       ],
       followUp: followUpGuj[stage] || report.recommended_follow_up,
-      disclaimer: 'ઓપ્ટીજેમ્મા (OptiGemma) એ એક AI સહાયક ક્લિનિકલ સિસ્ટમ છે. અંતિમ નિર્ણય માન્ય આંખના ડૉક્ટર દ્વારા જ લેવો.',
+      disclaimer: 'ઓપ્ટીજેમ્મા (DrishtiAI) એ એક AI સહાયક ક્લિનિકલ સિસ્ટમ છે. અંતિમ નિર્ણય માન્ય આંખના ડૉક્ટર દ્વારા જ લેવો.',
       urgencyText: report.urgency,
     };
   },

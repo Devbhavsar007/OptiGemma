@@ -38,21 +38,21 @@ export const AccessibilityToolbar: React.FC = () => {
 
     let speechText = '';
     if (activeView === 'dashboard') {
-      speechText = `OptiGemma Clinical Dashboard. Total patients screened: ${dashboardStats.total_patients}. High risk cases requiring immediate attention: ${dashboardStats.high_risk_cases}. Treatment referrals needed: ${dashboardStats.referrals_needed}. AI Diagnostic Accuracy: ${dashboardStats.diagnostic_accuracy} percent. To begin screening, select Start New Scan.`;
+      speechText = `DrishtiAI Clinical Dashboard. Total patients screened: ${dashboardStats.total_patients}. High risk cases requiring immediate attention: ${dashboardStats.high_risk_cases}. Treatment referrals needed: ${dashboardStats.referrals_needed}. AI Diagnostic Accuracy: ${dashboardStats.diagnostic_accuracy} percent. To begin screening, select Start New Scan.`;
     } else if (activeView === 'new-scan') {
       if (activeScan) {
         speechText = `Retinal Analysis Results for ${activeScan.patient_name || 'Patient'}. Diagnosis: ${activeScan.detection.stage_name}. Confidence: ${activeScan.detection.confidence} percent. Clinical Urgency: ${activeScan.report.urgency}. ${activeScan.report.current_diagnosis.plain_language} Recommended follow up: ${activeScan.report.recommended_follow_up}.`;
       } else {
-        speechText = `OptiGemma New Retinal Scan Screening Workflow. Step 1: Assign a patient. Step 2: Upload or drag and drop a retinal fundus image or choose a preset case. Then select Run Full AI Analysis.`;
+        speechText = `DrishtiAI New Retinal Scan Screening Workflow. Step 1: Assign a patient. Step 2: Upload or drag and drop a retinal fundus image or choose a preset case. Then select Run Full AI Analysis.`;
       }
     } else if (activeView === 'batch-screening') {
-      speechText = `OptiGemma Mobile Camp Batch Screening Queue. Manage multiple patient retinal scans simultaneously with real-time queue processing.`;
+      speechText = `DrishtiAI Mobile Camp Batch Screening Queue. Manage multiple patient retinal scans simultaneously with real-time queue processing.`;
     } else if (activeView === 'patients') {
       speechText = `Patient Records Directory. Search and filter patients by Diabetic Retinopathy severity and review longitudinal HbA1c histories.`;
     } else if (activeView === 'patient-detail' && activePatient) {
       speechText = `Patient Profile for ${activePatient.name}. Age ${activePatient.age}. Diabetes duration: ${activePatient.diabetes_duration} years. Latest fasting sugar: ${activePatient.sugar_level} mg per dL. HbA1c: ${activePatient.hba1c} percent. Past retinal scans on record: ${activePatient.scans?.length || 0}.`;
     } else {
-      speechText = `Welcome to OptiGemma, an accessible medical AI dashboard for Diabetic Retinopathy screening.`;
+      speechText = `Welcome to DrishtiAI, an accessible medical AI dashboard for Diabetic Retinopathy screening.`;
     }
 
     speak(speechText);
@@ -78,7 +78,7 @@ export const AccessibilityToolbar: React.FC = () => {
             <div className="flex flex-col">
               <div className="flex items-center gap-2">
                 <span className="text-xl font-bold tracking-tight text-white" style={{ fontFamily: 'var(--font-heading)' }}>
-                  OptiGemma
+                  DrishtiAI
                 </span>
                 <span className="inline-flex items-center gap-1 text-[9px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-md bg-sky-100 text-[#22D3EE] border border-sky-200">
                   <Sparkles className="w-2.5 h-2.5" />
