@@ -1,0 +1,48 @@
+\documentclass[border=8pt, multi, tikz]{standalone}
+\usepackage{import}
+\subimport{layers/}{init}
+\usetikzlibrary{positioning}
+\usetikzlibrary{3d}
+
+\def\ConvColor{rgb:yellow,5;red,2.5;white,5}
+\def\ConvReluColor{rgb:yellow,5;red,5;white,5}
+\def\PoolColor{rgb:red,1;black,0.3}
+\def\DcnvColor{rgb:blue,5;green,2.5;white,5}
+\def\SoftmaxColor{rgb:magenta,5;black,7}
+
+\begin{document}
+\begin{tikzpicture}
+\tikzstyle{connection}=[ultra thick,every node/.style={sloped,allow upside down},draw=\edgecolor,opacity=0.7]
+
+% 1. Input Tensor
+\pic[shift={(0,0,0)}] at (0,0,0) 
+    {Box={name=input,caption=Input Tensor\\$H \times W \times C$, xlabel={{"$C$",""}}, ylabel=H, zlabel=W, fill=\ConvColor, height=30, width=5, depth=30}};
+
+% 2. 1x1 Expansion Convolution (Widens the network)
+\pic[shift={(2,0,0)}] at (input-east) 
+    {Box={name=expand,caption=1x1 Expansion\\Conv + Swish, xlabel={{"$C \times 6$",""}}, ylabel=H, zlabel=W, fill=\ConvReluColor, height=30, width=20, depth=30}};
+
+% 3. 3x3 Depthwise Convolution (Spatial processing)
+\pic[shift={(2.5,0,0)}] at (expand-east) 
+    {Box={name=depthwise,caption=3x3 Depthwise\\Conv + Swish, xlabel={{"$C \times 6$",""}}, ylabel=$H/2$, zlabel=$W/2$, fill=\DcnvColor, height=15, width=20, depth=15}};
+
+% 4. 1x1 Projection Convolution (Compresses back down)
+\pic[shift={(2.5,0,0)}] at (depthwise-east) 
+    {Box={name=project,caption=1x1 Projection\\Linear, xlabel={{"$C_{out}$",""}}, ylabel=$H/2$, zlabel=$W/2$, fill=\ConvColor, height=15, width=8, depth=15}};
+
+% 5. Residual Addition (Skip Connection)
+\pic[shift={(2,0,0)}] at (project-east) 
+    {Ball={name=add,fill=\SoftmaxColor,radius=2.5,logo=$+$}};
+
+% Draw Connections
+\draw [connection]  (input-east)    -- node {\midarrow} (expand-west);
+\draw [connection]  (expand-east)   -- node {\midarrow} (depthwise-west);
+\draw [connection]  (depthwise-east)-- node {\midarrow} (project-west);
+\draw [connection]  (project-east)  -- node {\midarrow} (add-west);
+
+% Draw Skip Connection Arc (Input to Addition)
+\path (input-south) -- (input-south|-add-west) coordinate (skip_start);
+\draw [connection] (input-south) -- node {\midarrow} (skip_start) -- (skip_start-|add-south) -- node {\midarrow} (add-south);
+
+\end{tikzpicture}
+\end{document}

@@ -96,6 +96,9 @@ if not GEMMA_KEYS:
 # Gemma Model — configurable via env to allow switching to MedGemma
 # Options: "gemma-4-31b-it", "medgemma-27b-it", "gemma-4-4b-it" (edge)
 GEMMA_MODEL_NAME = os.getenv("GEMMA_MODEL", "gemma-4-31b-it")
+MEDGEMMA_MODEL_NAME = os.getenv("MEDGEMMA_MODEL", "medgemma-27b-it")
+TIER2_TIMEOUT = int(os.getenv("TIER2_TIMEOUT", "30"))
+HIRESCAM_THRESHOLD = float(os.getenv("HIRESCAM_THRESHOLD", "0.4"))
 
 # ---------------------------------------------------------------------------
 # Pipeline Model Paths (new ordinal grading model + calibration)

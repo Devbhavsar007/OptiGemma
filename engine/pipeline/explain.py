@@ -84,12 +84,20 @@ def lesion_evidence(maps: dict, cam: np.ndarray, threshold: float = 0.4) -> list
 
 def make_overlay(img_bgr: np.ndarray, cam: np.ndarray, alpha: float = 0.45) -> np.ndarray:
     heat = cv2.applyColorMap((cam * 255).astype(np.uint8), cv2.COLORMAP_JET)
+    if img_bgr.shape[:2] != heat.shape[:2]:
+        heat = cv2.resize(heat, (img_bgr.shape[1], img_bgr.shape[0]))
     return cv2.addWeighted(img_bgr, 1 - alpha, heat, alpha, 0)
 
 
-def build_explanation(img_bgr: np.ndarray, cam_referable: np.ndarray,
-                      cam_grade: np.ndarray, structures: dict,
-                      prediction: dict, case_id: str = "case") -> dict:
+def build_explanation(
+    img_bgr: np.ndarray,
+    cam_referable: np.ndarray,
+    cam_grade: np.ndarray,
+    structures: dict,
+    prediction: dict,
+    case_id: str = "case",
+    cam_hirescam: np.ndarray | None = None,
+) -> dict:
     """Assemble the human-in-the-loop validation package (<30 s review)."""
     grade = int(prediction["grade"][0])
     ref_prob = float(prediction["referable_prob"][0])
@@ -99,9 +107,9 @@ def build_explanation(img_bgr: np.ndarray, cam_referable: np.ndarray,
     rationale = [
         f"Model grade: {grade} ({DR_STAGE_NAMES[grade]}) with referable-DR "
         f"probability {ref_prob:.2f} (calibrated).",
-        f"Lesion counts: {structures['microaneurysms']} microaneurysms, "
-        f"{structures['hemorrhages']} hemorrhages, "
-        f"exudate area {structures['exudate_area_px']} px.",
+        f"Lesion counts: {structures.get('microaneurysms', 0)} microaneurysms, "
+        f"{structures.get('hemorrhages', 0)} hemorrhages, "
+        f"exudate area {structures.get('exudate_area_px', 0)} px.",
     ]
     if structures.get("nv_suspicion"):
         rationale.append("Neovascularization suspicion: elevated peripapillary "
@@ -114,7 +122,26 @@ def build_explanation(img_bgr: np.ndarray, cam_referable: np.ndarray,
                          "lesion maps - recommend human review.")
 
     overlay = make_overlay(img_bgr, cam_referable)
-    return {
+
+    # HiResCAM & quantitative localization scoring
+    hires_overlay = None
+    localization_metrics = None
+    from engine.pipeline.hirescam import compute_localization_score, make_hirescam_overlay
+
+    lesion_maps = {k: v for k, v in structures.get("maps", {}).items() if k in ("microaneurysms", "hemorrhages", "exudates")}
+
+    if cam_hirescam is not None:
+        hires_overlay = make_hirescam_overlay(img_bgr, cam_hirescam)
+        localization_metrics = {
+            "hirescam": compute_localization_score(cam_hirescam, lesion_maps),
+            "gradcam": compute_localization_score(cam_referable, lesion_maps),
+        }
+    elif lesion_maps:
+        localization_metrics = {
+            "gradcam": compute_localization_score(cam_referable, lesion_maps),
+        }
+
+    res = {
         "case_id": case_id,
         "grade": grade,
         "grade_name": DR_STAGE_NAMES[grade],
@@ -127,3 +154,14 @@ def build_explanation(img_bgr: np.ndarray, cam_referable: np.ndarray,
         "cam_referable": cam_referable,
         "cam_grade": cam_grade,
     }
+    if hires_overlay is not None:
+        res["hires_overlay_bgr"] = hires_overlay
+        res["cam_hirescam"] = cam_hirescam
+    if localization_metrics is not None:
+        res["localization_metrics"] = localization_metrics
+
+    return res
+
+
+# Re-export HiResCAM and DualCAM for unified access
+from engine.pipeline.hirescam import HiResCAM, DualCAM, compute_localization_score, make_hirescam_overlay

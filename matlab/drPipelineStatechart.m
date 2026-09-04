@@ -34,7 +34,7 @@ function drPipelineStatechart()
         close_system(model, 0);
     end
 
-    new_system(model, 'Library', 'off');
+    new_system(model);
     open_system(model);
 
     % ====================================================================

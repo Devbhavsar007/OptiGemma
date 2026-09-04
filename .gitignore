@@ -29,11 +29,18 @@ env/
 *.h5
 *.pt
 *.pth
+*.onnx
+*.onnx.data
 best_model_final.pt
 models/*.h5
 models/*.pt
 models/vessel_model/*.pt
 models/vessel_model/*.pth
+models/onnx/
+
+# === Archives & Third-Party Tools ===
+*.zip
+gemini-web2api-main/
 
 # === Database ===
 optigemma.db

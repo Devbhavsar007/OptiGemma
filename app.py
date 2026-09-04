@@ -652,6 +652,88 @@ def analyze_v2():
 
 
 # ========================================
+# V3 PIPELINE — Two-Tiered Architecture
+# (Tier 1: Edge HiResCAM/Grading + Tier 2: MedGemma Multimodal VLM)
+# ========================================
+
+@app.route("/api/analyze-v3", methods=["POST"])
+@limiter.limit("10 per minute")
+def analyze_v3():
+    """
+    OptiGemma Two-Tiered Architecture Endpoint:
+      Tier 1 (Edge): IQA -> Structures -> DR Grading -> HiResCAM + Grad-CAM -> Quantitative Localization Metrics
+      Tier 2 (Cloud): MedGemma 27B multimodal vision-language verification + grounded clinical narrative
+      (Graceful offline fallback if disconnected or timed out)
+    """
+    start_time = time.time()
+
+    if "image" not in request.files:
+        return jsonify({"error": "No image file uploaded."}), 400
+
+    file = request.files["image"]
+    if not file or not allowed_file(file.filename):
+        return jsonify({"error": "Invalid file type. Use PNG, JPG, JPEG, BMP, or TIFF."}), 400
+
+    analysis_id = str(uuid.uuid4())[:12]
+    filename = secure_filename(file.filename)
+    filepath = os.path.join(UPLOAD_DIR, f"{analysis_id}_{filename}")
+    file.save(filepath)
+
+    patient_id = request.form.get("patient_id", "")
+    patient_info = {}
+    for field_name in ("age", "diabetes_duration", "sugar_level", "hba1c"):
+        val = request.form.get(field_name)
+        if val:
+            patient_info[field_name] = val
+
+    force_offline = (
+        request.form.get("offline", "").lower() in ("true", "1", "yes")
+        or request.headers.get("X-Force-Offline", "").lower() == "true"
+    )
+
+    try:
+        from engine.pipeline.two_tier_runner import run_two_tier_pipeline
+
+        result = run_two_tier_pipeline(
+            image_input=filepath,
+            force_offline=force_offline,
+            patient_info=patient_info,
+            save_overlays=True,
+            case_id=analysis_id,
+        )
+
+        result["analysis_id"] = analysis_id
+        result["patient_id"] = patient_id
+
+        # Save to DB if patient_id provided
+        if patient_id and result.get("status") != "REJECTED":
+            try:
+                save_scan(
+                    scan_id=analysis_id,
+                    patient_id=patient_id,
+                    detection_result=result.get("detection") or {},
+                    heatmap_analysis=result.get("explanation") or {},
+                    vessel_stats=result.get("structures") or {},
+                    report=result.get("report") or {},
+                    image_paths=result.get("images") or {},
+                    processing_time=round(result.get("total_latency_ms", 0) / 1000.0, 2),
+                )
+                log.info("Scan %s saved for patient %s (v3 two-tiered)", analysis_id, patient_id)
+            except Exception as db_err:
+                log.warning("Failed to save v3 scan to DB: %s", db_err)
+
+        return jsonify(result)
+
+    except Exception as e:
+        log.exception("v3 two-tier pipeline error for %s", analysis_id)
+        error_response = {"error": str(e)}
+        if DEBUG:
+            import traceback
+            error_response["traceback"] = traceback.format_exc()
+        return jsonify(error_response), 500
+
+
+# ========================================
 # STARTUP
 # ========================================
 
