@@ -1,0 +1,34 @@
+# DrishtiAI — Backend Production Dockerfile
+FROM python:3.11-slim
+
+WORKDIR /app
+
+# System dependencies for OpenCV headless and healthcheck
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl \
+    libglib2.0-0 \
+    && rm -rf /var/lib/apt/lists/*
+
+# Environment settings
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PORT=5000 \
+    OFFLINE_MODE=True
+
+# Install Python requirements
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy application files
+COPY . .
+
+# Ensure upload and results directories exist
+RUN mkdir -p uploads results data
+
+EXPOSE 5000
+
+# Healthcheck
+HEALTHCHECK --interval=30s --timeout=10s --start-period=15s --retries=3 \
+    CMD curl -f http://localhost:5000/api/health || exit 1
+
+CMD ["python", "app.py"]
