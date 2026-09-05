@@ -12,7 +12,7 @@ interface AccessibilityContextValue {
   toggleTheme: () => void;
   setFontSize: (size: FontSizeScale) => void;
   toggleContrast: () => void;
-  speak: (text: string) => void;
+  speak: (text: string, options?: { lang?: string; rate?: number }) => void;
   stopSpeech: () => void;
 }
 
@@ -56,10 +56,12 @@ export const AccessibilityProvider: React.FC<{ children: React.ReactNode }> = ({
     setHighContrast((prev) => !prev);
   }, []);
 
-  const speak = useCallback((text: string) => {
+  const speak = useCallback((text: string, options?: { lang?: string; rate?: number }) => {
     if (!isSpeechSynthesisSupported()) return;
     setIsSpeaking(true);
     speakText(text, {
+      lang: options?.lang,
+      rate: options?.rate,
       onStart: () => setIsSpeaking(true),
       onEnd: () => setIsSpeaking(false),
       onError: () => setIsSpeaking(false),

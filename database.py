@@ -8,6 +8,7 @@ import os
 import re
 import json
 import logging
+import uuid
 from contextlib import contextmanager
 from datetime import datetime
 
@@ -103,20 +104,104 @@ def init_db():
                 created_at TEXT DEFAULT (datetime('now'))
             );
 
+            CREATE TABLE IF NOT EXISTS progression_assessments (
+                id TEXT PRIMARY KEY,
+                scan_id TEXT NOT NULL,
+                patient_id TEXT NOT NULL,
+                risk_category TEXT NOT NULL,
+                six_month_risk REAL NOT NULL,
+                twelve_month_risk REAL NOT NULL,
+                payload TEXT DEFAULT '{}',
+                created_at TEXT DEFAULT (datetime('now')),
+                FOREIGN KEY (scan_id) REFERENCES scans(id),
+                FOREIGN KEY (patient_id) REFERENCES patients(id)
+            );
+
+            CREATE TABLE IF NOT EXISTS referrals (
+                id TEXT PRIMARY KEY,
+                scan_id TEXT NOT NULL,
+                patient_id TEXT NOT NULL,
+                priority TEXT NOT NULL,
+                reason_codes TEXT DEFAULT '[]',
+                human_review_required INTEGER DEFAULT 0,
+                doctor_review_status TEXT DEFAULT 'PENDING',
+                doctor_notes TEXT DEFAULT '',
+                payload TEXT DEFAULT '{}',
+                created_at TEXT DEFAULT (datetime('now')),
+                FOREIGN KEY (scan_id) REFERENCES scans(id),
+                FOREIGN KEY (patient_id) REFERENCES patients(id)
+            );
+
+            CREATE TABLE IF NOT EXISTS doctor_reviews (
+                id TEXT PRIMARY KEY,
+                scan_id TEXT NOT NULL,
+                patient_id TEXT NOT NULL,
+                doctor_id TEXT NOT NULL,
+                doctor_name TEXT DEFAULT '',
+                decision TEXT NOT NULL,
+                original_stage INTEGER NOT NULL,
+                adjusted_stage INTEGER,
+                approved_priority TEXT NOT NULL,
+                clinical_notes TEXT DEFAULT '',
+                recommended_intervention TEXT DEFAULT '',
+                created_at TEXT DEFAULT (datetime('now')),
+                FOREIGN KEY (scan_id) REFERENCES scans(id),
+                FOREIGN KEY (patient_id) REFERENCES patients(id)
+            );
+
+            CREATE TABLE IF NOT EXISTS audit_log (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                action TEXT NOT NULL,
+                entity_type TEXT NOT NULL,
+                entity_id TEXT NOT NULL,
+                actor_id TEXT DEFAULT 'system',
+                actor_role TEXT DEFAULT 'SYSTEM',
+                details TEXT DEFAULT '',
+                created_at TEXT DEFAULT (datetime('now'))
+            );
+
+            CREATE TABLE IF NOT EXISTS sync_events (
+                id TEXT PRIMARY KEY,
+                device_id TEXT NOT NULL,
+                entity_type TEXT NOT NULL,
+                entity_id TEXT NOT NULL,
+                action TEXT NOT NULL,
+                version INTEGER DEFAULT 1,
+                payload TEXT DEFAULT '{}',
+                sync_status TEXT DEFAULT 'PENDING',
+                conflict_resolution TEXT DEFAULT '',
+                created_at TEXT DEFAULT (datetime('now')),
+                synced_at TEXT
+            );
+
             CREATE INDEX IF NOT EXISTS idx_scans_patient ON scans(patient_id);
             CREATE INDEX IF NOT EXISTS idx_scans_created ON scans(created_at);
             CREATE INDEX IF NOT EXISTS idx_audit_entity ON audit_log(entity_type, entity_id);
             CREATE INDEX IF NOT EXISTS idx_audit_created ON audit_log(created_at);
+            CREATE INDEX IF NOT EXISTS idx_progression_scan ON progression_assessments(scan_id);
+            CREATE INDEX IF NOT EXISTS idx_progression_patient ON progression_assessments(patient_id);
+            CREATE INDEX IF NOT EXISTS idx_referrals_scan ON referrals(scan_id);
+            CREATE INDEX IF NOT EXISTS idx_referrals_patient ON referrals(patient_id);
+            CREATE INDEX IF NOT EXISTS idx_doc_reviews_scan ON doctor_reviews(scan_id);
+            CREATE INDEX IF NOT EXISTS idx_doc_reviews_patient ON doctor_reviews(patient_id);
+            CREATE INDEX IF NOT EXISTS idx_sync_status ON sync_events(sync_status);
+            CREATE INDEX IF NOT EXISTS idx_sync_entity ON sync_events(entity_type, entity_id);
         """)
+        # Backward compatibility column migrations for existing SQLite file
+        for col_def in ["actor_id TEXT DEFAULT 'system'", "actor_role TEXT DEFAULT 'SYSTEM'"]:
+            try:
+                conn.execute(f"ALTER TABLE audit_log ADD COLUMN {col_def}")
+            except sqlite3.OperationalError:
+                pass  # Column already exists
         conn.commit()
     log.info("Database initialized at %s", DB_PATH)
 
 
-def _audit(conn, action: str, entity_type: str, entity_id: str, details: str = ""):
-    """Record an audit trail entry."""
+def _audit(conn, action: str, entity_type: str, entity_id: str, details: str = "", actor_id: str = "system", actor_role: str = "SYSTEM"):
+    """Record an audit trail entry with actor provenance."""
     conn.execute(
-        "INSERT INTO audit_log (action, entity_type, entity_id, details) VALUES (?, ?, ?, ?)",
-        (action, entity_type, entity_id, _sanitize_string(details, 2000))
+        "INSERT INTO audit_log (action, entity_type, entity_id, actor_id, actor_role, details) VALUES (?, ?, ?, ?, ?, ?)",
+        (action, entity_type, entity_id, _sanitize_string(actor_id, 100), _sanitize_string(actor_role, 50), _sanitize_string(details, 2000))
     )
 
 
@@ -243,9 +328,12 @@ def update_patient(patient_id, **kwargs):
 
 
 def delete_patient(patient_id):
-    """Delete a patient and all their scans."""
+    """Delete a patient and all their scans, assessments, and reviews."""
     _validate_patient_id(patient_id)
     with get_db() as conn:
+        conn.execute("DELETE FROM doctor_reviews WHERE patient_id = ?", (patient_id,))
+        conn.execute("DELETE FROM progression_assessments WHERE patient_id = ?", (patient_id,))
+        conn.execute("DELETE FROM referrals WHERE patient_id = ?", (patient_id,))
         conn.execute("DELETE FROM scans WHERE patient_id = ?", (patient_id,))
         conn.execute("DELETE FROM patients WHERE id = ?", (patient_id,))
         _audit(conn, "DELETE", "patient", patient_id)
@@ -364,6 +452,391 @@ def get_dashboard_stats():
         'total_scans': total_scans,
         'stage_distribution': stage_dist,
         'recent_scans': recent_scans,
+    }
+
+
+# === Progression & Referral Persistence ===
+
+def save_progression_assessment(scan_id: str, patient_id: str, progression_data: dict) -> dict:
+    """Save or update a progression assessment for a scan."""
+    assessment_id = f"prog-{uuid.uuid4().hex[:12]}"
+    predicted = progression_data.get("predicted_risk") or {}
+    risk_cat = str(predicted.get("risk_category", "LOW")).upper()
+    six_m = float(predicted.get("six_month_risk", 0.0))
+    twelve_m = float(predicted.get("twelve_month_risk", 0.0))
+
+    with get_db() as conn:
+        conn.execute(
+            """INSERT OR REPLACE INTO progression_assessments
+               (id, scan_id, patient_id, risk_category, six_month_risk, twelve_month_risk, payload)
+               VALUES (?, ?, ?, ?, ?, ?, ?)""",
+            (assessment_id, scan_id, patient_id, risk_cat, six_m, twelve_m, json.dumps(progression_data))
+        )
+        _audit(conn, "SAVE", "progression_assessment", scan_id, f"risk={risk_cat}")
+        conn.commit()
+    return {"id": assessment_id, "scan_id": scan_id, "risk_category": risk_cat}
+
+
+def get_progression_assessment(scan_id: str) -> dict | None:
+    """Retrieve progression assessment for a scan."""
+    with get_db() as conn:
+        row = conn.execute(
+            "SELECT * FROM progression_assessments WHERE scan_id = ? ORDER BY created_at DESC LIMIT 1",
+            (scan_id,)
+        ).fetchone()
+    if not row:
+        return None
+    res = dict(row)
+    try:
+        res["payload"] = json.loads(res["payload"]) if res.get("payload") else {}
+    except (json.JSONDecodeError, TypeError):
+        res["payload"] = {}
+    return res
+
+
+def save_referral(
+    scan_id: str,
+    patient_id: str,
+    triage_data: dict,
+    doctor_review_status: str = "PENDING",
+    doctor_notes: str = ""
+) -> dict:
+    """Save or update referral triage record for a scan."""
+    referral_id = f"ref-{uuid.uuid4().hex[:12]}"
+    priority = str(triage_data.get("priority", "ROUTINE")).upper()
+    reason_codes = triage_data.get("reasonCodes", [])
+    human_review = 1 if triage_data.get("humanReviewRequired", False) else 0
+
+    with get_db() as conn:
+        conn.execute(
+            """INSERT OR REPLACE INTO referrals
+               (id, scan_id, patient_id, priority, reason_codes, human_review_required,
+                doctor_review_status, doctor_notes, payload)
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+            (
+                referral_id, scan_id, patient_id, priority,
+                json.dumps(reason_codes), human_review,
+                _sanitize_string(doctor_review_status, 50),
+                _sanitize_string(doctor_notes, 2000),
+                json.dumps(triage_data)
+            )
+        )
+        _audit(conn, "SAVE", "referral", scan_id, f"priority={priority}")
+        conn.commit()
+    return {"id": referral_id, "scan_id": scan_id, "priority": priority}
+
+
+def get_referral(scan_id: str) -> dict | None:
+    """Retrieve referral record for a scan."""
+    with get_db() as conn:
+        row = conn.execute(
+            "SELECT * FROM referrals WHERE scan_id = ? ORDER BY created_at DESC LIMIT 1",
+            (scan_id,)
+        ).fetchone()
+    if not row:
+        return None
+    res = dict(row)
+    for k in ["reason_codes", "payload"]:
+        try:
+            res[k] = json.loads(res[k]) if res.get(k) else {}
+        except (json.JSONDecodeError, TypeError):
+            res[k] = {} if k == "payload" else []
+    return res
+
+
+def save_doctor_review(
+    scan_id: str,
+    patient_id: str,
+    doctor_id: str,
+    decision: str,
+    original_stage: int,
+    adjusted_stage: int | None,
+    approved_priority: str,
+    doctor_name: str = "",
+    clinical_notes: str = "",
+    recommended_intervention: str = ""
+) -> dict:
+    """Record clinician evaluation/sign-off and update referral triage status."""
+    review_id = f"rev-{uuid.uuid4().hex[:12]}"
+    decision_clean = str(decision).upper()
+    priority_clean = str(approved_priority).upper()
+
+    with get_db() as conn:
+        conn.execute(
+            """INSERT OR REPLACE INTO doctor_reviews
+               (id, scan_id, patient_id, doctor_id, doctor_name, decision,
+                original_stage, adjusted_stage, approved_priority,
+                clinical_notes, recommended_intervention)
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+            (
+                review_id, scan_id, patient_id, _sanitize_string(doctor_id, 100),
+                _sanitize_string(doctor_name, 100), decision_clean,
+                int(original_stage), int(adjusted_stage) if adjusted_stage is not None else None,
+                priority_clean, _sanitize_string(clinical_notes, 2000),
+                _sanitize_string(recommended_intervention, 500)
+            )
+        )
+        # Synchronize referral record with doctor's verified status
+        conn.execute(
+            """UPDATE referrals
+               SET doctor_review_status = ?, priority = ?,
+                   doctor_notes = CASE WHEN doctor_notes = '' THEN ? ELSE doctor_notes || '; ' || ? END
+               WHERE scan_id = ?""",
+            (decision_clean, priority_clean, clinical_notes, clinical_notes, scan_id)
+        )
+        _audit(conn, "SIGN_OFF", "doctor_review", scan_id, f"doctor={doctor_id} decision={decision_clean}")
+        conn.commit()
+
+    return {
+        "id": review_id,
+        "scan_id": scan_id,
+        "decision": decision_clean,
+        "approved_priority": priority_clean,
+    }
+
+
+def get_doctor_review(scan_id: str) -> dict | None:
+    """Retrieve clinician review for a scan."""
+    with get_db() as conn:
+        row = conn.execute(
+            "SELECT * FROM doctor_reviews WHERE scan_id = ? ORDER BY created_at DESC LIMIT 1",
+            (scan_id,)
+        ).fetchone()
+    return dict(row) if row else None
+
+
+def get_patient_timeline(patient_id: str) -> dict:
+    """
+    Get chronological longitudinal timeline for a patient,
+    combining scans, progression risks, triage referrals, and clinician reviews.
+    """
+    _validate_patient_id(patient_id)
+    with get_db() as conn:
+        p_row = conn.execute("SELECT * FROM patients WHERE id = ?", (patient_id,)).fetchone()
+        if not p_row:
+            raise ValueError(f"Patient {patient_id} not found.")
+
+        # Get scans in chronological order (oldest to newest)
+        scan_rows = conn.execute(
+            "SELECT * FROM scans WHERE patient_id = ? ORDER BY created_at ASC",
+            (patient_id,)
+        ).fetchall()
+
+    timeline_events = []
+    prev_stage = None
+    prev_date = None
+
+    for r in scan_rows:
+        s = dict(r)
+        scan_id = s["id"]
+        created_at = s.get("created_at", "")
+
+        # Attach progression if exists
+        prog = get_progression_assessment(scan_id)
+        # Attach referral if exists
+        ref = get_referral(scan_id)
+        # Attach doctor review if exists
+        doc_rev = get_doctor_review(scan_id)
+
+        curr_stage = s.get("stage", 0)
+        stage_delta = curr_stage - prev_stage if prev_stage is not None else None
+
+        review_status = doc_rev.get("decision") if doc_rev else (ref.get("doctor_review_status", "PENDING") if ref else "PENDING")
+
+        timeline_events.append({
+            "scan_id": scan_id,
+            "patient_id": patient_id,
+            "date": created_at,
+            "stage": curr_stage,
+            "stage_name": s.get("stage_name", "Unknown"),
+            "confidence": s.get("confidence", 0.0),
+            "severity": s.get("severity", ""),
+            "stage_delta": stage_delta,
+            "progression": prog.get("payload") if prog else None,
+            "referral": ref.get("payload") if ref else None,
+            "doctor_review": doc_rev,
+            "doctor_review_status": review_status,
+            "image_thumbnail": s.get("image_original", ""),
+        })
+
+        prev_stage = curr_stage
+        prev_date = created_at
+
+    return {
+        "patient": dict(p_row),
+        "total_events": len(timeline_events),
+        "events": timeline_events,
+    }
+
+
+# === Offline Sync Ledger & Conflict Reconciliation ===
+
+def record_sync_event(
+    device_id: str,
+    entity_type: str,
+    entity_id: str,
+    action: str,
+    payload: dict,
+    version: int = 1
+) -> str:
+    """Record an offline edge change event into the sync ledger."""
+    event_id = f"sync-{uuid.uuid4().hex[:12]}"
+    with get_db() as conn:
+        conn.execute(
+            """INSERT INTO sync_events
+               (id, device_id, entity_type, entity_id, action, version, payload, sync_status)
+               VALUES (?, ?, ?, ?, ?, ?, ?, 'PENDING')""",
+            (
+                event_id, _sanitize_string(device_id, 100),
+                _sanitize_string(entity_type, 50), entity_id,
+                _sanitize_string(action, 20).upper(), int(version),
+                json.dumps(payload)
+            )
+        )
+        conn.commit()
+    return event_id
+
+
+def get_pending_sync_events(device_id: str | None = None, limit: int = 100) -> list[dict]:
+    """Retrieve pending sync events for replication."""
+    with get_db() as conn:
+        if device_id:
+            rows = conn.execute(
+                "SELECT * FROM sync_events WHERE sync_status = 'PENDING' AND device_id = ? ORDER BY created_at ASC LIMIT ?",
+                (device_id, limit)
+            ).fetchall()
+        else:
+            rows = conn.execute(
+                "SELECT * FROM sync_events WHERE sync_status = 'PENDING' ORDER BY created_at ASC LIMIT ?",
+                (limit,)
+            ).fetchall()
+
+    events = []
+    for r in rows:
+        item = dict(r)
+        try:
+            item["payload"] = json.loads(item["payload"]) if item.get("payload") else {}
+        except Exception:
+            item["payload"] = {}
+        events.append(item)
+    return events
+
+
+def reconcile_sync_batch(incoming_events: list[dict]) -> dict:
+    """
+    Reconcile an incoming batch of sync events from an edge device.
+    Follows Last-Write-Wins with explicit conflict logging rather than silent overwrite.
+    """
+    synced_ids = []
+    conflict_ids = []
+
+    with get_db() as conn:
+        for evt in incoming_events:
+            event_id = evt.get("id") or f"sync-{uuid.uuid4().hex[:12]}"
+            device_id = evt.get("device_id", "unknown-edge")
+            entity_type = evt.get("entity_type", "unknown")
+            entity_id = evt.get("entity_id", "")
+            action = str(evt.get("action", "UPDATE")).upper()
+            payload = evt.get("payload") or {}
+            incoming_version = int(evt.get("version", 1))
+
+            # Check if local record has higher version
+            existing = conn.execute(
+                "SELECT version, sync_status FROM sync_events WHERE entity_id = ? ORDER BY version DESC LIMIT 1",
+                (entity_id,)
+            ).fetchone()
+
+            if existing and existing["version"] > incoming_version:
+                # Conflict detected: local version is newer
+                conn.execute(
+                    """INSERT OR REPLACE INTO sync_events
+                       (id, device_id, entity_type, entity_id, action, version, payload, sync_status, conflict_resolution, synced_at)
+                       VALUES (?, ?, ?, ?, ?, ?, ?, 'CONFLICT', 'Retained local newer version', datetime('now'))""",
+                    (event_id, device_id, entity_type, entity_id, action, incoming_version, json.dumps(payload))
+                )
+                conflict_ids.append(entity_id)
+            else:
+                # Clean apply
+                conn.execute(
+                    """INSERT OR REPLACE INTO sync_events
+                       (id, device_id, entity_type, entity_id, action, version, payload, sync_status, synced_at)
+                       VALUES (?, ?, ?, ?, ?, ?, ?, 'SYNCED', datetime('now'))""",
+                    (event_id, device_id, entity_type, entity_id, action, incoming_version, json.dumps(payload))
+                )
+                synced_ids.append(entity_id)
+
+        conn.commit()
+
+    return {
+        "synced_count": len(synced_ids),
+        "synced_ids": synced_ids,
+        "conflict_count": len(conflict_ids),
+        "conflict_ids": conflict_ids,
+        "server_timestamp": datetime.utcnow().isoformat() + "Z",
+    }
+
+
+def get_sync_status() -> dict:
+    """Query current edge sync ledger health and queue depth."""
+    with get_db() as conn:
+        pending = conn.execute("SELECT COUNT(*) as cnt FROM sync_events WHERE sync_status = 'PENDING'").fetchone()["cnt"]
+        synced = conn.execute("SELECT COUNT(*) as cnt FROM sync_events WHERE sync_status = 'SYNCED'").fetchone()["cnt"]
+        conflicts = conn.execute("SELECT COUNT(*) as cnt FROM sync_events WHERE sync_status = 'CONFLICT'").fetchone()["cnt"]
+    return {
+        "pending_events": pending,
+        "synced_events": synced,
+        "conflicts": conflicts,
+        "is_synced": pending == 0,
+    }
+
+
+# === Observability & Health Metrics ===
+
+def get_observability_metrics() -> dict:
+    """Aggregate structured system metrics for screening throughput, clinical referrals, and sync health."""
+    with get_db() as conn:
+        total_patients = conn.execute("SELECT COUNT(*) as cnt FROM patients").fetchone()["cnt"]
+        total_scans = conn.execute("SELECT COUNT(*) as cnt FROM scans").fetchone()["cnt"]
+
+        # Stage distribution
+        stage_counts = {0: 0, 1: 0, 2: 0, 3: 0, 4: 0}
+        for row in conn.execute("SELECT stage, COUNT(*) as cnt FROM scans GROUP BY stage").fetchall():
+            if row["stage"] in stage_counts:
+                stage_counts[row["stage"]] = row["cnt"]
+
+        # Referral breakdown
+        triage_breakdown = {"ROUTINE": 0, "EARLY": 0, "URGENT": 0}
+        for row in conn.execute("SELECT priority, COUNT(*) as cnt FROM referrals GROUP BY priority").fetchall():
+            p = str(row["priority"]).upper()
+            if p in triage_breakdown:
+                triage_breakdown[p] = row["cnt"]
+
+        # Doctor reviews summary
+        doc_reviews = conn.execute("SELECT COUNT(*) as cnt FROM doctor_reviews").fetchone()["cnt"]
+
+        # Avg processing latency
+        avg_latency = conn.execute("SELECT AVG(processing_time) as lat FROM scans").fetchone()["lat"] or 0.0
+
+    sync_health = get_sync_status()
+
+    return {
+        "system": "DrishtiAI",
+        "version": "2.2.0",
+        "timestamp": datetime.utcnow().isoformat() + "Z",
+        "throughput": {
+            "total_screenings": total_scans,
+            "total_patients": total_patients,
+            "average_inference_latency_seconds": round(float(avg_latency), 3),
+        },
+        "epidemiology": {
+            "stage_distribution": stage_counts,
+            "referable_percentage": round((sum(stage_counts[s] for s in [2, 3, 4]) / max(1, total_scans)) * 100, 1),
+        },
+        "clinical_triage": triage_breakdown,
+        "human_oversight": {
+            "doctor_reviews_recorded": doc_reviews,
+        },
+        "edge_sync": sync_health,
     }
 
 

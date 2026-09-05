@@ -31,9 +31,12 @@ import { PRESET_FUNDUS_CASES, PresetFundusCase } from '../data/sampleFundusPrese
 import { DR_STAGES, DRStage, Patient, ScanAnalysis } from '../types';
 import { REPORT_TRANSLATIONS } from '../data/translations';
 import { generateLargePrintPDF } from '../utils/pdfGenerator';
-import { generateDiagnosticSpeechScript } from '../utils/accessibility';
+import { generateLocalizedDiagnosticSpeechScript, SpeechLanguage } from '../utils/accessibility';
 import { DualCodedBadge } from './DualCodedBadge';
 import { ImageLightboxModal } from './ImageLightboxModal';
+import { DoctorReviewSection } from './DoctorReviewSection';
+import { MedicalRAGDrawer } from './MedicalRAGDrawer';
+import { BookOpen } from 'lucide-react';
 
 type PatientMode = 'existing' | 'new' | 'quick';
 
@@ -78,6 +81,7 @@ export const NewScanView: React.FC = () => {
 
   // Lightbox Modal State
   const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [ragDrawerOpen, setRagDrawerOpen] = useState(false);
 
   // Inverted / High contrast preview filter states for the 3 triptych cards
   const [invertOriginal, setInvertOriginal] = useState(false);
@@ -191,17 +195,21 @@ export const NewScanView: React.FC = () => {
       return;
     }
 
-    const script = generateDiagnosticSpeechScript(
+    const langKey: SpeechLanguage =
+      reportLanguage === 'hindi' ? 'hi' : reportLanguage === 'gujarati' ? 'gu' : 'en';
+
+    const { script, langCode } = generateLocalizedDiagnosticSpeechScript(
       activePatient?.name || activeScan.patient_name || 'Patient',
       activeScan.detection.stage_name,
       activeScan.detection.confidence.toFixed(1),
       activeScan.report.current_diagnosis.plain_language,
       activeScan.report.urgency,
       activeScan.report.recommended_follow_up,
-      activeScan.report.action_plan
+      activeScan.report.action_plan,
+      langKey
     );
 
-    speak(script);
+    speak(script, { lang: langCode });
   };
 
   const handleDownloadPDF = () => {
@@ -755,6 +763,15 @@ export const NewScanView: React.FC = () => {
                   <FileDown className="w-4 h-4 text-[#1E54B7]" />
                   <span>Large-Print PDF</span>
                 </button>
+
+                <button
+                  type="button"
+                  onClick={() => setRagDrawerOpen(true)}
+                  className="flex items-center gap-2 px-6 py-3.5 rounded-full bg-sky-50 hover:bg-sky-100 text-[#1E54B7] border border-sky-200 font-black text-xs uppercase tracking-wider transition-all min-h-[46px] cursor-pointer shadow-sm"
+                >
+                  <BookOpen className="w-4 h-4 text-[#1E54B7]" />
+                  <span>Clinical Guidelines (RAG)</span>
+                </button>
               </div>
             </div>
           </div>
@@ -1128,6 +1145,13 @@ export const NewScanView: React.FC = () => {
             </div>
           )}
 
+          {/* 4.5 CLINICIAN SIGN-OFF & OVERSIGHT (DOCTOR REVIEW WORKFLOW) */}
+          <DoctorReviewSection
+            scanId={activeScan.analysis_id}
+            patientId={activePatient?.id || activeScan.patient_id}
+            originalStage={activeScan.detection.stage}
+          />
+
           {/* 5. ACTION FOOTER */}
           <div className="flex flex-wrap items-center justify-between gap-4 p-7 bg-white text-black border-4 border-white rounded-[36px] shadow-2xl">
             <button
@@ -1176,6 +1200,14 @@ export const NewScanView: React.FC = () => {
           stageName={activeScan.detection.stage_name}
         />
       )}
+
+      {/* Clinical Guidelines Intelligence Drawer (Medical RAG) */}
+      <MedicalRAGDrawer
+        isOpen={ragDrawerOpen}
+        onClose={() => setRagDrawerOpen(false)}
+        initialStage={activeScan?.detection.stage}
+        initialHbA1c={activePatient?.hba1c}
+      />
     </div>
   );
 };

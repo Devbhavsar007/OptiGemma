@@ -36,15 +36,24 @@ from engine.detector import predict
 from engine.gradcam import generate_gradcam, get_heatmap_analysis
 from engine.segmentor import segment_vessels
 from engine.gemma_report import generate_report
+from engine.clinical.progression import assess_progression_risk
+from engine.clinical.referral import decide_referral
+from engine.clinical.safety import evaluate_safety
+from engine.clinical.rag import MedicalRAGRetriever
+from engine.security.auth import Role, create_access_token, require_role, get_current_actor
 
 # Import database
 from database import (
     create_patient, get_patient, get_all_patients, update_patient,
     delete_patient, save_scan, get_patient_scans, get_scan,
-    get_dashboard_stats
+    get_dashboard_stats, save_progression_assessment, save_referral,
+    get_patient_timeline, save_doctor_review, get_doctor_review,
+    reconcile_sync_batch, get_sync_status, get_observability_metrics,
+    get_pending_sync_events
 )
 
-import re
+rag_retriever = MedicalRAGRetriever()
+
 from config import FLASK_SECRET, DEBUG
 
 # ---------------------------------------------------------------------------
@@ -275,6 +284,360 @@ def api_scan_detail(scan_id):
     except Exception as e:
         log.exception("Scan detail error")
         return jsonify({"success": False, "error": str(e)}), 500
+
+
+@app.route("/api/scans/<scan_id>/progression", methods=["POST"])
+def api_scan_progression(scan_id):
+    """Compute deterministic progression risk for a scan using longitudinal context."""
+    try:
+        scan = get_scan(scan_id)
+        if not scan:
+            return jsonify({"success": False, "error": "Scan not found."}), 404
+
+        patient_id = scan.get("patient_id")
+        previous_scans = get_patient_scans(patient_id) if patient_id else []
+        patient = get_patient(patient_id) if patient_id else None
+
+        patient_profile = None
+        if patient:
+            patient_profile = {
+                "hba1c": patient.get("hba1c"),
+                "diabetes_duration": patient.get("diabetes_duration"),
+                "sugar_level": patient.get("sugar_level"),
+            }
+
+        progression = assess_progression_risk(
+            current_scan={
+                "id": scan.get("id"),
+                "stage": scan.get("stage"),
+                "confidence": scan.get("confidence"),
+            },
+            previous_scans=previous_scans,
+            patient_profile=patient_profile,
+        )
+
+        # Persist progression assessment if patient linked
+        if patient_id:
+            save_progression_assessment(scan_id, patient_id, progression)
+
+        return jsonify({
+            "success": True,
+            "scan_id": scan_id,
+            "progression": progression,
+        })
+    except ValueError as ve:
+        return jsonify({"success": False, "error": str(ve)}), 400
+    except Exception as e:
+        log.exception("Progression assessment error")
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+@app.route("/api/scans/<scan_id>/triage", methods=["POST"])
+def api_scan_triage(scan_id):
+    """Compute deterministic referral priority (triage) for a scan."""
+    try:
+        scan = get_scan(scan_id)
+        if not scan:
+            return jsonify({"success": False, "error": "Scan not found."}), 404
+
+        payload = request.get_json(silent=True) or {}
+        doctor_review_present = bool(payload.get("doctor_review_present", False))
+
+        patient_id = scan.get("patient_id")
+        previous_scans = get_patient_scans(patient_id) if patient_id else []
+        patient = get_patient(patient_id) if patient_id else None
+        patient_profile = None
+        if patient:
+            patient_profile = {
+                "hba1c": patient.get("hba1c"),
+                "diabetes_duration": patient.get("diabetes_duration"),
+                "sugar_level": patient.get("sugar_level"),
+            }
+
+        progression = payload.get("progression")
+        if not progression:
+            progression = assess_progression_risk(
+                current_scan={
+                    "id": scan.get("id"),
+                    "stage": scan.get("stage"),
+                    "confidence": scan.get("confidence"),
+                },
+                previous_scans=previous_scans,
+                patient_profile=patient_profile,
+            )
+
+        triage = decide_referral(
+            screening={
+                "stage": scan.get("stage", 0),
+                "confidence": scan.get("confidence", 0.0),
+            },
+            progression=progression,
+            doctor_review_present=doctor_review_present,
+        )
+
+        # Persist referral decision if patient linked
+        if patient_id:
+            save_referral(
+                scan_id=scan_id,
+                patient_id=patient_id,
+                triage_data=triage,
+                doctor_review_status="APPROVED" if doctor_review_present else "PENDING",
+            )
+
+        return jsonify({
+            "success": True,
+            "scan_id": scan_id,
+            "triage": triage,
+            "progression": progression,
+        })
+    except ValueError as ve:
+        return jsonify({"success": False, "error": str(ve)}), 400
+    except Exception as e:
+        log.exception("Triage policy error")
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+@app.route("/api/patients/<patient_id>/timeline", methods=["GET"])
+def api_patient_timeline(patient_id):
+    """Retrieve chronological longitudinal timeline for a patient."""
+    try:
+        timeline = get_patient_timeline(patient_id)
+        return jsonify({"success": True, "timeline": timeline})
+    except ValueError as ve:
+        return jsonify({"success": False, "error": str(ve)}), 404
+    except Exception as e:
+        log.exception("Timeline retrieval error")
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+@app.route("/api/screenings/safety-check", methods=["POST"])
+def api_screening_safety():
+    """Evaluate image quality, confidence, and agreement to produce a safety decision."""
+    try:
+        payload = request.get_json(silent=True) or {}
+        quality = payload.get("quality_assessment")
+        primary = payload.get("primary_prediction")
+        secondary = payload.get("secondary_prediction")
+
+        safety = evaluate_safety(
+            quality_assessment=quality,
+            primary_prediction=primary,
+            secondary_prediction=secondary,
+        )
+
+        return jsonify({
+            "success": True,
+            "safety": {
+                "status": safety.status,
+                "overall_quality_score": safety.overall_quality_score,
+                "model_confidence": safety.model_confidence,
+                "reasons": safety.reasons,
+                "human_review_required": safety.human_review_required,
+                "retake_guidance": safety.retake_guidance,
+                "disclaimer": safety.disclaimer,
+                "metadata": safety.metadata,
+            }
+        })
+    except Exception as e:
+        log.exception("Safety evaluation error")
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+@app.route("/api/medical/query", methods=["POST"])
+def api_medical_query():
+    """Execute grounded clinical guideline query with verified citations."""
+    try:
+        payload = request.get_json(silent=True) or {}
+        query_text = payload.get("query", "").strip()
+        clinical_context = payload.get("clinical_context")
+        if not query_text:
+            return jsonify({"success": False, "error": "Query string is required."}), 400
+
+        resp = rag_retriever.query(query_text, clinical_context)
+        return jsonify({
+            "success": True,
+            "query": query_text,
+            "answer": resp.answer,
+            "citations": [
+                {
+                    "id": c.id,
+                    "title": c.title,
+                    "organization": c.organization,
+                    "year": c.year,
+                    "section": c.section,
+                    "citation": c.citation,
+                    "relevance_score": c.relevance_score,
+                }
+                for c in resp.citations
+            ],
+            "confidence": resp.confidence,
+            "evidence_found": resp.evidence_found,
+            "disclaimer": resp.disclaimer,
+            "metadata": resp.metadata,
+        })
+    except Exception as e:
+        log.exception("Medical query RAG error")
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+@app.route("/api/scans/<scan_id>/doctor-review", methods=["POST"])
+@require_role(Role.DOCTOR, Role.ADMIN)
+def api_scan_doctor_review(scan_id):
+    """Submit doctor sign-off / review for a screening."""
+    try:
+        scan = get_scan(scan_id)
+        if not scan:
+            return jsonify({"success": False, "error": "Scan not found."}), 404
+
+        payload = request.get_json(silent=True) or {}
+        doctor_id = payload.get("doctor_id") or "DOC-ONLINE"
+        doctor_name = payload.get("doctor_name") or "Attending Ophthalmologist"
+        decision = payload.get("decision") or "APPROVED"  # APPROVED | MODIFIED | REJECTED_RETAKE
+        original_stage = int(scan.get("stage", 0))
+        adjusted_stage = payload.get("adjusted_stage")
+        if adjusted_stage is not None:
+            adjusted_stage = int(adjusted_stage)
+        approved_priority = payload.get("approved_priority") or (
+            "URGENT" if original_stage >= 3 else "EARLY" if original_stage >= 2 else "ROUTINE"
+        )
+        clinical_notes = payload.get("clinical_notes", "")
+        recommended_intervention = payload.get("recommended_intervention", "")
+
+        patient_id = scan.get("patient_id")
+        saved = save_doctor_review(
+            scan_id=scan_id,
+            patient_id=patient_id,
+            doctor_id=doctor_id,
+            doctor_name=doctor_name,
+            decision=decision,
+            original_stage=original_stage,
+            adjusted_stage=adjusted_stage,
+            approved_priority=approved_priority,
+            clinical_notes=clinical_notes,
+            recommended_intervention=recommended_intervention,
+        )
+
+        return jsonify({
+            "success": True,
+            "scan_id": scan_id,
+            "review": saved,
+        })
+    except ValueError as ve:
+        return jsonify({"success": False, "error": str(ve)}), 400
+    except Exception as e:
+        log.exception("Doctor review submission error")
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+@app.route("/api/scans/<scan_id>/doctor-review", methods=["GET"])
+def api_get_doctor_review(scan_id):
+    """Retrieve clinician sign-off details for a scan."""
+    try:
+        review = get_doctor_review(scan_id)
+        return jsonify({
+            "success": True,
+            "scan_id": scan_id,
+            "review": review,
+        })
+    except Exception as e:
+        log.exception("Doctor review retrieval error")
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+# ========================================
+# AUTH & RBAC ENDPOINTS
+# ========================================
+
+@app.route("/api/auth/login", methods=["POST"])
+def api_auth_login():
+    """Generate session access token for DrishtiAI roles."""
+    data = request.get_json(silent=True) or {}
+    user_id = data.get("user_id", "").strip() or f"user-{uuid.uuid4().hex[:6]}"
+    requested_role = str(data.get("role") or Role.HEALTH_WORKER.value).upper()
+    valid_roles = {r.value for r in Role}
+    if requested_role not in valid_roles:
+        return jsonify({
+            "success": False,
+            "error": f"Invalid role: {requested_role}. Valid roles are: {sorted(list(valid_roles))}"
+        }), 400
+
+    token = create_access_token(user_id=user_id, role=requested_role)
+    return jsonify({
+        "success": True,
+        "token": token,
+        "user": {
+            "user_id": user_id,
+            "role": requested_role,
+        }
+    })
+
+
+@app.route("/api/auth/me", methods=["GET"])
+def api_auth_me():
+    """Retrieve identity and privileges of active session actor."""
+    actor = get_current_actor()
+    return jsonify({
+        "success": True,
+        "actor": actor,
+    })
+
+
+# ========================================
+# OFFLINE SYNC RECONCILIATION
+# ========================================
+
+@app.route("/api/sync", methods=["POST"])
+@require_role(Role.ADMIN, Role.HEALTH_WORKER, Role.DOCTOR)
+def api_sync_batch():
+    """Reconcile offline sync events from edge screening devices."""
+    payload = request.get_json(silent=True) or {}
+    events = payload.get("events")
+    if not isinstance(events, list):
+        return jsonify({"success": False, "error": "Invalid format: 'events' must be an array"}), 400
+
+    result = reconcile_sync_batch(events)
+    return jsonify({
+        "success": True,
+        "reconciliation": result,
+    })
+
+
+@app.route("/api/sync/status", methods=["GET"])
+def api_sync_status():
+    """Retrieve ledger synchronization health and backlog depth."""
+    status = get_sync_status()
+    return jsonify({
+        "success": True,
+        "status": status,
+    })
+
+
+@app.route("/api/sync/pending", methods=["GET"])
+@require_role(Role.ADMIN, Role.HEALTH_WORKER)
+def api_sync_pending():
+    """Retrieve pending sync events for local device synchronization."""
+    device_id = request.args.get("device_id")
+    limit = int(request.args.get("limit", 100))
+    events = get_pending_sync_events(device_id=device_id, limit=limit)
+    return jsonify({
+        "success": True,
+        "count": len(events),
+        "events": events,
+    })
+
+
+# ========================================
+# OBSERVABILITY & CLINICAL METRICS
+# ========================================
+
+@app.route("/api/analytics/metrics", methods=["GET"])
+def api_analytics_metrics():
+    """Aggregate structured system observability, epidemiology, and referral metrics."""
+    metrics = get_observability_metrics()
+    return jsonify({
+        "success": True,
+        "metrics": metrics,
+    })
 
 
 @app.route("/analyze", methods=["POST"])

@@ -1,0 +1,74 @@
+[
+  {
+    "id": "AIOS-DR-001",
+    "title": "Clinical Practice Guidelines for Management of Diabetic Retinopathy",
+    "organization": "All India Ophthalmological Society (AIOS)",
+    "year": 2023,
+    "section": "Screening Intervals and Primary Triage",
+    "stage_applicability": [0, 1],
+    "keywords": ["screening", "interval", "stage 0", "stage 1", "mild npdr", "annual", "follow-up"],
+    "summary": "Patients with no retinopathy (Stage 0) require rescreening annually. Patients with Mild NPDR (Stage 1) without macular edema should be re-evaluated every 6 to 12 months with optimized systemic glycemic and blood pressure control.",
+    "evidence_text": "In patients with Type 2 Diabetes Mellitus with no visible diabetic retinopathy (Stage 0), annual dilated retinal examination or validated fundus photography is recommended. For patients exhibiting only microaneurysms (Mild NPDR, Stage 1) and no macular involvement, repeat screening within 6-12 months is standard protocol. Aggressive management of HbA1c (<7.0%) and blood pressure (<130/80 mmHg) significantly retards progression.",
+    "citation": "All India Ophthalmological Society (AIOS) Diabetic Retinopathy Guidelines Task Force. Indian J Ophthalmol. 2023;71(4):1120-1135."
+  },
+  {
+    "id": "AIOS-DR-002",
+    "title": "Referral Thresholds for Moderate and Severe NPDR",
+    "organization": "All India Ophthalmological Society (AIOS)",
+    "year": 2023,
+    "section": "Referral Protocols for Secondary Care",
+    "stage_applicability": [2, 3],
+    "keywords": ["moderate npdr", "severe npdr", "referral", "stage 2", "stage 3", "macular edema", "specialist"],
+    "summary": "Moderate NPDR (Stage 2) requires specialist ophthalmologist review within 3-6 months. Severe NPDR (Stage 3) mandates urgent referral to a vitreoretinal specialist within 2-4 weeks due to high risk of progression to proliferative disease.",
+    "evidence_text": "Patients classified as Moderate NPDR (more than microaneurysms, including intraretinal hemorrhages or cotton wool spots) must be referred to an ophthalmologist for comprehensive stereoscopic evaluation within 3 to 6 months. Severe NPDR (meeting the 4:2:1 rule: diffuse intraretinal hemorrhages in 4 quadrants, venous beading in 2, or IRMA in 1) carries a 50% one-year risk of developing high-risk PDR; urgent referral within 2-4 weeks for consideration of panretinal photocoagulation (PRP) is imperative.",
+    "citation": "AIOS Guidelines for Screening and Management of Diabetic Retinopathy in India. Indian J Ophthalmol. 2023;71(4):1136-1148."
+  },
+  {
+    "id": "AIOS-DR-003",
+    "title": "Emergency Vitreoretinal Intervention Protocol for PDR",
+    "organization": "All India Ophthalmological Society (AIOS)",
+    "year": 2023,
+    "section": "Proliferative Diabetic Retinopathy (PDR) & Vitreous Hemorrhage",
+    "stage_applicability": [4],
+    "keywords": ["proliferative dr", "pdr", "stage 4", "neovascularization", "vitreous hemorrhage", "laser", "emergency"],
+    "summary": "Proliferative Diabetic Retinopathy (Stage 4) is a sight-threatening ophthalmic emergency requiring immediate referral within 24 to 48 hours for urgent laser photocoagulation (PRP) or anti-VEGF therapy.",
+    "evidence_text": "Neovascularization of the disc (NVD) or retina elsewhere (NVE), pre-retinal or vitreous hemorrhage, or fibrovascular proliferation represents high-risk Proliferative Diabetic Retinopathy (Stage 4). Immediate referral to a vitreoretinal center within 24-48 hours is mandatory. Prompt panretinal photocoagulation (PRP) supplemented by anti-VEGF pharmacotherapy reduces severe vision loss risk by over 50%.",
+    "citation": "AIOS Clinical Practice Guidelines: Proliferative Diabetic Retinopathy. Indian J Ophthalmol. 2023;71(4):1149-1160."
+  },
+  {
+    "id": "ICMR-DR-001",
+    "title": "Guidelines for Screening and Management of Diabetic Retinopathy in India",
+    "organization": "Indian Council of Medical Research (ICMR)",
+    "year": 2024,
+    "section": "Systemic Risk Modifiers & Glycemic Target Thresholds",
+    "stage_applicability": [0, 1, 2, 3, 4],
+    "keywords": ["hba1c", "glycemic control", "blood sugar", "risk modifier", "hypertension", "duration"],
+    "summary": "HbA1c levels >= 8.0%, diabetes duration > 10 years, and uncontrolled hypertension accelerate retinal microvascular deterioration by 1.5x to 2.0x, elevating screening frequency priority.",
+    "evidence_text": "Chronic hyperglycemia (HbA1c >= 8.0%) accelerates pericyte dropout and endothelial capillary basement membrane thickening. When combined with systemic hypertension (>140/90 mmHg) or nephropathy (microalbuminuria), progression velocity from non-referable to referable DR increases nearly twofold. Screening intervals should be shortened by half in patients with HbA1c > 9.0% or active renal co-morbidity.",
+    "citation": "ICMR National Task Force for Non-Communicable Diseases. Guidelines for Diagnosis and Management of Diabetic Retinopathy. ICMR New Delhi, 2024;32-45."
+  },
+  {
+    "id": "WHO-DR-001",
+    "title": "Universal Eye Health: Global Action Plan and Screening Standards",
+    "organization": "World Health Organization (WHO)",
+    "year": 2022,
+    "section": "Community-Based Non-Mydriatic Tele-Screening",
+    "stage_applicability": [0, 1, 2, 3, 4],
+    "keywords": ["who", "telemedicine", "community screening", "retake", "quality", "decision support"],
+    "summary": "WHO mandates that AI decision-support systems in primary healthcare must incorporate image quality checks and never substitute for specialist diagnosis without clinician confirmation.",
+    "evidence_text": "Artificial intelligence-based screening tools deployed in rural and decentralized health facilities must enforce strict image quality gates (IQA) before inference. Poor quality images should trigger on-site retake guidance. AI results must serve as triage assistance; affirmative clinical referrals for referable stages (moderate NPDR and above) require definitive specialist examination and human-in-the-loop sign-off.",
+    "citation": "World Health Organization. Guide for Action: Screening and Management of Diabetes-related Eye Complications. WHO Geneva, 2022; ISBN 978-92-4-004454-8."
+  },
+  {
+    "id": "ICO-DR-001",
+    "title": "ICO Guidelines for Diabetic Eye Care",
+    "organization": "International Council of Ophthalmology (ICO)",
+    "year": 2023,
+    "section": "Diabetic Macular Edema (DME) Screening & Warning Signals",
+    "stage_applicability": [1, 2, 3, 4],
+    "keywords": ["dme", "macular edema", "exudates", "central vision", "anti-vegf", "macula"],
+    "summary": "Hard exudates within 1 disc diameter of the foveal center indicate diabetic macular edema (DME), requiring urgent specialist optical coherence tomography (OCT) regardless of NPDR stage.",
+    "evidence_text": "Diabetic macular edema (DME) can develop at any stage of diabetic retinopathy and is the primary cause of moderate visual impairment. Any retinal thickening or lipid exudates situated within 500 microns of the foveal center or retinal edema involving the center of the macula mandates urgent ophthalmologist evaluation for spectral-domain OCT and intravitreal anti-VEGF therapy within 1 month.",
+    "citation": "International Council of Ophthalmology (ICO). ICO Guidelines for Diabetic Eye Care: Updated Global Consensus. Ophthalmology. 2023;130(7):720-738."
+  }
+]

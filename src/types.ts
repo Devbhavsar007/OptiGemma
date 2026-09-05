@@ -201,3 +201,98 @@ export interface DashboardStats {
 export type ReportLanguage = 'english' | 'hindi' | 'gujarati';
 
 export type ActiveView = 'landing' | 'dashboard' | 'new-scan' | 'batch-screening' | 'patients' | 'patient-detail';
+
+export interface ProgressionAssessment {
+  engine: string;
+  observed_data: {
+    current_stage: number;
+    previous_stage: number | null;
+    stage_delta: number | null;
+    current_confidence: number;
+  };
+  predicted_risk: {
+    risk_category: 'LOW' | 'MODERATE' | 'HIGH';
+    six_month_risk: number;
+    twelve_month_risk: number;
+    supporting_factors: string[];
+    uncertainty_flags: string[];
+  };
+  clinical_recommendation: {
+    follow_up_priority: 'LOW' | 'MEDIUM' | 'HIGH';
+    human_review_recommended: boolean;
+    note: string;
+  };
+}
+
+export interface TriageDecision {
+  priority: 'ROUTINE' | 'EARLY' | 'URGENT';
+  reasonCodes: string[];
+  humanReviewRequired: boolean;
+  disclaimer: string;
+}
+
+export interface SafetyDecision {
+  status: 'PROCEED' | 'UNCERTAIN' | 'RETAKE_REQUIRED';
+  overall_quality_score: number;
+  model_confidence: number;
+  reasons: string[];
+  human_review_required: boolean;
+  retake_guidance: string | null;
+  disclaimer: string;
+}
+
+export interface TimelineEvent {
+  scan_id: string;
+  patient_id: string;
+  date: string;
+  stage: DRStage;
+  stage_name: string;
+  confidence: number;
+  severity: string;
+  stage_delta: number | null;
+  progression?: ProgressionAssessment | null;
+  referral?: TriageDecision | null;
+  doctor_review_status?: string;
+  image_thumbnail?: string;
+}
+
+export interface PatientTimelineData {
+  patient: Patient;
+  total_events: number;
+  events: TimelineEvent[];
+}
+
+export interface DoctorReview {
+  id?: string;
+  scan_id: string;
+  patient_id: string;
+  doctor_id: string;
+  doctor_name: string;
+  decision: 'APPROVED' | 'MODIFIED' | 'REJECTED_RETAKE';
+  original_stage: DRStage;
+  adjusted_stage?: DRStage | null;
+  approved_priority: 'ROUTINE' | 'EARLY' | 'URGENT';
+  clinical_notes: string;
+  recommended_intervention?: string;
+  created_at?: string;
+}
+
+export interface ClinicalCitation {
+  id: string;
+  title: string;
+  organization: string;
+  year: number;
+  section: string;
+  citation: string;
+  relevance_score: number;
+}
+
+export interface GroundedMedicalQueryResponse {
+  query: string;
+  answer: string;
+  citations: ClinicalCitation[];
+  confidence: number;
+  evidence_found: boolean;
+  disclaimer: string;
+  metadata?: Record<string, any>;
+}
